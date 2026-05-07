@@ -2,5 +2,5 @@
 
 from ._loop import loop
 
-__version__ = "0.1.4"
+__version__ = "0.2.1"
 __all__ = ["loop"]
