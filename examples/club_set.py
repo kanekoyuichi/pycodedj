@@ -1,44 +1,24 @@
 # PyCodeDJ club groove — EDM edition
 #
-# Four-on-the-floor kick · sub bass · acid squelch · rave stabs · hoover
-#
+# 8 loops, each with a distinct code structure and sonic role.
 # Load sc/synths.scd in SuperCollider, then run:
 #   pycodedj watch examples/club_set.py
 #
 # Code structure → sound (by design):
 #
-#   foundation  kick_hard + floor_kick + sub_bass
-#                 depth=1-2 → cutoff  580-960 Hz  (dark, locked to kick)
-#                 cf=0-1    → lfo     0.10-0.59 Hz (static)
-#
-#   groove      bass_reese + bass_acid
-#                 depth=3-4 → cutoff 1340-1720 Hz  (mid)
-#                 cf=3-4    → lfo    1.57-2.06 Hz
-#
-#   rhythm      hat_engine + hat_ride + clap_snare
-#                 depth=4-6 → cutoff 1720-2480 Hz  (bright to crisp)
-#                 cf=3-9    → lfo    1.57-4.51 Hz
-#
-#   harmonic    chord_rave + stab_saw
-#                 depth=4-6 → cutoff 1720-2480 Hz  (bright)
-#                 cf=4-7    → lfo    2.06-3.53 Hz
-#
-#   lead        lead_hoover
-#                 depth=5   → cutoff 2100 Hz
-#                 2 comments → reverb 0.13 (air without washing out)
-#
-#   build       snare_roll
-#                 depth=4   → cutoff 1720 Hz
-#                 cf=3      → lfo    1.57 Hz  (lfoRate drives roll speed)
-#
-#   space       shimmer_pad + warehouse_air
-#                 depth=1   → cutoff  580 Hz
-#                 comments  → reverb 0.50-0.53
+#   kick_hard    depth=1, cf=0  →  580 Hz,  0.10 Hz LFO  (dark, static)
+#   sub_bass     depth=2, cf=1  →  960 Hz,  0.59 Hz LFO  (dark sub pulse)
+#   bass_acid    depth=5, cf=4  → 2100 Hz,  2.06 Hz LFO  (acid squelch)
+#   hat_engine   depth=7, cf=9  → 2860 Hz,  4.51 Hz LFO  (brightest, fastest)
+#   clap_snare   depth=6, cf=5  → 2480 Hz,  2.55 Hz LFO  (bright backbeat)
+#   chord_rave   depth=7, cf=7  → 2860 Hz,  3.53 Hz LFO  (rave stabs)
+#   lead_hoover  depth=5, cf=4  → 2100 Hz,  2.06 Hz LFO  reverb=0.15
+#   shimmer_pad  depth=1, cf=0  →  580 Hz,  0.10 Hz LFO  reverb=0.60
 
 from pycodedj import loop
 
 
-# --- Foundation (depth=1-2: darkest, static, bone-dry) ---
+# --- Foundation: dead simple, bone-dry ---
 
 @loop("kick_hard", interval=1.0)
 def four_on_floor(volume=0.9):
@@ -46,48 +26,35 @@ def four_on_floor(volume=0.9):
     _ = hit
 
 
-@loop("floor_kick", interval=1.0)
-def kick_body(volume=0.6):
-    boom = "punch"
-    _ = boom
-
+# --- Sub: minimal pulse, barely more than the kick ---
 
 @loop("sub_bass", interval=1.0)
-def sub_layer(volume=0.42):
+def sub_layer(volume=0.4):
     for beat in range(4):
         sub = "low"
         _ = sub
 
 
-# --- Groove (depth=3-4: mid-dark, bass movement and acid squelch) ---
-
-@loop("bass_reese", interval=0.5)
-def reese_groove(volume=0.28):
-    for step in range(8):
-        if step % 4 == 0:
-            note = "root"
-        elif step % 2 == 0:
-            note = "fifth"
-        else:
-            note = "slide"
-        _ = note
-
+# --- Groove: syncopated acid sequence with accents ---
 
 @loop("bass_acid", interval=0.5)
-def acid_line(volume=0.2):
-    for step in range(8):
-        if step % 4 == 0:
-            note = "root"
-        elif step % 2 == 0:
-            for accent in range(2):
-                note = f"sq{accent}"
-                _ = note
-        else:
-            note = "skip"
-        _ = note
+def acid_line(volume=0.22):
+    pattern = [
+        ("hit", True), ("skip", False), ("slide", True),
+        ("hit", True), ("skip", False), ("accent", True),
+        ("skip", False), ("slide", True),
+    ]
+    for step, (note, active) in enumerate(pattern):
+        if active:
+            for layer in range(2):
+                if layer == 0:
+                    out = note
+                else:
+                    out = f"{note}_tail"
+                _ = out
 
 
-# --- Rhythm (depth=4-6: bright, driving grid above groove layer) ---
+# --- Hats: mechanical 16th-note grid ---
 
 @loop("hat_engine", interval=0.25)
 def closed_hats(volume=0.13):
@@ -115,14 +82,7 @@ def closed_hats(volume=0.13):
             _ = hat
 
 
-@loop("hat_ride", interval=0.5)
-def offbeat_ride(volume=0.08):
-    for bar in range(4):
-        for beat in range(2):
-            if beat == 1:
-                ride = "open"
-                _ = ride
-
+# --- Backbeat: decisive 2 & 4 with fill on bar 4 ---
 
 @loop("clap_snare", interval=1.0)
 def backbeat(volume=0.26):
@@ -140,10 +100,10 @@ def backbeat(volume=0.26):
             _ = hit
 
 
-# --- Harmonic (depth=4-6: brightest, energy and euphoria) ---
+# --- Harmonic: stacked chord voices across phrases ---
 
 @loop("chord_rave", interval=2.0)
-def rave_stabs(volume=0.15):
+def rave_stabs(volume=0.14):
     for phrase in range(4):
         for voice in range(3):
             for harmonic in range(2):
@@ -161,23 +121,10 @@ def rave_stabs(volume=0.15):
                 _ = chord
 
 
-@loop("stab_saw", interval=1.0)
-def saw_layer(volume=0.16):
-    for phrase in range(8):
-        for voice in range(3):
-            if phrase % 4 == 0:
-                stab = "down"
-            elif phrase % 2 == 0:
-                stab = "up"
-            else:
-                stab = "tail"
-            _ = stab
-
-
-# --- Lead (depth=5: bright, slight reverb from comments) ---
+# --- Lead: phrase-based, slight air ---
 
 @loop("lead_hoover", interval=4.0)
-def hoover(volume=0.12):
+def hoover(volume=0.11):
     # classic rave swell
     # builds and drops
     for phrase in range(4):
@@ -190,35 +137,14 @@ def hoover(volume=0.12):
                 _ = motion
 
 
-# --- Build (snare_roll: lfoRate controls how fast the roll runs) ---
-
-@loop("snare_roll", interval=1.0)
-def roll_build(volume=0.18):
-    for tick in range(16):
-        if tick % 2 == 0:
-            for layer in range(2):
-                roll = f"r{layer}"
-                _ = roll
-
-
-# --- Space (depth=1: dark, maximum reverb from comment ratio) ---
+# --- Space: pure atmosphere, no code at all ---
 
 @loop("shimmer_pad", interval=8.0)
-def shimmer(volume=0.07):
+def shimmer(volume=0.06):
     # wide hall reverb
     # slow harmonic drift
     # always underneath everything
     # never noticed until it stops
     # consonance without definition
     # air between the notes
-    pass
-
-
-@loop("warehouse_air", interval=4.0)
-def room_tone(volume=0.06):
-    # concrete walls
-    # low ceiling pressing down
-    # crowd warmth from two hundred bodies
-    # sub frequencies bleeding through
-    # smoke machine haze
     pass

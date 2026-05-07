@@ -517,7 +517,7 @@ To stop a loop, delete the entire `@loop`-decorated function from the file and s
 
 ## 8. Club set example — running club_set.py
 
-`examples/club_set.py` is a four-on-the-floor EDM groove with 7 layers and 14 loops. Code structure (nesting depth, branch count, comment ratio) determines filter brightness, modulation speed, and reverb for each layer.
+`examples/club_set.py` is a four-on-the-floor EDM groove built from 8 loops, each with a deliberately distinct code structure and sonic role.
 
 For the full list of available sounds, see [Chapter 9: Sound Reference](#9-sound-reference).
 
@@ -525,22 +525,16 @@ Loop names such as `@loop("kick_hard", ...)` are interpreted as sound names on t
 
 ### club_set.py loop overview
 
-| Loop name | Layer | Character |
-| :--- | :--- | :--- |
-| `kick_hard` | foundation | Four-on-the-floor main kick (depth=1, 580 Hz, dry) |
-| `floor_kick` | foundation | Kick body / weight layer (depth=1, 580 Hz, dry) |
-| `sub_bass` | foundation | Deep sub bass (depth=2, 960 Hz, dry) |
-| `bass_reese` | groove | Detuned Reese bass movement (depth=4, 1720 Hz) |
-| `bass_acid` | groove | TB-303-style acid line (depth=5, 2100 Hz) |
-| `hat_engine` | rhythm | 16th-note hi-hat grid (depth=7, 2860 Hz, fastest LFO) |
-| `hat_ride` | rhythm | Offbeat ride / open hat (depth=4, 1720 Hz) |
-| `clap_snare` | rhythm | Backbeat on beats 2 & 4 (depth=6, 2480 Hz) |
-| `chord_rave` | harmonic | Rave chord stabs (depth=7, 2860 Hz) |
-| `stab_saw` | harmonic | Detuned saw chord layer (depth=5, 2100 Hz) |
-| `lead_hoover` | lead | Classic hoover lead (depth=5, 2100 Hz, slight reverb) |
-| `snare_roll` | build | Snare roll build-up (depth=4, 1720 Hz) |
-| `shimmer_pad` | space | Shimmer pad (heavy comments, reverb 0.60) |
-| `warehouse_air` | space | Warehouse ambience (comments only, reverb 0.57) |
+| Loop name | Role | Code style | Cutoff / LFO |
+| :--- | :--- | :--- | :--- |
+| `kick_hard` | Four-on-the-floor kick | Single assignment (minimal) | 580 Hz / 0.10 Hz |
+| `sub_bass` | Deep sub bass | Simple for loop | 960 Hz / 0.59 Hz |
+| `bass_acid` | Acid line | List pattern + double loop + if | 2100 Hz / 2.06 Hz |
+| `hat_engine` | 16th-note hi-hat grid | Double for + multi-level if/elif (most complex) | 2860 Hz / 4.51 Hz |
+| `clap_snare` | Backbeat 2 & 4 | Double for + if/elif + nested if | 2480 Hz / 2.55 Hz |
+| `chord_rave` | Rave chord stabs | Triple for + multi-level if/elif | 2860 Hz / 3.53 Hz |
+| `lead_hoover` | Classic hoover lead | Comments + double for + two-level if | 2100 Hz / 2.06 Hz, reverb 0.15 |
+| `shimmer_pad` | Depth and atmosphere | Comments only, no code | 580 Hz / 0.10 Hz, reverb 0.60 |
 
 ### Getting it running
 

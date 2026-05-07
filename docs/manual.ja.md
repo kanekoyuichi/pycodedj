@@ -521,7 +521,7 @@ eval で止めたい場合は、関数名の `def` だけを残して本体を�
 
 ## 8. クラブセット例 — club_set.py を動かす
 
-`examples/club_set.py` は、四つ打ちを中心とした EDM クラブグルーヴのデモファイルです。foundation / groove / rhythm / harmonic / lead / build / space の 7 層 14 ループ構成で、各ループのコード構造が音域・変調速度・リバーブを決定します。
+`examples/club_set.py` は、四つ打ちを中心とした EDM クラブグルーヴのデモファイルです。8 ループで構成され、各ループのコード構造が意図的に異なるキャラクターを持つよう設計されています。
 
 全 30 音色を 1 音ずつ確認したい場合は `examples/sound_showcase.py` を使います。
 
@@ -535,22 +535,16 @@ pycodedj eval examples/sound_showcase.py::bell_rave
 
 ### club_set.py のループ構成
 
-| ループ名 | レイヤー | キャラクター |
-| :--- | :--- | :--- |
-| `kick_hard` | foundation | 四つ打ち主軸キック（depth=1、580Hz、ドライ） |
-| `floor_kick` | foundation | キックの厚み補強（depth=1、580Hz、ドライ） |
-| `sub_bass` | foundation | ディープサブベース（depth=2、960Hz、ドライ） |
-| `bass_reese` | groove | Reese ベースの揺れ（depth=4、1720Hz） |
-| `bass_acid` | groove | TB-303 アシッドライン（depth=5、2100Hz） |
-| `hat_engine` | rhythm | 16分ハットグリッド（depth=7、2860Hz、最速 LFO） |
-| `hat_ride` | rhythm | オフビートライド（depth=4、1720Hz） |
-| `clap_snare` | rhythm | 2・4拍バックビート（depth=6、2480Hz） |
-| `chord_rave` | harmonic | レイブコードスタブ（depth=7、2860Hz） |
-| `stab_saw` | harmonic | デチューンソー層（depth=5、2100Hz） |
-| `lead_hoover` | lead | Hoover 風リード（depth=5、2100Hz、微リバーブ） |
-| `snare_roll` | build | スネアロール・ビルドアップ（depth=4、1720Hz） |
-| `shimmer_pad` | space | シマーパッド（コメント多め、reverb 0.60） |
-| `warehouse_air` | space | 倉庫の空気感（コメントのみ、reverb 0.57） |
+| ループ名 | 役割 | コード構造の特徴 | cutoff / LFO |
+| :--- | :--- | :--- | :--- |
+| `kick_hard` | 四つ打ちキック | 1行代入のみ（最小） | 580Hz / 0.10Hz |
+| `sub_bass` | ディープサブ | 単純な for ループ | 960Hz / 0.59Hz |
+| `bass_acid` | アシッドライン | リスト展開 + 二重ループ + if | 2100Hz / 2.06Hz |
+| `hat_engine` | 16分ハットグリッド | 二重 for + 多段 if/elif（最複雑） | 2860Hz / 4.51Hz |
+| `clap_snare` | 2・4拍バックビート | 二重 for + if/elif + ネスト if | 2480Hz / 2.55Hz |
+| `chord_rave` | レイブコードスタブ | 三重 for + 多段 if/elif | 2860Hz / 3.53Hz |
+| `lead_hoover` | Hoover 風リード | コメント + 二重 for + 二段 if | 2100Hz / 2.06Hz、reverb 0.15 |
+| `shimmer_pad` | 空気感・奥行き | コメントのみ、コードなし | 580Hz / 0.10Hz、reverb 0.60 |
 
 ### 動かしてみる
 
