@@ -124,18 +124,6 @@ s.waitForBoot({
         Out.ar(0, sig ! 2);
     }).add;
 
-    SynthDef(\pycodedj_build_riser, {
-        arg cutoff = 900, lfoRate = 0.2, reverbMix = 0.55, amp = 0.07, gate = 1;
-        var sweep, shimmer, pulse, sig, gateEnv;
-        pulse = LFPulse.kr(2.133, 0.5, 0.5).range(0.45, 1);
-        sweep = LFSaw.kr(lfoRate.clip(0.05, 0.4)).range(0, 1).exprange(500, cutoff.clip(1200, 9000));
-        shimmer = BPF.ar(WhiteNoise.ar(0.18), sweep, 0.18);
-        sig = HPF.ar(shimmer, 600) * pulse;
-        gateEnv = EnvGen.kr(Env.asr(2.0, 1, 2.0), gate, doneAction: 2);
-        sig = FreeVerb.ar(sig, reverbMix.clip(0.25, 0.9), 0.9, 0.45) * gateEnv * amp;
-        Out.ar(0, Pan2.ar(sig, SinOsc.kr(0.08).range(-0.35, 0.35)));
-    }).add;
-
     SynthDef(\pycodedj_glitch_ticks, {
         arg cutoff = 5000, lfoRate = 2.0, reverbMix = 0.08, amp = 0.06, gate = 1;
         var trig, rate, env, sig, gateEnv;
@@ -216,7 +204,6 @@ s.waitForBoot({
             "warehouse_air", { \pycodedj_warehouse_air },
             "kick_pulse", { \pycodedj_kick_pulse },
             "floor_kick", { \pycodedj_floor_kick },
-            "build_riser", { \pycodedj_build_riser },
             "glitch_ticks", { \pycodedj_glitch_ticks },
             "soft_pluck", { \pycodedj_soft_pluck },
             "dub_chord", { \pycodedj_dub_chord },

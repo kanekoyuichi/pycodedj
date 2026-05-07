@@ -7,7 +7,7 @@
 # - floor_kick is fixed near 128 BPM four-on-the-floor
 # - sub_bass carries physical low-end pressure and pumps against the kick
 # - hat_engine and clap_snap create the offbeat/backbeat groove
-# - dub_chord, warehouse_air, and build_riser add repetition, space, and tension
+# - dub_chord and warehouse_air add repetition and space without taking over
 
 
 # @loop floor_kick interval=1.0
@@ -72,15 +72,6 @@ def dub_chord():
         return "wide"
 
     return root(), fifth()
-
-
-# @loop build_riser interval=4.0
-# filter opens
-# pressure rises
-# crowd waits
-# kick returns
-def build_riser():
-    pass
 
 
 # @loop warehouse_air interval=4.0
