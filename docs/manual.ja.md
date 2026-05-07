@@ -186,13 +186,13 @@ PyCodeDJ synths loaded. Ready. OSC port: 57120
 
 SuperCollider は audio server を起動した時点の出力先を使います。Mac/PC 側でスピーカー、イヤホン、オーディオインターフェースなどの出力先を変更した場合は、SuperCollider の audio server を起動し直してください。
 
-まず使えるデバイス名を確認します。
+まず SuperCollider IDE のコードを書くドキュメントで、使えるデバイス名を確認します。これはターミナルではなく SuperCollider で実行します。
 
 ```supercollider
 ServerOptions.devices;
 ```
 
-Post window にデバイス名の一覧が表示されます。使いたい出力先の名前を確認したら、次のように指定します。
+Post window にデバイス名の一覧が表示されます。使いたい出力先の名前を確認したら、同じく SuperCollider IDE のコードを書くドキュメントで次のように指定します。
 
 ```supercollider
 s.quit;

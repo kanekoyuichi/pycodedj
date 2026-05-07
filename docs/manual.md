@@ -184,13 +184,13 @@ If this message does not appear, see [Troubleshooting](#10-troubleshooting).
 
 SuperCollider uses the audio output device that is active when the audio server boots. If you change the system output to speakers, headphones, or an audio interface, restart the SuperCollider audio server.
 
-First list the available device names:
+First list the available device names in a SuperCollider IDE code document. Run this in SuperCollider, not in your terminal:
 
 ```supercollider
 ServerOptions.devices;
 ```
 
-The device names appear in the Post window. After choosing the output device name, set it explicitly:
+The device names appear in the Post window. After choosing the output device name, set it explicitly in the same kind of SuperCollider code document:
 
 ```supercollider
 s.quit;
