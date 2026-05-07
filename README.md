@@ -179,10 +179,11 @@ Addresses used to communicate with SuperCollider.
 
 | Address | Type | Range | Parameter |
 | :--- | :--- | :--- | :--- |
-| `/pycodedj/loop/<name>/cutoff` | float | 200–4000 Hz | Filter Cutoff |
-| `/pycodedj/loop/<name>/lfo_rate` | float | 0.1–5.0 Hz | LFO rate |
-| `/pycodedj/loop/<name>/reverb` | float | 0.0–0.8 | Reverb depth |
-| `/pycodedj/loop/<name>/voice_count` | int | 1–4 | Polyphony voice count |
+| `/pycodedj/loop/<name>/params` | int, float, float, float | see parameter order | `voice_count`, `cutoff`, `lfo_rate`, `reverb` |
+| `/pycodedj/loop/<name>/cutoff` | float | 200–4000 Hz | Filter Cutoff (compatibility) |
+| `/pycodedj/loop/<name>/lfo_rate` | float | 0.1–5.0 Hz | LFO rate (compatibility) |
+| `/pycodedj/loop/<name>/reverb` | float | 0.0–0.8 | Reverb depth (compatibility) |
+| `/pycodedj/loop/<name>/voice_count` | int | 1–4 | Polyphony voice count (compatibility) |
 
 `<name>` is the loop name (e.g. `bass`, `melody`). Each loop has its own address namespace, so multiple loops never overwrite each other's parameters.
 

@@ -179,10 +179,11 @@ SuperCollider との通信に使うアドレスです。
 
 | アドレス | 型 | 値域 | 対応パラメーター |
 | :--- | :--- | :--- | :--- |
-| `/pycodedj/loop/<name>/cutoff` | float | 200–4000 Hz | フィルター Cutoff |
-| `/pycodedj/loop/<name>/lfo_rate` | float | 0.1–5.0 Hz | LFO レート |
-| `/pycodedj/loop/<name>/reverb` | float | 0.0–0.8 | リバーブ Depth |
-| `/pycodedj/loop/<name>/voice_count` | int | 1–4 | ポリフォニー声部数 |
+| `/pycodedj/loop/<name>/params` | int, float, float, float | パラメーター順を参照 | `voice_count`, `cutoff`, `lfo_rate`, `reverb` |
+| `/pycodedj/loop/<name>/cutoff` | float | 200–4000 Hz | フィルター Cutoff（互換用） |
+| `/pycodedj/loop/<name>/lfo_rate` | float | 0.1–5.0 Hz | LFO レート（互換用） |
+| `/pycodedj/loop/<name>/reverb` | float | 0.0–0.8 | リバーブ Depth（互換用） |
+| `/pycodedj/loop/<name>/voice_count` | int | 1–4 | ポリフォニー声部数（互換用） |
 
 `<name>` はブロック名（`bass`、`melody` など）です。ループごとに独立したアドレスを持つため、複数ループが同じパラメーターを上書きしません。
 

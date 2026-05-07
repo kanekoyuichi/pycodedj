@@ -39,13 +39,19 @@ class OscBridge:
 
     def send_params(self, name: str, params: "MusicParams") -> None:
         base = f"/pycodedj/loop/{name}"
-        # voice_count を先に送り SC 側でシンセを起動してから各パラメーターを適用させる
-        self.audio.send(f"{base}/voice_count", params.voice_count)
-        self.audio.send(f"{base}/cutoff", params.cutoff)
-        self.audio.send(f"{base}/lfo_rate", params.lfo_rate)
-        self.audio.send(f"{base}/reverb", params.reverb_mix)
+        # Keep audio updates atomic so SuperCollider does not set params on stale nodes.
+        self.audio.send(
+            f"{base}/params",
+            params.voice_count,
+            params.cutoff,
+            params.lfo_rate,
+            params.reverb_mix,
+        )
         if self.visual is not None:
-            self.visual.send(f"{base}/voice_count", params.voice_count)
-            self.visual.send(f"{base}/cutoff", params.cutoff)
-            self.visual.send(f"{base}/lfo_rate", params.lfo_rate)
-            self.visual.send(f"{base}/reverb", params.reverb_mix)
+            self.visual.send(
+                f"{base}/params",
+                params.voice_count,
+                params.cutoff,
+                params.lfo_rate,
+                params.reverb_mix,
+            )

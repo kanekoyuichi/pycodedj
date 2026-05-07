@@ -37,10 +37,7 @@ def test_send_params_addresses(mock_endpoint: OscEndpoint) -> None:
     bridge.send_params("bass", _make_params())
 
     calls = [c.args[0] for c in _send_mock(mock_endpoint).call_args_list]
-    assert "/pycodedj/loop/bass/cutoff" in calls
-    assert "/pycodedj/loop/bass/lfo_rate" in calls
-    assert "/pycodedj/loop/bass/reverb" in calls
-    assert "/pycodedj/loop/bass/voice_count" in calls
+    assert calls == ["/pycodedj/loop/bass/params"]
 
 
 def test_send_params_values(mock_endpoint: OscEndpoint) -> None:
@@ -48,20 +45,19 @@ def test_send_params_values(mock_endpoint: OscEndpoint) -> None:
     bridge.send_params("bass", _make_params())
 
     call_map = {c.args[0]: c.args[1] for c in _send_mock(mock_endpoint).call_args_list}
-    assert call_map["/pycodedj/loop/bass/cutoff"] == [800.0]
-    assert call_map["/pycodedj/loop/bass/voice_count"] == [2]
+    assert call_map["/pycodedj/loop/bass/params"] == [2, 800.0, 1.0, 0.3]
 
 
 def test_no_visual_sends_only_audio(mock_endpoint: OscEndpoint) -> None:
     bridge = OscBridge(audio=mock_endpoint, visual=None)
     bridge.send_params("bass", _make_params())
-    assert _send_mock(mock_endpoint).call_count == 4
+    assert _send_mock(mock_endpoint).call_count == 1
 
 
 def test_visual_receives_params(mock_endpoint: OscEndpoint, mock_visual: OscEndpoint) -> None:
     bridge = OscBridge(audio=mock_endpoint, visual=mock_visual)
     bridge.send_params("bass", _make_params())
-    assert _send_mock(mock_visual).call_count == 4
+    assert _send_mock(mock_visual).call_count == 1
 
 
 def test_osc_error_on_init_failure() -> None:

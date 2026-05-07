@@ -90,6 +90,7 @@ s.waitForBoot({
 
     // Registry: loop name -> array of running Synth instances
     ~loops = Dictionary.new;
+    ~loopParams = Dictionary.new;
 
     ~synthForLoop = { |name|
         switch (name,
@@ -104,13 +105,49 @@ s.waitForBoot({
 
     // Helper: start or restart a loop with given voice count
     ~startLoop = { |name, voiceCount = 1|
-        var synthName, synths;
+        var synthName, synths, params;
         if (~loops[name].notNil) {
             ~loops[name].do({ |synth| synth.set(\gate, 0) });
         };
+        params = ~loopParams[name] ?? {
+            (cutoff: 800, lfoRate: 0.5, reverbMix: 0.2)
+        };
+        ~loopParams[name] = params;
         synthName = ~synthForLoop.value(name);
-        synths = voiceCount.collect({ Synth(synthName) });
+        synths = voiceCount.collect({
+            Synth(synthName, [
+                \cutoff, params[\cutoff],
+                \lfoRate, params[\lfoRate],
+                \reverbMix, params[\reverbMix]
+            ])
+        });
         ~loops[name] = synths;
+    };
+
+    ~setLoopParam = { |name, key, val|
+        var params;
+        params = ~loopParams[name] ?? {
+            (cutoff: 800, lfoRate: 0.5, reverbMix: 0.2)
+        };
+        params[key] = val;
+        ~loopParams[name] = params;
+        if (~loops[name].notNil) {
+            ~loops[name].do({ |synth| synth.set(key, val) });
+        };
+    };
+
+    ~applyLoopParams = { |name, voiceCount, cutoff, lfoRate, reverbMix|
+        var params;
+        params = (cutoff: cutoff, lfoRate: lfoRate, reverbMix: reverbMix);
+        ~loopParams[name] = params;
+        if (voiceCount.asInteger <= 0) {
+            if (~loops[name].notNil) {
+                ~loops[name].do({ |synth| synth.set(\gate, 0) });
+                ~loops[name] = nil;
+            };
+        } {
+            ~startLoop.value(name, voiceCount.asInteger);
+        };
     };
 
     // Single handler for all /pycodedj/loop/<name>/<param> addresses.
@@ -142,9 +179,14 @@ s.waitForBoot({
                         ~startLoop.value(name, val.asInteger);
                     };
                 },
-                "cutoff",    { ~loops[name].do({ |synth| synth.set(\cutoff,    val.asFloat) }) },
-                "lfo_rate",  { ~loops[name].do({ |synth| synth.set(\lfoRate,   val.asFloat) }) },
-                "reverb",    { ~loops[name].do({ |synth| synth.set(\reverbMix, val.asFloat) }) }
+                "cutoff",    { ~setLoopParam.value(name, \cutoff,    val.asFloat) },
+                "lfo_rate",  { ~setLoopParam.value(name, \lfoRate,   val.asFloat) },
+                "reverb",    { ~setLoopParam.value(name, \reverbMix, val.asFloat) },
+                "params",    {
+                    if (msg.size >= 5) {
+                        ~applyLoopParams.value(name, msg[1], msg[2].asFloat, msg[3].asFloat, msg[4].asFloat);
+                    };
+                }
             );
         };
     };

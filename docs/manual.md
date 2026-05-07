@@ -876,10 +876,11 @@ Address format used to communicate with SuperCollider. Reference these when conn
 
 | Address | Type | Range |
 | :--- | :--- | :--- |
-| `/pycodedj/loop/<name>/voice_count` | int | 1–4 (sent first) |
-| `/pycodedj/loop/<name>/cutoff` | float | 200–4000 |
-| `/pycodedj/loop/<name>/lfo_rate` | float | 0.1–5.0 |
-| `/pycodedj/loop/<name>/reverb` | float | 0.0–0.8 |
+| `/pycodedj/loop/<name>/params` | int, float, float, float | `voice_count`, `cutoff`, `lfo_rate`, `reverb` |
+| `/pycodedj/loop/<name>/voice_count` | int | 1–4 (compatibility) |
+| `/pycodedj/loop/<name>/cutoff` | float | 200–4000 (compatibility) |
+| `/pycodedj/loop/<name>/lfo_rate` | float | 0.1–5.0 (compatibility) |
+| `/pycodedj/loop/<name>/reverb` | float | 0.0–0.8 (compatibility) |
 
 ### Using the Python API directly
 
