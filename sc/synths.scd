@@ -124,31 +124,29 @@ s.waitForBoot({
 
     ~pycodedjOSC = { |msg, time, addr, recvPort|
         var parts, name, param, val;
-        parts = msg[0].asString.split($/);
+        parts = msg[0].asString.split($/).reject({ |part| part.size == 0 });
         // parts: ["pycodedj", "loop", <name>, <param>]
-        if (parts.size != 4) { ^nil };
-        if (parts[0] != "pycodedj") { ^nil };
-        if (parts[1] != "loop") { ^nil };
+        if ((parts.size == 4) and: { parts[0] == "pycodedj" } and: { parts[1] == "loop" }) {
+            name  = parts[2];
+            param = parts[3];
+            val   = msg[1];
 
-        name  = parts[2];
-        param = parts[3];
-        val   = msg[1];
-
-        switch (param,
-            "voice_count", {
-                if (val.asInteger <= 0) {
-                    if (~loops[name].notNil) {
-                        ~loops[name].do({ |synth| synth.set(\gate, 0) });
-                        ~loops[name] = nil;
+            switch (param,
+                "voice_count", {
+                    if (val.asInteger <= 0) {
+                        if (~loops[name].notNil) {
+                            ~loops[name].do({ |synth| synth.set(\gate, 0) });
+                            ~loops[name] = nil;
+                        };
+                    } {
+                        ~startLoop.value(name, val.asInteger);
                     };
-                } {
-                    ~startLoop.value(name, val.asInteger);
-                };
-            },
-            "cutoff",    { ~loops[name].do({ |synth| synth.set(\cutoff,    val.asFloat) }) },
-            "lfo_rate",  { ~loops[name].do({ |synth| synth.set(\lfoRate,   val.asFloat) }) },
-            "reverb",    { ~loops[name].do({ |synth| synth.set(\reverbMix, val.asFloat) }) }
-        );
+                },
+                "cutoff",    { ~loops[name].do({ |synth| synth.set(\cutoff,    val.asFloat) }) },
+                "lfo_rate",  { ~loops[name].do({ |synth| synth.set(\lfoRate,   val.asFloat) }) },
+                "reverb",    { ~loops[name].do({ |synth| synth.set(\reverbMix, val.asFloat) }) }
+            );
+        };
     };
     thisProcess.addOSCRecvFunc(~pycodedjOSC);
 
