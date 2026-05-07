@@ -135,7 +135,7 @@ From here, just write code and save.
 | File | Contents |
 | :--- | :--- |
 | `examples/demo.py` | Intro demo with bass / melody / pad |
-| `examples/club_set.py` | 8-layer club groove (14 loops, foundation → space) |
+| `examples/club_set.py` | 7-layer EDM groove (14 loops, four-on-the-floor kick → acid bass → rave stabs → space) |
 | `examples/sound_showcase.py` | All 30 synths — evaluate one at a time to audition each sound |
 
 ---

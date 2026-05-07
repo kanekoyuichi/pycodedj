@@ -517,7 +517,7 @@ To stop a loop, delete the entire `@loop`-decorated function from the file and s
 
 ## 8. Club set example — running club_set.py
 
-`examples/club_set.py` is a layered dancefloor groove with 8 layers and 14 loops. Code structure (nesting depth, branch count, comment ratio) determines brightness, modulation speed, and reverb for each layer.
+`examples/club_set.py` is a four-on-the-floor EDM groove with 7 layers and 14 loops. Code structure (nesting depth, branch count, comment ratio) determines filter brightness, modulation speed, and reverb for each layer.
 
 For the full list of available sounds, see [Chapter 9: Sound Reference](#9-sound-reference).
 
@@ -527,20 +527,20 @@ Loop names such as `@loop("kick_hard", ...)` are interpreted as sound names on t
 
 | Loop name | Layer | Character |
 | :--- | :--- | :--- |
-| `kick_hard` | foundation | Hard four-on-the-floor kick (depth=1, dry) |
-| `bass_rumble` | foundation | Rumble under the kick (depth=1, dry) |
-| `bass_reese` | movement | Moving Reese bass (depth=4, mid-range) |
-| `hat_ride` | movement | Ride / open hat (depth=4) |
-| `clap_snap` | body | Sharp snap clap (depth=4, faster LFO) |
-| `clap_snare` | body | Snare-like accent (depth=4) |
-| `chord_rave` | harmonic | Rave stab (depth=6, bright) |
-| `neon_stab` | harmonic | Answer stab (depth=5) |
-| `lead_hoover` | lead | Hoover-style lead (depth=5, slight reverb) |
-| `hat_engine` | hats | Hi-hat grid (depth=6, fastest LFO) |
-| `shimmer_pad` | space | Shimmer pad (heavy comments, high reverb) |
-| `warehouse_air` | space | Warehouse ambience (comments only, max reverb) |
-| `glitch_ticks` | texture | Digital glitch texture (depth=4, fast LFO) |
-| `fx_impact` | texture | Drop impact hit (depth=5) |
+| `kick_hard` | foundation | Four-on-the-floor main kick (depth=1, 580 Hz, dry) |
+| `floor_kick` | foundation | Kick body / weight layer (depth=1, 580 Hz, dry) |
+| `sub_bass` | foundation | Deep sub bass (depth=2, 960 Hz, dry) |
+| `bass_reese` | groove | Detuned Reese bass movement (depth=4, 1720 Hz) |
+| `bass_acid` | groove | TB-303-style acid line (depth=5, 2100 Hz) |
+| `hat_engine` | rhythm | 16th-note hi-hat grid (depth=7, 2860 Hz, fastest LFO) |
+| `hat_ride` | rhythm | Offbeat ride / open hat (depth=4, 1720 Hz) |
+| `clap_snare` | rhythm | Backbeat on beats 2 & 4 (depth=6, 2480 Hz) |
+| `chord_rave` | harmonic | Rave chord stabs (depth=7, 2860 Hz) |
+| `stab_saw` | harmonic | Detuned saw chord layer (depth=5, 2100 Hz) |
+| `lead_hoover` | lead | Classic hoover lead (depth=5, 2100 Hz, slight reverb) |
+| `snare_roll` | build | Snare roll build-up (depth=4, 1720 Hz) |
+| `shimmer_pad` | space | Shimmer pad (heavy comments, reverb 0.60) |
+| `warehouse_air` | space | Warehouse ambience (comments only, reverb 0.57) |
 
 ### Getting it running
 
@@ -581,7 +581,7 @@ def room_tone(volume=0.06):
 
 Leave only one comment line and save. The space dries out immediately.
 
-**Change the voices:** Remove an inner function from `chord_rave` and the chord drops from four voices to three.
+**Change the groove:** Remove the `elif` block from `bass_acid` to flatten the acid squelch into a plain bass. Raise `snare_roll`'s `volume=` to push the build-up forward.
 
 Changing code structure *is* the performance.
 

@@ -521,7 +521,7 @@ eval で止めたい場合は、関数名の `def` だけを残して本体を�
 
 ## 8. クラブセット例 — club_set.py を動かす
 
-`examples/club_set.py` は、クラブのグルーヴとして成立しやすい多層デモファイルです。foundation / movement / body / harmonic / lead / hats / space / texture の 8 層 14 ループ構成で、各ループのコード構造が音域・変調速度・リバーブを決定します。
+`examples/club_set.py` は、四つ打ちを中心とした EDM クラブグルーヴのデモファイルです。foundation / groove / rhythm / harmonic / lead / build / space の 7 層 14 ループ構成で、各ループのコード構造が音域・変調速度・リバーブを決定します。
 
 全 30 音色を 1 音ずつ確認したい場合は `examples/sound_showcase.py` を使います。
 
@@ -537,20 +537,20 @@ pycodedj eval examples/sound_showcase.py::bell_rave
 
 | ループ名 | レイヤー | キャラクター |
 | :--- | :--- | :--- |
-| `kick_hard` | foundation | 硬い四つ打ちキック（depth=1、ドライ） |
-| `bass_rumble` | foundation | キック下のランブル（depth=1、ドライ） |
-| `bass_reese` | movement | 揺れる Reese ベース（depth=4、中域） |
-| `hat_ride` | movement | ライド/オープンハット（depth=4） |
-| `clap_snap` | body | スナップクラップ（depth=4、速い LFO） |
-| `clap_snare` | body | スネア寄りのアクセント（depth=4） |
-| `chord_rave` | harmonic | レイブスタブ（depth=6、明るい） |
-| `neon_stab` | harmonic | アンサースタブ（depth=5） |
-| `lead_hoover` | lead | Hoover 風リード（depth=5、微リバーブ） |
-| `hat_engine` | hats | ハットグリッド（depth=6、最速 LFO） |
-| `shimmer_pad` | space | シマーパッド（コメント多め、高リバーブ） |
-| `warehouse_air` | space | 倉庫の空気感（コメントのみ、最大リバーブ） |
-| `glitch_ticks` | texture | グリッチテクスチャ（depth=4、速い LFO） |
-| `fx_impact` | texture | ドロップのインパクト（depth=5） |
+| `kick_hard` | foundation | 四つ打ち主軸キック（depth=1、580Hz、ドライ） |
+| `floor_kick` | foundation | キックの厚み補強（depth=1、580Hz、ドライ） |
+| `sub_bass` | foundation | ディープサブベース（depth=2、960Hz、ドライ） |
+| `bass_reese` | groove | Reese ベースの揺れ（depth=4、1720Hz） |
+| `bass_acid` | groove | TB-303 アシッドライン（depth=5、2100Hz） |
+| `hat_engine` | rhythm | 16分ハットグリッド（depth=7、2860Hz、最速 LFO） |
+| `hat_ride` | rhythm | オフビートライド（depth=4、1720Hz） |
+| `clap_snare` | rhythm | 2・4拍バックビート（depth=6、2480Hz） |
+| `chord_rave` | harmonic | レイブコードスタブ（depth=7、2860Hz） |
+| `stab_saw` | harmonic | デチューンソー層（depth=5、2100Hz） |
+| `lead_hoover` | lead | Hoover 風リード（depth=5、2100Hz、微リバーブ） |
+| `snare_roll` | build | スネアロール・ビルドアップ（depth=4、1720Hz） |
+| `shimmer_pad` | space | シマーパッド（コメント多め、reverb 0.60） |
+| `warehouse_air` | space | 倉庫の空気感（コメントのみ、reverb 0.57） |
 
 ### 動かしてみる
 
@@ -591,7 +591,7 @@ def room_tone(volume=0.06):
 
 コメントを 1 行だけ残して保存してみてください。空間が一気に乾いた音になります。
 
-**声部を変える:** `chord_rave` の内部関数を 1 つ減らすと、3 声から 2 声になって音が薄くなります。
+**グルーヴを変える:** `bass_acid` の `elif` ブロックを削除してフラットにすると、アシッドのスクウェルチが消えて落ち着いたベースになります。`snare_roll` の `volume=` を上げると、ビルドアップがより強調されます。
 
 ---
 

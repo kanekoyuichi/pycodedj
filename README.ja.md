@@ -135,7 +135,7 @@ pycodedj watch demo.py
 | ファイル | 内容 |
 | :--- | :--- |
 | `examples/demo.py` | bass / melody / pad の 3 ループ入門デモ |
-| `examples/club_set.py` | 8 層 14 ループのクラブグルーヴ（foundation → space） |
+| `examples/club_set.py` | 7 層 14 ループの EDM クラブグルーヴ（四つ打ちキック → アシッドベース → レイブスタブ → スペース） |
 | `examples/sound_showcase.py` | 全 30 音色を収録 — 1 音ずつ eval して確認できる |
 
 ---
