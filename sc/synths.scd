@@ -118,7 +118,11 @@ s.waitForBoot({
     // OSCFunc with nil path receives every incoming OSC message and we filter by prefix.
     // var は SC では実行文より前に宣言しなければならないため、
     // すべての var をクロージャ先頭にまとめる。
-    OSCFunc({ |msg, time, addr|
+    if (~pycodedjOSC.notNil) {
+        ~pycodedjOSC.free;
+    };
+
+    ~pycodedjOSC = OSCFunc({ |msg, time, addr|
         var parts, name, param, val;
         parts = msg[0].asString.split($/);
         // parts: ["", "pycodedj", "loop", <name>, <param>]
@@ -145,7 +149,7 @@ s.waitForBoot({
             "lfo_rate",  { ~loops[name].do({ |synth| synth.set(\lfoRate,   val.asFloat) }) },
             "reverb",    { ~loops[name].do({ |synth| synth.set(\reverbMix, val.asFloat) }) }
         );
-    });  // nil path = receive all OSC messages
+    }, nil, nil, NetAddr.langPort);  // nil path = receive all OSC messages
 
-    "PyCodeDJ synths loaded. Ready.".postln;
+    ("PyCodeDJ synths loaded. Ready. OSC port: " ++ NetAddr.langPort).postln;
 });
