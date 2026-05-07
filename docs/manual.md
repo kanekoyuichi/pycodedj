@@ -500,16 +500,18 @@ pycodedj eval myfile.py::bass
 
 `examples/club_set.py` is a focused six-part dancefloor groove. It is not a synth catalogue: it combines kick, sub bass, hats, clap, chord hits, and room ambience.
 
+Loop names such as `# @loop kick_floor interval=1.0` are interpreted as role names on the SuperCollider side. For example, `kick_...` maps to a kick synth, `bass_...` maps to a bass synth, and `hat_...` maps to a hat synth. If you are only changing the Python groove or arrangement, you usually do not need to edit `sc/synths.scd`. Edit SuperCollider only when you want to add a genuinely new sound engine.
+
 ### Block overview
 
 | Loop name | Character | Code features |
 | :--- | :--- | :--- |
-| `floor_kick` | Big four-on-the-floor kick | Low body and a short attack |
-| `sub_bass` | Heavy sub bass | Deep `if` nesting, filter wide open |
-| `hat_engine` | Hi-hat grid | Many `for` + `if`, fast LFO |
-| `clap_snap` | Clap / snare accent | Backbeat energy |
-| `dub_chord` | Dub chord | Reverb-heavy chord hits |
-| `warehouse_air` | Warehouse ambience | Comment-heavy = deep reverb |
+| `kick_floor` | Big four-on-the-floor kick | Low body and a short attack |
+| `bass_sub` | Heavy sub bass | Deep `if` nesting, filter wide open |
+| `hat_offbeat` | Hi-hat grid | Many `for` + `if`, fast LFO |
+| `clap_backbeat` | Clap / snare accent | Backbeat energy |
+| `chord_dub` | Dub chord | Reverb-heavy chord hits |
+| `fx_air` | Warehouse ambience | Comment-heavy = deep reverb |
 
 ### Getting it running
 
@@ -522,20 +524,20 @@ pycodedj watch examples/club_set.py
 You can also evaluate individual loops:
 
 ```bash
-pycodedj eval examples/club_set.py::sub_bass
-pycodedj eval examples/club_set.py::hat_engine
-pycodedj eval examples/club_set.py::clap_snap
-pycodedj eval examples/club_set.py::dub_chord
-pycodedj eval examples/club_set.py::warehouse_air
-pycodedj eval examples/club_set.py::floor_kick
+pycodedj eval examples/club_set.py::kick_floor
+pycodedj eval examples/club_set.py::bass_sub
+pycodedj eval examples/club_set.py::hat_offbeat
+pycodedj eval examples/club_set.py::clap_backbeat
+pycodedj eval examples/club_set.py::chord_dub
+pycodedj eval examples/club_set.py::fx_air
 ```
 
 ### Performing with it
 
-`warehouse_air` is a comment-only block. Adding or removing comments changes the reverb depth.
+`fx_air` is a comment-only block. Adding or removing comments changes the reverb depth. The function can still be named `warehouse_air`; the OSC loop name comes from `# @loop fx_air ...`.
 
 ```python
-# @loop warehouse_air interval=4.0
+# @loop fx_air interval=4.0
 # smoke above the kick
 # late reflections
 # concrete room tail
@@ -547,10 +549,10 @@ def warehouse_air():
 
 Try leaving only two comment lines and saving. The space dries out immediately.
 
-Remove one function from `neon_stab` and the chord drops from three voices to two:
+Remove one function from `chord_dub` and the chord drops from three voices to two:
 
 ```python
-# @loop neon_stab interval=2.0
+# @loop chord_dub interval=2.0
 def chord_root():
     return "minor"
 
@@ -560,7 +562,7 @@ def chord_fifth():
 # chord_seventh removed
 ```
 
-Remove the inner `for slide in range(2)` loop from `acid_lead`. The filter drops and the sound turns muddy.
+Remove the inner `for pressure in range(3)` loop from `bass_sub`. The filter drops and the bass loses some forward pressure.
 
 Changing code structure *is* the performance.
 

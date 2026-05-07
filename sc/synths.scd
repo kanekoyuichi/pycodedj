@@ -195,7 +195,10 @@ s.waitForBoot({
     ~loopParams = Dictionary.new;
 
     ~synthForLoop = { |name|
-        switch (name,
+        var nameString, parts, role, variant;
+        nameString = name.asString;
+
+        switch (nameString,
             "sub_bass", { \pycodedj_sub_bass },
             "hat_engine", { \pycodedj_hat_engine },
             "clap_snap", { \pycodedj_clap_snap },
@@ -208,7 +211,28 @@ s.waitForBoot({
             "soft_pluck", { \pycodedj_soft_pluck },
             "dub_chord", { \pycodedj_dub_chord },
             "shimmer_pad", { \pycodedj_shimmer_pad },
-            { \pycodedj_base }
+            {
+                parts = nameString.split($_);
+                role = parts[0];
+                variant = if (parts.size > 1) { parts[1] } { "" };
+
+                switch (role,
+                    "kick",  { \pycodedj_floor_kick },
+                    "bass",  { \pycodedj_sub_bass },
+                    "hat",   { \pycodedj_hat_engine },
+                    "clap",  { \pycodedj_clap_snap },
+                    "chord", { if (variant == "stab") { \pycodedj_neon_stab } { \pycodedj_dub_chord } },
+                    "lead",  { if (variant == "acid") { \pycodedj_acid_lead } { \pycodedj_soft_pluck } },
+                    "fx",    {
+                        switch (variant,
+                            "ticks", { \pycodedj_glitch_ticks },
+                            "pad", { \pycodedj_shimmer_pad },
+                            { \pycodedj_warehouse_air }
+                        )
+                    },
+                    { \pycodedj_base }
+                );
+            }
         );
     };
 

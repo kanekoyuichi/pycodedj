@@ -502,16 +502,18 @@ pycodedj eval myfile.py::bass
 
 `examples/club_set.py` は、クラブのグルーヴとして成立しやすい 6 パートに絞ったデモファイルです。音色カタログではなく、キック、サブベース、ハット、クラップ、コード、空気感を組み合わせたセットです。
 
+`# @loop kick_floor interval=1.0` のような `@loop` 名は、SuperCollider 側では役割名として解釈されます。たとえば `kick_...` はキック系、`bass_...` はベース系、`hat_...` はハット系のシンセに割り当てられます。Python 側でグルーヴや構成を変えるだけなら、通常は `sc/synths.scd` を編集する必要はありません。まったく新しい音色エンジンを増やしたいときだけ、SuperCollider 側に SynthDef を追加します。
+
 ### ブロック一覧
 
 | ループ名 | キャラクター | コードの特徴 |
 | :--- | :--- | :--- |
-| `floor_kick` | ドスドス響く四つ打ちキック | 低域の胴鳴りと短いアタック |
-| `sub_bass` | 重いサブベース | `if` のネストが深く、フィルターが開いている |
-| `hat_engine` | ハイハットのグリッド | `for` + `if` が多く、揺らぎが速い |
-| `clap_snap` | クラップ/スネア感 | バックビートのアクセント |
-| `dub_chord` | ダブコード | 残響のあるコードヒット |
-| `warehouse_air` | 倉庫の空気感 | コメントだらけでリバーブが深い |
+| `kick_floor` | ドスドス響く四つ打ちキック | 低域の胴鳴りと短いアタック |
+| `bass_sub` | 重いサブベース | `if` のネストが深く、フィルターが開いている |
+| `hat_offbeat` | ハイハットのグリッド | `for` + `if` が多く、揺らぎが速い |
+| `clap_backbeat` | クラップ/スネア感 | バックビートのアクセント |
+| `chord_dub` | ダブコード | 残響のあるコードヒット |
+| `fx_air` | 倉庫の空気感 | コメントだらけでリバーブが深い |
 
 ### 動かしてみる
 
@@ -524,20 +526,20 @@ pycodedj watch examples/club_set.py
 個別にループを足したい場合は eval することもできます。
 
 ```bash
-pycodedj eval examples/club_set.py::sub_bass
-pycodedj eval examples/club_set.py::hat_engine
-pycodedj eval examples/club_set.py::clap_snap
-pycodedj eval examples/club_set.py::dub_chord
-pycodedj eval examples/club_set.py::warehouse_air
-pycodedj eval examples/club_set.py::floor_kick
+pycodedj eval examples/club_set.py::kick_floor
+pycodedj eval examples/club_set.py::bass_sub
+pycodedj eval examples/club_set.py::hat_offbeat
+pycodedj eval examples/club_set.py::clap_backbeat
+pycodedj eval examples/club_set.py::chord_dub
+pycodedj eval examples/club_set.py::fx_air
 ```
 
 ### 演奏してみる
 
-`warehouse_air` はコメントだけのブロックです。コメントを増やしたり減らしたりすると、リバーブの深さが変わります。
+`fx_air` はコメントだけのブロックです。コメントを増やしたり減らしたりすると、リバーブの深さが変わります。関数名は `warehouse_air` のままでもかまいません。PyCodeDJ が OSC で使う名前は `# @loop fx_air ...` の部分です。
 
 ```python
-# @loop warehouse_air interval=4.0
+# @loop fx_air interval=4.0
 # smoke above the kick
 # late reflections
 # concrete room tail
@@ -549,10 +551,10 @@ def warehouse_air():
 
 コメントを 2 行だけ残して保存してみてください。空間が一気に乾いた音になります。
 
-`neon_stab` の関数を 1 つ減らしてみましょう。3 声から 2 声になって音が薄くなります。
+`chord_dub` の関数を 1 つ減らしてみましょう。3 声から 2 声になって音が薄くなります。
 
 ```python
-# @loop neon_stab interval=2.0
+# @loop chord_dub interval=2.0
 def chord_root():
     return "minor"
 
@@ -562,7 +564,7 @@ def chord_fifth():
 # chord_seventh を削除
 ```
 
-`acid_lead` の `for slide in range(2)` のネストを削除して、フラットにしてみましょう。フィルターがグッと下がって音がこもります。
+`bass_sub` の `for pressure in range(3)` のネストを削除して、フラットにしてみましょう。フィルターが下がり、低音の押し出しが弱くなります。
 
 このように、コードの構造を変えることが演奏になります。
 
