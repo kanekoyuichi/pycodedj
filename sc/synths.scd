@@ -119,10 +119,10 @@ s.waitForBoot({
     // var は SC では実行文より前に宣言しなければならないため、
     // すべての var をクロージャ先頭にまとめる。
     if (~pycodedjOSC.notNil) {
-        ~pycodedjOSC.free;
+        thisProcess.removeOSCRecvFunc(~pycodedjOSC);
     };
 
-    ~pycodedjOSC = OSCFunc({ |msg, time, addr|
+    ~pycodedjOSC = { |msg, time, addr, recvPort|
         var parts, name, param, val;
         parts = msg[0].asString.split($/);
         // parts: ["pycodedj", "loop", <name>, <param>]
@@ -149,7 +149,8 @@ s.waitForBoot({
             "lfo_rate",  { ~loops[name].do({ |synth| synth.set(\lfoRate,   val.asFloat) }) },
             "reverb",    { ~loops[name].do({ |synth| synth.set(\reverbMix, val.asFloat) }) }
         );
-    }, nil, nil, NetAddr.langPort);  // nil path = receive all OSC messages
+    };
+    thisProcess.addOSCRecvFunc(~pycodedjOSC);
 
     ("PyCodeDJ synths loaded. Ready. OSC port: " ++ NetAddr.langPort).postln;
 });
