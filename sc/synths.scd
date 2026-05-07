@@ -177,6 +177,126 @@ s.waitForBoot({
         Out.ar(0, sig);
     }).add;
 
+    SynthDef(\pycodedj_kick_hard, {
+        arg cutoff = 1300, lfoRate = 1.0, reverbMix = 0.04, amp = 0.76, gate = 1;
+        var trig, bodyEnv, clickEnv, driveEnv, pitch, body, click, drive, sig, gateEnv;
+        trig = Impulse.kr(2.133);
+        bodyEnv = Decay2.kr(trig, 0.001, 0.34);
+        clickEnv = Decay2.kr(trig, 0.001, 0.018);
+        driveEnv = Decay2.kr(trig, 0.001, 0.09);
+        pitch = EnvGen.kr(Env([105, 48, 36], [0.012, 0.13], \exp), trig).midicps;
+        body = SinOsc.ar(pitch) * bodyEnv;
+        click = HPF.ar(WhiteNoise.ar(0.42), cutoff.clip(1800, 9000)) * clickEnv;
+        drive = (SinOsc.ar(54) + Pulse.ar(27, 0.42, 0.18)) * driveEnv;
+        sig = (body + click + drive).tanh;
+        sig = Compander.ar(sig, sig, 0.42, 1, 0.22, 0.001, 0.045);
+        gateEnv = EnvGen.kr(Env.asr(0.005, 1, 0.1), gate, doneAction: 2);
+        sig = FreeVerb.ar(sig, reverbMix.clip(0, 0.18), 0.25, 0.12) * gateEnv * amp;
+        Out.ar(0, sig ! 2);
+    }).add;
+
+    SynthDef(\pycodedj_bass_reese, {
+        arg cutoff = 1100, lfoRate = 0.9, reverbMix = 0.08, amp = 0.28, gate = 1;
+        var trig, note, freq, env, wobble, sig, gateEnv;
+        trig = Impulse.kr((lfoRate * 1.6).clip(0.8, 5.0));
+        note = Demand.kr(trig, 0, Dseq([36, 36, 43, 34, 36, 31, 34, 36], inf));
+        freq = Lag.kr(note.midicps, 0.055);
+        env = Decay2.kr(trig, 0.008, 0.46);
+        wobble = SinOsc.kr(lfoRate.clip(0.1, 4.5)).range(0.65, 1.2);
+        sig = Splay.ar(Saw.ar(freq * [0.995, 1.004, 1.012], [0.26, 0.22, 0.18])) * 0.42;
+        sig = RLPF.ar(sig, (cutoff * wobble).clip(120, 2600), 0.18);
+        sig = (sig * 1.8).tanh * env;
+        gateEnv = EnvGen.kr(Env.asr(0.06, 1, 0.18), gate, doneAction: 2);
+        sig = FreeVerb.ar(sig, reverbMix.clip(0, 0.38), 0.36, 0.2) * gateEnv * amp;
+        Out.ar(0, sig);
+    }).add;
+
+    SynthDef(\pycodedj_bass_rumble, {
+        arg cutoff = 500, lfoRate = 1.0, reverbMix = 0.28, amp = 0.34, gate = 1;
+        var trig, kickEnv, rumbleEnv, pitch, kick, rumble, pump, sig, gateEnv;
+        trig = Impulse.kr(2.133);
+        kickEnv = Decay2.kr(trig, 0.001, 0.16);
+        rumbleEnv = Decay2.kr(trig, 0.03, 0.82);
+        pitch = EnvGen.kr(Env([75, 38, 32], [0.015, 0.14], \exp), trig).midicps;
+        kick = SinOsc.ar(pitch) * kickEnv;
+        rumble = LPF.ar((SinOsc.ar(45) + Saw.ar(22.5, 0.18)).tanh, cutoff.clip(90, 900)) * rumbleEnv;
+        pump = 1 - (Decay2.kr(trig, 0.001, 0.22) * 0.45);
+        sig = (kick + FreeVerb.ar(rumble, reverbMix.clip(0.15, 0.65), 0.9, 0.55)) * pump;
+        gateEnv = EnvGen.kr(Env.asr(0.02, 1, 0.18), gate, doneAction: 2);
+        Out.ar(0, (sig.tanh * gateEnv * amp) ! 2);
+    }).add;
+
+    SynthDef(\pycodedj_hat_ride, {
+        arg cutoff = 9000, lfoRate = 1.5, reverbMix = 0.18, amp = 0.1, gate = 1;
+        var trig, env, tone, metal, sig, gateEnv;
+        trig = Impulse.kr((lfoRate * 1.6).clip(3, 12));
+        env = Decay2.kr(trig, 0.002, 0.42);
+        tone = cutoff.clip(5000, 14000);
+        metal = Mix.ar(Pulse.ar([5300, 6110, 7240, 8110], 0.5)) * 0.08;
+        sig = HPF.ar((WhiteNoise.ar(0.45) + metal), tone * 0.55);
+        sig = BPF.ar(sig, tone, 0.34) * env;
+        gateEnv = EnvGen.kr(Env.asr(0.01, 1, 0.12), gate, doneAction: 2);
+        sig = FreeVerb.ar(sig, reverbMix.clip(0, 0.55), 0.55, 0.24) * gateEnv * amp;
+        Out.ar(0, Pan2.ar(sig, LFNoise1.kr(0.35).range(-0.45, 0.45)));
+    }).add;
+
+    SynthDef(\pycodedj_clap_snare, {
+        arg cutoff = 3600, lfoRate = 1.0, reverbMix = 0.16, amp = 0.2, gate = 1;
+        var trig, env, bodyEnv, noise, body, sig, gateEnv;
+        trig = Impulse.kr((lfoRate * 0.65).clip(0.8, 1.8));
+        env = Decay2.kr(trig, 0.001, 0.18);
+        bodyEnv = Decay2.kr(trig, 0.001, 0.08);
+        noise = BPF.ar(WhiteNoise.ar(0.65), cutoff.clip(1400, 9000), 0.48) * env;
+        body = SinOsc.ar(185) * bodyEnv * 0.45;
+        sig = HPF.ar(noise + body, 120);
+        gateEnv = EnvGen.kr(Env.asr(0.01, 1, 0.11), gate, doneAction: 2);
+        sig = FreeVerb.ar(sig, reverbMix.clip(0.04, 0.55), 0.52, 0.24) * gateEnv * amp;
+        Out.ar(0, sig ! 2);
+    }).add;
+
+    SynthDef(\pycodedj_chord_rave, {
+        arg cutoff = 1800, lfoRate = 0.55, reverbMix = 0.28, amp = 0.15, gate = 1;
+        var trig, root, freqs, env, detune, sig, gateEnv;
+        trig = Impulse.kr((lfoRate * 1.15).clip(0.15, 2.2));
+        root = Demand.kr(trig, 0, Dseq([48, 51, 46, 43], inf));
+        freqs = (root + [0, 7, 10, 15]).midicps;
+        detune = [0.996, 1.003, 1.007, 0.992];
+        env = Decay2.kr(trig, 0.004, 0.34);
+        sig = Splay.ar(Saw.ar(freqs * detune)) * 0.18;
+        sig = RLPF.ar((sig * 1.7).tanh, cutoff.clip(650, 6200), 0.2) * env;
+        gateEnv = EnvGen.kr(Env.asr(0.03, 1, 0.22), gate, doneAction: 2);
+        sig = FreeVerb.ar(sig, reverbMix.clip(0.08, 0.75), 0.62, 0.34) * gateEnv * amp;
+        Out.ar(0, sig);
+    }).add;
+
+    SynthDef(\pycodedj_lead_hoover, {
+        arg cutoff = 2400, lfoRate = 1.2, reverbMix = 0.18, amp = 0.13, gate = 1;
+        var trig, note, freq, env, detune, sig, gateEnv;
+        trig = Impulse.kr((lfoRate * 1.8).clip(0.6, 7.0));
+        note = Demand.kr(trig, 0, Dseq([60, 63, 58, 55, 60, 67, 65, 63], inf));
+        freq = Lag.kr(note.midicps, 0.08);
+        env = Decay2.kr(trig, 0.008, 0.34);
+        detune = LFNoise1.kr(4 ! 4).range(0.986, 1.014);
+        sig = Splay.ar(Saw.ar(freq * [0.5, 0.997, 1.006, 2.01] * detune)) * 0.2;
+        sig = RLPF.ar((sig * 1.5).tanh, cutoff.clip(700, 7600), 0.24) * env;
+        gateEnv = EnvGen.kr(Env.asr(0.04, 1, 0.2), gate, doneAction: 2);
+        sig = FreeVerb.ar(sig, reverbMix.clip(0.04, 0.65), 0.48, 0.24) * gateEnv * amp;
+        Out.ar(0, sig);
+    }).add;
+
+    SynthDef(\pycodedj_fx_impact, {
+        arg cutoff = 1600, lfoRate = 0.25, reverbMix = 0.55, amp = 0.16, gate = 1;
+        var trig, env, thump, noise, tail, sig, gateEnv;
+        trig = Impulse.kr(lfoRate.clip(0.05, 1.0));
+        env = Decay2.kr(trig, 0.001, 1.2);
+        thump = SinOsc.ar(EnvGen.kr(Env([62, 32], [0.18], \exp), trig).midicps) * Decay2.kr(trig, 0.001, 0.45);
+        noise = LPF.ar(PinkNoise.ar(0.34), cutoff.clip(400, 5000)) * env;
+        tail = FreeVerb.ar(noise + thump, reverbMix.clip(0.25, 0.9), 0.92, 0.62);
+        sig = (thump + tail).tanh;
+        gateEnv = EnvGen.kr(Env.asr(0.02, 1, 0.35), gate, doneAction: 2);
+        Out.ar(0, (sig ! 2) * gateEnv * amp);
+    }).add;
+
     SynthDef(\pycodedj_base, {
         arg cutoff = 800, lfoRate = 0.5, reverbMix = 0.2, amp = 0.3, gate = 1;
         var sig, env, lfo;
@@ -211,22 +331,65 @@ s.waitForBoot({
             "soft_pluck", { \pycodedj_soft_pluck },
             "dub_chord", { \pycodedj_dub_chord },
             "shimmer_pad", { \pycodedj_shimmer_pad },
+            "kick_hard", { \pycodedj_kick_hard },
+            "bass_reese", { \pycodedj_bass_reese },
+            "bass_rumble", { \pycodedj_bass_rumble },
+            "hat_ride", { \pycodedj_hat_ride },
+            "clap_snare", { \pycodedj_clap_snare },
+            "chord_rave", { \pycodedj_chord_rave },
+            "lead_hoover", { \pycodedj_lead_hoover },
+            "fx_impact", { \pycodedj_fx_impact },
             {
                 parts = nameString.split($_);
                 role = parts[0];
                 variant = if (parts.size > 1) { parts[1] } { "" };
 
                 switch (role,
-                    "kick",  { \pycodedj_floor_kick },
-                    "bass",  { \pycodedj_sub_bass },
-                    "hat",   { \pycodedj_hat_engine },
-                    "clap",  { \pycodedj_clap_snap },
-                    "chord", { if (variant == "stab") { \pycodedj_neon_stab } { \pycodedj_dub_chord } },
-                    "lead",  { if (variant == "acid") { \pycodedj_acid_lead } { \pycodedj_soft_pluck } },
+                    "kick",  {
+                        switch (variant,
+                            "hard", { \pycodedj_kick_hard },
+                            "pulse", { \pycodedj_kick_pulse },
+                            { \pycodedj_floor_kick }
+                        )
+                    },
+                    "bass",  {
+                        switch (variant,
+                            "reese", { \pycodedj_bass_reese },
+                            "rumble", { \pycodedj_bass_rumble },
+                            { \pycodedj_sub_bass }
+                        )
+                    },
+                    "hat",   {
+                        switch (variant,
+                            "ride", { \pycodedj_hat_ride },
+                            { \pycodedj_hat_engine }
+                        )
+                    },
+                    "clap",  {
+                        switch (variant,
+                            "snare", { \pycodedj_clap_snare },
+                            { \pycodedj_clap_snap }
+                        )
+                    },
+                    "chord", {
+                        switch (variant,
+                            "stab", { \pycodedj_neon_stab },
+                            "rave", { \pycodedj_chord_rave },
+                            { \pycodedj_dub_chord }
+                        )
+                    },
+                    "lead",  {
+                        switch (variant,
+                            "acid", { \pycodedj_acid_lead },
+                            "hoover", { \pycodedj_lead_hoover },
+                            { \pycodedj_soft_pluck }
+                        )
+                    },
                     "fx",    {
                         switch (variant,
                             "ticks", { \pycodedj_glitch_ticks },
                             "pad", { \pycodedj_shimmer_pad },
+                            "impact", { \pycodedj_fx_impact },
                             { \pycodedj_warehouse_air }
                         )
                     },

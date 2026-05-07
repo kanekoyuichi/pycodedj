@@ -504,6 +504,34 @@ pycodedj eval myfile.py::bass
 
 `# @loop kick_floor interval=1.0` のような `@loop` 名は、SuperCollider 側では役割名として解釈されます。たとえば `kick_...` はキック系、`bass_...` はベース系、`hat_...` はハット系のシンセに割り当てられます。Python 側でグルーヴや構成を変えるだけなら、通常は `sc/synths.scd` を編集する必要はありません。まったく新しい音色エンジンを増やしたいときだけ、SuperCollider 側に SynthDef を追加します。
 
+### 使える音色名
+
+`@loop` 名を変えると、SuperCollider 側で使う音色を選べます。関数名は自由ですが、OSC に送られる名前は `# @loop ...` の部分です。
+
+| `@loop` 名 | 音 |
+| :--- | :--- |
+| `kick_floor` | 太い四つ打ちキック |
+| `kick_hard` | 硬めでアタックの強いキック |
+| `kick_pulse` | 軽めのパルスキック |
+| `bass_sub` | サブベース |
+| `bass_reese` | 揺れる Reese 系ベース |
+| `bass_rumble` | キック由来の低いランブル |
+| `hat_offbeat` | クローズ/オープンのハットグリッド |
+| `hat_ride` | 長めのライド/オープンハット |
+| `clap_backbeat` | クラップ |
+| `clap_snare` | スネア寄りのクラップ |
+| `chord_dub` | ダブコード |
+| `chord_stab` | 短いスタブコード |
+| `chord_rave` | 明るいレイブスタブ |
+| `lead_acid` | アシッド系リード |
+| `lead_hoover` | Hoover 風リード |
+| `fx_air` | 倉庫っぽい空気感 |
+| `fx_ticks` | 細かいグリッチ音 |
+| `fx_pad` | 深いパッド |
+| `fx_impact` | 低いインパクト |
+
+たとえば `club_set.py` の `# @loop bass_sub interval=0.5` を `# @loop bass_reese interval=0.5` に変えるだけで、ベースの音色を変えられます。
+
 ### ブロック一覧
 
 | ループ名 | キャラクター | コードの特徴 |

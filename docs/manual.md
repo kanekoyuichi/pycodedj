@@ -502,6 +502,34 @@ pycodedj eval myfile.py::bass
 
 Loop names such as `# @loop kick_floor interval=1.0` are interpreted as role names on the SuperCollider side. For example, `kick_...` maps to a kick synth, `bass_...` maps to a bass synth, and `hat_...` maps to a hat synth. If you are only changing the Python groove or arrangement, you usually do not need to edit `sc/synths.scd`. Edit SuperCollider only when you want to add a genuinely new sound engine.
 
+### Available sound names
+
+Change the `@loop` name to choose the SuperCollider sound. The Python function name can be anything; the OSC loop name comes from the `# @loop ...` marker.
+
+| `@loop` name | Sound |
+| :--- | :--- |
+| `kick_floor` | Big four-on-the-floor kick |
+| `kick_hard` | Hard kick with a stronger attack |
+| `kick_pulse` | Lighter pulse kick |
+| `bass_sub` | Sub bass |
+| `bass_reese` | Moving Reese-style bass |
+| `bass_rumble` | Low kick-derived rumble |
+| `hat_offbeat` | Closed/open hat grid |
+| `hat_ride` | Longer ride/open hat |
+| `clap_backbeat` | Clap |
+| `clap_snare` | Snare-like clap |
+| `chord_dub` | Dub chord |
+| `chord_stab` | Short chord stab |
+| `chord_rave` | Bright rave stab |
+| `lead_acid` | Acid-style lead |
+| `lead_hoover` | Hoover-style lead |
+| `fx_air` | Warehouse ambience |
+| `fx_ticks` | Small glitch ticks |
+| `fx_pad` | Deep pad |
+| `fx_impact` | Low impact |
+
+For example, change `# @loop bass_sub interval=0.5` in `club_set.py` to `# @loop bass_reese interval=0.5` to change the bass sound.
+
 ### Block overview
 
 | Loop name | Character | Code features |
