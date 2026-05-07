@@ -1527,7 +1527,7 @@ if params is not None:
       function placeholder(match, cls) {
         const idx = slots.length;
         slots.push(`<span class="sh-${cls}">${match}</span>`);
-        return `\x00${idx}\x00`;
+        return `\x00_${idx}\x00`;
       }
 
       // comments first (they can contain quote chars)
@@ -1544,29 +1544,29 @@ if params is not None:
       s = s.replace(PY_KEYWORDS, (m) => placeholder(m, 'keyword'));
 
       // restore placeholders
-      s = s.replace(/\x00(\d+)\x00/g, (_, i) => slots[parseInt(i)]);
+      s = s.replace(/\x00_(\d+)\x00/g, (_, i) => slots[parseInt(i)]);
 
     } else if (lang === 'bash') {
       const slots = [];
       function ph(match, cls) {
         const idx = slots.length;
         slots.push(`<span class="sh-${cls}">${match}</span>`);
-        return `\x00${idx}\x00`;
+        return `\x00_${idx}\x00`;
       }
       s = s.replace(BASH_COMMENT, (m) => ph(m, 'comment'));
       s = s.replace(BASH_STRING,  (m) => ph(m, 'string'));
-      s = s.replace(/\x00(\d+)\x00/g, (_, i) => slots[parseInt(i)]);
+      s = s.replace(/\x00_(\d+)\x00/g, (_, i) => slots[parseInt(i)]);
 
     } else if (lang === 'supercollider') {
       const slots = [];
       function ph(match, cls) {
         const idx = slots.length;
         slots.push(`<span class="sh-${cls}">${match}</span>`);
-        return `\x00${idx}\x00`;
+        return `\x00_${idx}\x00`;
       }
       s = s.replace(SC_COMMENT, (m) => ph(m, 'comment'));
       s = s.replace(SC_STRING,  (m) => ph(m, 'string'));
-      s = s.replace(/\x00(\d+)\x00/g, (_, i) => slots[parseInt(i)]);
+      s = s.replace(/\x00_(\d+)\x00/g, (_, i) => slots[parseInt(i)]);
     }
 
     return s;
