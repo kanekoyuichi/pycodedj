@@ -1,5 +1,7 @@
 # PyCodeDJ
 
+[English README](README.md)
+
 Pythonコードの構造をリアルタイムに音楽へ変換するライブコーディング環境。ファイルを保存するたびに演奏が変わる。
 
 ---

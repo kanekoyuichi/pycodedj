@@ -1,5 +1,7 @@
 # PyCodeDJ マニュアル
 
+[English manual](manual.md)
+
 > Python コードを書くと、リアルタイムに音が変わる
 
 ---
