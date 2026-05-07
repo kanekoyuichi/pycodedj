@@ -1,5 +1,7 @@
 # PyCodeDJ Manual
 
+[日本語版マニュアルはこちら](manual.ja.md)
+
 > Write Python code. Hear it change in real time.
 
 ---
