@@ -1,0 +1,875 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PyCodeDJ — Code is the Instrument</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,300;0,400;0,600;1,400&family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:       #08080e;
+      --bg2:      #0f0f18;
+      --bg3:      #16161f;
+      --border:   #1e1e2e;
+      --text:     #cdd6f4;
+      --muted:    #585b70;
+      --green:    #a6e3a1;
+      --pink:     #f38ba8;
+      --blue:     #89b4fa;
+      --cyan:     #89dceb;
+      --yellow:   #f9e2af;
+      --mauve:    #cba6f7;
+      --red:      #f38ba8;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Inter', sans-serif;
+      font-size: 16px;
+      line-height: 1.6;
+      overflow-x: hidden;
+    }
+
+    /* ── Nav ── */
+    nav {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 100;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 2rem;
+      height: 56px;
+      background: rgba(8,8,14,0.85);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border);
+    }
+    .nav-logo {
+      font-family: 'JetBrains Mono', monospace;
+      font-weight: 600;
+      font-size: 1rem;
+      color: var(--green);
+      letter-spacing: 0.05em;
+    }
+    .nav-links { display: flex; gap: 1.5rem; }
+    .nav-links a {
+      color: var(--muted);
+      text-decoration: none;
+      font-size: 0.875rem;
+      transition: color 0.2s;
+    }
+    .nav-links a:hover { color: var(--text); }
+
+    /* ── Hero ── */
+    .hero {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 6rem 2rem 4rem;
+      position: relative;
+    }
+
+    .hero::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background:
+        radial-gradient(ellipse 80% 50% at 50% 0%, rgba(166,227,161,0.06) 0%, transparent 60%),
+        radial-gradient(ellipse 60% 40% at 20% 80%, rgba(137,180,250,0.05) 0%, transparent 50%),
+        radial-gradient(ellipse 60% 40% at 80% 60%, rgba(203,166,247,0.05) 0%, transparent 50%);
+      pointer-events: none;
+    }
+
+    .hero-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      background: rgba(166,227,161,0.08);
+      border: 1px solid rgba(166,227,161,0.2);
+      color: var(--green);
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.75rem;
+      padding: 0.35rem 0.9rem;
+      border-radius: 2rem;
+      margin-bottom: 2rem;
+      letter-spacing: 0.05em;
+    }
+    .hero-badge::before { content: '▶'; font-size: 0.6rem; }
+
+    h1 {
+      font-size: clamp(2.5rem, 7vw, 5.5rem);
+      font-weight: 700;
+      line-height: 1.1;
+      letter-spacing: -0.03em;
+      margin-bottom: 1.5rem;
+    }
+    h1 span.accent-green { color: var(--green); }
+    h1 span.accent-mauve { color: var(--mauve); }
+
+    .hero-sub {
+      font-size: clamp(1rem, 2vw, 1.25rem);
+      color: var(--muted);
+      max-width: 520px;
+      margin: 0 auto 3rem;
+      font-weight: 300;
+    }
+
+    .hero-ctas {
+      display: flex;
+      gap: 1rem;
+      flex-wrap: wrap;
+      justify-content: center;
+      margin-bottom: 4rem;
+    }
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.75rem 1.75rem;
+      border-radius: 0.5rem;
+      font-size: 0.9rem;
+      font-weight: 600;
+      text-decoration: none;
+      transition: all 0.2s;
+      cursor: pointer;
+      border: none;
+    }
+    .btn-primary {
+      background: var(--green);
+      color: #0a0f0a;
+    }
+    .btn-primary:hover { background: #c3f0be; transform: translateY(-1px); }
+    .btn-ghost {
+      background: transparent;
+      color: var(--text);
+      border: 1px solid var(--border);
+    }
+    .btn-ghost:hover { border-color: var(--muted); transform: translateY(-1px); }
+
+    /* ── Live demo ── */
+    .demo-wrap {
+      width: 100%;
+      max-width: 780px;
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1rem;
+    }
+    @media (max-width: 640px) { .demo-wrap { grid-template-columns: 1fr; } }
+
+    .demo-panel {
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      border-radius: 0.75rem;
+      overflow: hidden;
+    }
+    .demo-panel-header {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.6rem 1rem;
+      background: var(--bg3);
+      border-bottom: 1px solid var(--border);
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.72rem;
+      color: var(--muted);
+    }
+    .dot { width: 10px; height: 10px; border-radius: 50%; }
+    .dot-red   { background: #f38ba8; }
+    .dot-yellow{ background: #f9e2af; }
+    .dot-green { background: #a6e3a1; }
+
+    .demo-code {
+      padding: 1.25rem 1.25rem;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.78rem;
+      line-height: 1.75;
+      text-align: left;
+      min-height: 200px;
+    }
+    .c-comment { color: #585b70; font-style: italic; }
+    .c-keyword { color: var(--mauve); }
+    .c-fn      { color: var(--blue); }
+    .c-string  { color: var(--green); }
+    .c-num     { color: var(--yellow); }
+    .c-op      { color: var(--muted); }
+
+    .demo-params {
+      padding: 1.25rem;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.78rem;
+      min-height: 200px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      gap: 1.1rem;
+    }
+    .param-row { display: flex; flex-direction: column; gap: 0.3rem; }
+    .param-label { color: var(--muted); font-size: 0.7rem; letter-spacing: 0.06em; text-transform: uppercase; }
+    .param-bar-wrap { position: relative; height: 6px; background: var(--border); border-radius: 3px; overflow: hidden; }
+    .param-bar {
+      position: absolute;
+      left: 0; top: 0; bottom: 0;
+      border-radius: 3px;
+      transition: width 1.2s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    .param-val {
+      font-size: 0.8rem;
+      transition: opacity 0.3s;
+    }
+    .param-val.updating { opacity: 0.4; }
+
+    /* ── Section base ── */
+    section { padding: 6rem 2rem; }
+    .container { max-width: 960px; margin: 0 auto; }
+    .section-label {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.72rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--green);
+      margin-bottom: 0.75rem;
+    }
+    h2 {
+      font-size: clamp(1.75rem, 4vw, 2.5rem);
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      margin-bottom: 1rem;
+    }
+    .section-lead {
+      color: var(--muted);
+      max-width: 560px;
+      font-size: 1.05rem;
+      margin-bottom: 3rem;
+      font-weight: 300;
+    }
+
+    /* ── How it works ── */
+    .flow {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0;
+      flex-wrap: wrap;
+      margin-bottom: 4rem;
+    }
+    .flow-step {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      width: 160px;
+      padding: 1.5rem 1rem;
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      border-radius: 0.75rem;
+    }
+    .flow-icon {
+      font-size: 2rem;
+      margin-bottom: 0.75rem;
+      line-height: 1;
+    }
+    .flow-title {
+      font-size: 0.8rem;
+      font-weight: 600;
+      margin-bottom: 0.3rem;
+    }
+    .flow-desc {
+      font-size: 0.72rem;
+      color: var(--muted);
+    }
+    .flow-arrow {
+      font-family: 'JetBrains Mono', monospace;
+      color: var(--green);
+      font-size: 1.2rem;
+      padding: 0 0.5rem;
+      opacity: 0.6;
+    }
+    @media (max-width: 680px) { .flow-arrow { transform: rotate(90deg); } }
+
+    /* ── Mappings ── */
+    .mappings {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 1rem;
+    }
+    .mapping-card {
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      border-radius: 0.75rem;
+      padding: 1.5rem;
+      transition: border-color 0.2s, transform 0.2s;
+    }
+    .mapping-card:hover { border-color: var(--muted); transform: translateY(-2px); }
+    .mapping-icon {
+      font-size: 1.5rem;
+      margin-bottom: 1rem;
+    }
+    .mapping-code {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.75rem;
+      color: var(--mauve);
+      margin-bottom: 0.4rem;
+    }
+    .mapping-arrow {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.7rem;
+      color: var(--muted);
+      margin-bottom: 0.4rem;
+    }
+    .mapping-param {
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: var(--green);
+      margin-bottom: 0.5rem;
+    }
+    .mapping-desc {
+      font-size: 0.78rem;
+      color: var(--muted);
+    }
+
+    /* ── Install ── */
+    .install-section { background: var(--bg2); border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); }
+    .install-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 3rem;
+      align-items: center;
+    }
+    @media (max-width: 640px) { .install-grid { grid-template-columns: 1fr; } }
+
+    .code-block {
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 0.75rem;
+      overflow: hidden;
+    }
+    .code-block-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0.6rem 1rem;
+      background: var(--bg3);
+      border-bottom: 1px solid var(--border);
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.7rem;
+      color: var(--muted);
+    }
+    .copy-btn {
+      background: none;
+      border: none;
+      color: var(--muted);
+      cursor: pointer;
+      font-size: 0.7rem;
+      font-family: 'JetBrains Mono', monospace;
+      transition: color 0.2s;
+    }
+    .copy-btn:hover { color: var(--text); }
+    .code-block pre {
+      padding: 1.25rem;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.82rem;
+      line-height: 1.7;
+      overflow-x: auto;
+    }
+    .code-block .prompt { color: var(--muted); user-select: none; }
+    .code-block .cmd { color: var(--green); }
+    .code-block .arg { color: var(--yellow); }
+    .code-block .comment { color: var(--muted); font-style: italic; }
+
+    .steps { list-style: none; counter-reset: steps; display: flex; flex-direction: column; gap: 1.25rem; }
+    .steps li {
+      counter-increment: steps;
+      display: flex;
+      gap: 1rem;
+      align-items: flex-start;
+    }
+    .steps li::before {
+      content: counter(steps);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 28px;
+      height: 28px;
+      background: rgba(166,227,161,0.1);
+      border: 1px solid rgba(166,227,161,0.3);
+      border-radius: 50%;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.72rem;
+      color: var(--green);
+      margin-top: 0.1rem;
+    }
+    .steps li strong { font-size: 0.9rem; display: block; margin-bottom: 0.15rem; }
+    .steps li span { font-size: 0.82rem; color: var(--muted); }
+    .steps code {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.78rem;
+      background: var(--bg3);
+      color: var(--green);
+      padding: 0.1rem 0.4rem;
+      border-radius: 0.25rem;
+    }
+
+    /* ── Examples ── */
+    .examples-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 1rem;
+    }
+    .example-card {
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      border-radius: 0.75rem;
+      overflow: hidden;
+      transition: border-color 0.2s;
+    }
+    .example-card:hover { border-color: var(--muted); }
+    .example-card-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0.75rem 1rem;
+      border-bottom: 1px solid var(--border);
+    }
+    .example-tag {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.7rem;
+      color: var(--mauve);
+    }
+    .example-effect {
+      font-size: 0.72rem;
+      color: var(--muted);
+    }
+    .example-card pre {
+      padding: 1rem;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.75rem;
+      line-height: 1.7;
+    }
+
+    /* ── Footer ── */
+    footer {
+      border-top: 1px solid var(--border);
+      padding: 3rem 2rem;
+      text-align: center;
+    }
+    .footer-logo {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 1.1rem;
+      color: var(--green);
+      margin-bottom: 0.5rem;
+    }
+    .footer-links {
+      display: flex;
+      gap: 1.5rem;
+      justify-content: center;
+      margin: 1.25rem 0;
+      flex-wrap: wrap;
+    }
+    .footer-links a {
+      color: var(--muted);
+      text-decoration: none;
+      font-size: 0.85rem;
+      transition: color 0.2s;
+    }
+    .footer-links a:hover { color: var(--text); }
+    .footer-copy { font-size: 0.78rem; color: var(--muted); }
+
+    /* ── Scanline overlay ── */
+    body::after {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background: repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,0,0,0.03) 2px, rgba(0,0,0,0.03) 4px);
+      pointer-events: none;
+      z-index: 200;
+    }
+
+    /* ── Glow pulse on hero title ── */
+    @keyframes glow-pulse {
+      0%, 100% { text-shadow: 0 0 40px rgba(166,227,161,0.15); }
+      50%       { text-shadow: 0 0 80px rgba(166,227,161,0.3); }
+    }
+    h1 span.accent-green { animation: glow-pulse 4s ease-in-out infinite; }
+
+    /* ── Cursor blink ── */
+    .cursor {
+      display: inline-block;
+      width: 2px;
+      height: 1em;
+      background: var(--green);
+      vertical-align: text-bottom;
+      animation: blink 1s step-end infinite;
+    }
+    @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0} }
+  </style>
+</head>
+<body>
+
+<!-- Nav -->
+<nav>
+  <span class="nav-logo">PyCodeDJ</span>
+  <div class="nav-links">
+    <a href="#how">How it works</a>
+    <a href="#install">Install</a>
+    <a href="https://github.com/kanekoyuichi/pycodedj/blob/main/docs/manual.md" target="_blank">Docs</a>
+    <a href="https://github.com/kanekoyuichi/pycodedj" target="_blank">GitHub</a>
+  </div>
+</nav>
+
+<!-- Hero -->
+<section class="hero">
+  <div class="hero-badge">v0.1.1 — now on PyPI</div>
+  <h1>
+    <span class="accent-green">Code</span> is<br>
+    the <span class="accent-mauve">instrument</span>
+  </h1>
+  <p class="hero-sub">
+    Write Python. Save the file. Hear it change.<br>
+    Your code structure becomes music — in real time.
+  </p>
+  <div class="hero-ctas">
+    <a href="#install" class="btn btn-primary">Get started</a>
+    <a href="https://github.com/kanekoyuichi/pycodedj" target="_blank" class="btn btn-ghost">GitHub</a>
+  </div>
+
+  <!-- Live demo panels -->
+  <div class="demo-wrap">
+    <div class="demo-panel">
+      <div class="demo-panel-header">
+        <span class="dot dot-red"></span>
+        <span class="dot dot-yellow"></span>
+        <span class="dot dot-green"></span>
+        <span style="margin-left:0.5rem">demo.py</span>
+      </div>
+      <div class="demo-code" id="demoCode"></div>
+    </div>
+    <div class="demo-panel">
+      <div class="demo-panel-header">
+        <span class="dot dot-red"></span>
+        <span class="dot dot-yellow"></span>
+        <span class="dot dot-green"></span>
+        <span style="margin-left:0.5rem">SuperCollider output</span>
+      </div>
+      <div class="demo-params" id="demoParams">
+        <div class="param-row">
+          <div class="param-label">cutoff</div>
+          <div class="param-bar-wrap"><div class="param-bar" id="barCutoff" style="width:15%;background:var(--green)"></div></div>
+          <div class="param-val" id="valCutoff" style="color:var(--green)">418 Hz</div>
+        </div>
+        <div class="param-row">
+          <div class="param-label">lfo rate</div>
+          <div class="param-bar-wrap"><div class="param-bar" id="barLfo" style="width:20%;background:var(--blue)"></div></div>
+          <div class="param-val" id="valLfo" style="color:var(--blue)">1.08 Hz</div>
+        </div>
+        <div class="param-row">
+          <div class="param-label">reverb</div>
+          <div class="param-bar-wrap"><div class="param-bar" id="barReverb" style="width:0%;background:var(--mauve)"></div></div>
+          <div class="param-val" id="valReverb" style="color:var(--mauve)">0.00</div>
+        </div>
+        <div class="param-row">
+          <div class="param-label">voices</div>
+          <div class="param-bar-wrap"><div class="param-bar" id="barVoices" style="width:25%;background:var(--yellow)"></div></div>
+          <div class="param-val" id="valVoices" style="color:var(--yellow)">1 voice</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- How it works -->
+<section id="how">
+  <div class="container">
+    <p class="section-label">How it works</p>
+    <h2>Save a file. Change the music.</h2>
+    <p class="section-lead">PyCodeDJ analyses the AST of your Python code and maps structural features to audio parameters — no music theory required.</p>
+
+    <div class="flow">
+      <div class="flow-step">
+        <div class="flow-icon">✍️</div>
+        <div class="flow-title">Write Python</div>
+        <div class="flow-desc">Any valid Python — functions, loops, comments</div>
+      </div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-step">
+        <div class="flow-icon">🔬</div>
+        <div class="flow-title">AST Analysis</div>
+        <div class="flow-desc">Depth, control-flow count, function count, comment ratio</div>
+      </div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-step">
+        <div class="flow-icon">📡</div>
+        <div class="flow-title">OSC Bridge</div>
+        <div class="flow-desc">Parameters sent over UDP to SuperCollider</div>
+      </div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-step">
+        <div class="flow-icon">🔊</div>
+        <div class="flow-title">Sound</div>
+        <div class="flow-desc">Real-time synthesis via scsynth</div>
+      </div>
+    </div>
+
+    <div class="mappings">
+      <div class="mapping-card">
+        <div class="mapping-icon">🌊</div>
+        <div class="mapping-code">nesting depth</div>
+        <div class="mapping-arrow">──▶</div>
+        <div class="mapping-param">Filter Cutoff</div>
+        <div class="mapping-desc">Deeper if/for nesting opens the filter. More structure = brighter sound.</div>
+      </div>
+      <div class="mapping-card">
+        <div class="mapping-icon">〰️</div>
+        <div class="mapping-code">if / for / while count</div>
+        <div class="mapping-arrow">──▶</div>
+        <div class="mapping-param">LFO Rate</div>
+        <div class="mapping-desc">More control flow = faster modulation. Complexity becomes movement.</div>
+      </div>
+      <div class="mapping-card">
+        <div class="mapping-icon">🎹</div>
+        <div class="mapping-code">def count</div>
+        <div class="mapping-arrow">──▶</div>
+        <div class="mapping-param">Voice Count</div>
+        <div class="mapping-desc">Each function is a voice. Four functions fill a chord.</div>
+      </div>
+      <div class="mapping-card">
+        <div class="mapping-icon">🌫️</div>
+        <div class="mapping-code">comment ratio</div>
+        <div class="mapping-arrow">──▶</div>
+        <div class="mapping-param">Reverb Depth</div>
+        <div class="mapping-desc">Whitespace becomes space. More comments = deeper reverb.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Install -->
+<section id="install" class="install-section">
+  <div class="container">
+    <p class="section-label">Get started</p>
+    <h2>Up and running in minutes</h2>
+    <p class="section-lead">Python 3.10+, SuperCollider, and one pip command.</p>
+
+    <div class="install-grid">
+      <div class="code-block">
+        <div class="code-block-header">
+          <span>terminal</span>
+          <button class="copy-btn" onclick="copyInstall(this)">copy</button>
+        </div>
+        <pre id="installCode"><span class="prompt">$ </span><span class="cmd">pip install</span> <span class="arg">'pycodedj[watch]'</span>
+
+<span class="comment"># Evaluate a loop block once</span>
+<span class="prompt">$ </span><span class="cmd">pycodedj eval</span> <span class="arg">demo.py::bass</span>
+
+<span class="comment"># Watch file — auto-reload on save</span>
+<span class="prompt">$ </span><span class="cmd">pycodedj watch</span> <span class="arg">demo.py</span></pre>
+      </div>
+
+      <ol class="steps">
+        <li>
+          <div>
+            <strong>Install SuperCollider</strong>
+            <span>Download from supercollider.github.io and boot the server</span>
+          </div>
+        </li>
+        <li>
+          <div>
+            <strong>Load the synths</strong>
+            <span>Open <code>sc/synths.scd</code> in the SC IDE → Ctrl+A → Ctrl+Enter. Wait for <code>Ready.</code></span>
+          </div>
+        </li>
+        <li>
+          <div>
+            <strong>Install PyCodeDJ</strong>
+            <span><code>pip install 'pycodedj[watch]'</code></span>
+          </div>
+        </li>
+        <li>
+          <div>
+            <strong>Write code, hear sound</strong>
+            <span>Run <code>pycodedj watch myfile.py</code> and start editing</span>
+          </div>
+        </li>
+      </ol>
+    </div>
+  </div>
+</section>
+
+<!-- Examples -->
+<section id="examples">
+  <div class="container">
+    <p class="section-label">Examples</p>
+    <h2>Every edit is a performance</h2>
+    <p class="section-lead">Try changing these patterns — each one shifts the sound in a different direction.</p>
+
+    <div class="examples-grid">
+      <div class="example-card">
+        <div class="example-card-header">
+          <span class="example-tag"># bright + fast</span>
+          <span class="example-effect">cutoff ↑ lfo ↑</span>
+        </div>
+        <pre><span class="c-comment"># @loop bass interval=2.0</span>
+<span class="c-keyword">def</span> <span class="c-fn">bass</span>():
+    <span class="c-keyword">for</span> i <span class="c-keyword">in</span> <span class="c-fn">range</span>(<span class="c-num">8</span>):
+        <span class="c-keyword">for</span> j <span class="c-keyword">in</span> <span class="c-fn">range</span>(<span class="c-num">4</span>):
+            <span class="c-keyword">if</span> i <span class="c-op">==</span> j:
+                <span class="c-keyword">pass</span></pre>
+      </div>
+      <div class="example-card">
+        <div class="example-card-header">
+          <span class="example-tag"># 4-voice chord</span>
+          <span class="example-effect">voices = 4</span>
+        </div>
+        <pre><span class="c-comment"># @loop chord interval=1.0</span>
+<span class="c-keyword">def</span> <span class="c-fn">voice_a</span>(): <span class="c-keyword">pass</span>
+<span class="c-keyword">def</span> <span class="c-fn">voice_b</span>(): <span class="c-keyword">pass</span>
+<span class="c-keyword">def</span> <span class="c-fn">voice_c</span>(): <span class="c-keyword">pass</span>
+<span class="c-keyword">def</span> <span class="c-fn">voice_d</span>(): <span class="c-keyword">pass</span></pre>
+      </div>
+      <div class="example-card">
+        <div class="example-card-header">
+          <span class="example-tag"># deep space</span>
+          <span class="example-effect">reverb ↑↑</span>
+        </div>
+        <pre><span class="c-comment"># @loop pad interval=4.0</span>
+<span class="c-comment"># smoke above the kick</span>
+<span class="c-comment"># late reflections</span>
+<span class="c-comment"># concrete room tail</span>
+<span class="c-comment"># crowd heat</span>
+<span class="c-keyword">def</span> <span class="c-fn">pad</span>(): <span class="c-keyword">pass</span></pre>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Footer -->
+<footer>
+  <div class="footer-logo">PyCodeDJ</div>
+  <p style="color:var(--muted);font-size:0.85rem">Code is the instrument.</p>
+  <div class="footer-links">
+    <a href="https://github.com/kanekoyuichi/pycodedj" target="_blank">GitHub</a>
+    <a href="https://pypi.org/project/pycodedj/" target="_blank">PyPI</a>
+    <a href="https://github.com/kanekoyuichi/pycodedj/blob/main/docs/manual.md" target="_blank">Manual (EN)</a>
+    <a href="https://github.com/kanekoyuichi/pycodedj/blob/main/docs/manual.ja.md" target="_blank">マニュアル (JA)</a>
+    <a href="https://github.com/kanekoyuichi/pycodedj/blob/main/README.ja.md" target="_blank">README (JA)</a>
+  </div>
+  <p class="footer-copy">MIT License · Yuichi Kaneko</p>
+</footer>
+
+<script>
+  // ── Live demo animation ──
+  const frames = [
+    {
+      code: [
+        '<span class="c-comment"># @loop bass interval=2.0</span>',
+        '<span class="c-keyword">def</span> <span class="c-fn">bass</span>():',
+        '    <span class="c-keyword">pass</span>',
+      ],
+      cutoff: { pct: 8, val: '200 Hz' },
+      lfo:    { pct: 5, val: '0.10 Hz' },
+      reverb: { pct: 0, val: '0.00' },
+      voices: { pct: 25, val: '1 voice' },
+    },
+    {
+      code: [
+        '<span class="c-comment"># @loop bass interval=2.0</span>',
+        '<span class="c-keyword">def</span> <span class="c-fn">bass</span>():',
+        '    <span class="c-keyword">for</span> i <span class="c-keyword">in</span> <span class="c-fn">range</span>(<span class="c-num">8</span>):',
+        '        <span class="c-keyword">if</span> i <span class="c-op">%</span> <span class="c-num">2</span> <span class="c-op">==</span> <span class="c-num">0</span>:',
+        '            <span class="c-keyword">pass</span>',
+      ],
+      cutoff: { pct: 22, val: '580 Hz' },
+      lfo:    { pct: 35, val: '1.58 Hz' },
+      reverb: { pct: 0,  val: '0.00' },
+      voices: { pct: 25, val: '1 voice' },
+    },
+    {
+      code: [
+        '<span class="c-comment"># @loop bass interval=2.0</span>',
+        '<span class="c-keyword">def</span> <span class="c-fn">bass</span>():',
+        '    <span class="c-keyword">for</span> i <span class="c-keyword">in</span> <span class="c-fn">range</span>(<span class="c-num">8</span>):',
+        '        <span class="c-keyword">for</span> j <span class="c-keyword">in</span> <span class="c-fn">range</span>(<span class="c-num">4</span>):',
+        '            <span class="c-keyword">if</span> i <span class="c-op">==</span> j:',
+        '                <span class="c-keyword">pass</span>',
+      ],
+      cutoff: { pct: 62, val: '2340 Hz' },
+      lfo:    { pct: 64, val: '3.04 Hz' },
+      reverb: { pct: 0,  val: '0.00' },
+      voices: { pct: 25, val: '1 voice' },
+    },
+    {
+      code: [
+        '<span class="c-comment"># @loop chord interval=1.0</span>',
+        '<span class="c-keyword">def</span> <span class="c-fn">voice_a</span>(): <span class="c-keyword">pass</span>',
+        '<span class="c-keyword">def</span> <span class="c-fn">voice_b</span>(): <span class="c-keyword">pass</span>',
+        '<span class="c-keyword">def</span> <span class="c-fn">voice_c</span>(): <span class="c-keyword">pass</span>',
+        '<span class="c-keyword">def</span> <span class="c-fn">voice_d</span>(): <span class="c-keyword">pass</span>',
+      ],
+      cutoff: { pct: 8,  val: '200 Hz' },
+      lfo:    { pct: 5,  val: '0.10 Hz' },
+      reverb: { pct: 0,  val: '0.00' },
+      voices: { pct: 100, val: '4 voices' },
+    },
+    {
+      code: [
+        '<span class="c-comment"># @loop pad interval=4.0</span>',
+        '<span class="c-comment"># smoke above the kick</span>',
+        '<span class="c-comment"># late reflections</span>',
+        '<span class="c-comment"># concrete room tail</span>',
+        '<span class="c-comment"># crowd heat</span>',
+        '<span class="c-keyword">def</span> <span class="c-fn">pad</span>(): <span class="c-keyword">pass</span>',
+      ],
+      cutoff: { pct: 8,  val: '200 Hz' },
+      lfo:    { pct: 5,  val: '0.10 Hz' },
+      reverb: { pct: 87, val: '0.70' },
+      voices: { pct: 25, val: '1 voice' },
+    },
+  ];
+
+  let fi = 0;
+
+  function setFrame(f) {
+    // code
+    document.getElementById('demoCode').innerHTML =
+      f.code.join('<br>') + '<span class="cursor"></span>';
+    // params
+    ['Cutoff','Lfo','Reverb','Voices'].forEach(name => {
+      const key = name.toLowerCase();
+      const bar = document.getElementById('bar' + name);
+      const val = document.getElementById('val' + name);
+      val.classList.add('updating');
+      setTimeout(() => {
+        bar.style.width = f[key].pct + '%';
+        val.textContent = f[key].val;
+        val.classList.remove('updating');
+      }, 200);
+    });
+  }
+
+  setFrame(frames[0]);
+  setInterval(() => {
+    fi = (fi + 1) % frames.length;
+    setFrame(frames[fi]);
+  }, 3000);
+
+  // ── Copy install command ──
+  function copyInstall(btn) {
+    const text = `pip install 'pycodedj[watch]'`;
+    navigator.clipboard.writeText(text).then(() => {
+      btn.textContent = 'copied!';
+      setTimeout(() => btn.textContent = 'copy', 1500);
+    });
+  }
+</script>
+</body>
+</html>
