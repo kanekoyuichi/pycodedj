@@ -75,6 +75,72 @@ s.waitForBoot({
         Out.ar(0, Pan2.ar(sig * env * amp, LFNoise1.kr(0.08)));
     }).add;
 
+    SynthDef(\pycodedj_kick_pulse, {
+        arg cutoff = 900, lfoRate = 1.0, reverbMix = 0.02, amp = 0.42, gate = 1;
+        var trig, env, pitch, sig, gateEnv;
+        trig = Impulse.kr(lfoRate.clip(0.5, 4.0));
+        env = Decay2.kr(trig, 0.001, 0.22);
+        pitch = EnvGen.kr(Env([72, 38, 34], [0.025, 0.16], \exp), trig).midicps;
+        sig = SinOsc.ar(pitch) * env;
+        sig = (sig + (BPF.ar(WhiteNoise.ar(0.08), cutoff.clip(500, 4500), 0.5) * Decay2.kr(trig, 0.001, 0.02))).tanh;
+        gateEnv = EnvGen.kr(Env.asr(0.01, 1, 0.08), gate, doneAction: 2);
+        sig = FreeVerb.ar(sig, reverbMix.clip(0, 0.25), 0.2, 0.1) * gateEnv * amp;
+        Out.ar(0, sig ! 2);
+    }).add;
+
+    SynthDef(\pycodedj_glitch_ticks, {
+        arg cutoff = 5000, lfoRate = 2.0, reverbMix = 0.08, amp = 0.16, gate = 1;
+        var trig, rate, env, sig, gateEnv;
+        rate = (lfoRate * 8).clip(4, 28);
+        trig = Dust.kr(rate);
+        env = Decay2.kr(trig, 0.0005, 0.035);
+        sig = HPF.ar(Hasher.ar(Sweep.ar(trig)), cutoff.clip(1200, 12000) * 0.5) * env;
+        sig = Pan2.ar(sig, LFNoise1.kr(rate * 0.25).range(-0.8, 0.8));
+        gateEnv = EnvGen.kr(Env.asr(0.005, 1, 0.05), gate, doneAction: 2);
+        sig = FreeVerb.ar(sig, reverbMix.clip(0, 0.5), 0.35, 0.2) * gateEnv * amp;
+        Out.ar(0, sig);
+    }).add;
+
+    SynthDef(\pycodedj_soft_pluck, {
+        arg cutoff = 1600, lfoRate = 1.0, reverbMix = 0.18, amp = 0.22, gate = 1;
+        var trig, note, freq, env, sig, gateEnv;
+        trig = Impulse.kr(lfoRate.clip(0.2, 6.0));
+        note = Demand.kr(trig, 0, Dseq([60, 64, 67, 72, 67, 64], inf));
+        freq = note.midicps;
+        env = Decay2.kr(trig, 0.004, 0.28);
+        sig = Mix.ar(Pulse.ar(freq * [1, 2.01], [0.42, 0.35], [0.55, 0.12])) * env;
+        sig = RLPF.ar(sig, cutoff.clip(350, 7000), 0.38);
+        gateEnv = EnvGen.kr(Env.asr(0.02, 1, 0.16), gate, doneAction: 2);
+        sig = FreeVerb.ar(sig, reverbMix.clip(0, 0.75), 0.45, 0.28) * gateEnv * amp;
+        Out.ar(0, sig ! 2);
+    }).add;
+
+    SynthDef(\pycodedj_dub_chord, {
+        arg cutoff = 1200, lfoRate = 0.5, reverbMix = 0.35, amp = 0.2, gate = 1;
+        var trig, root, freqs, env, sig, gateEnv;
+        trig = Impulse.kr(lfoRate.clip(0.08, 2.0));
+        root = Demand.kr(trig, 0, Dseq([43, 46, 41, 48], inf));
+        freqs = (root + [0, 7, 10, 14]).midicps;
+        env = Decay2.kr(trig, 0.015, 0.55);
+        sig = Splay.ar(Pulse.ar(freqs, 0.48)) * 0.16;
+        sig = RLPF.ar(sig, cutoff.clip(500, 5000), 0.24) * env;
+        gateEnv = EnvGen.kr(Env.asr(0.05, 1, 0.3), gate, doneAction: 2);
+        sig = FreeVerb.ar(sig, reverbMix.clip(0.1, 0.85), 0.75, 0.45) * gateEnv * amp;
+        Out.ar(0, sig);
+    }).add;
+
+    SynthDef(\pycodedj_shimmer_pad, {
+        arg cutoff = 1400, lfoRate = 0.15, reverbMix = 0.55, amp = 0.2, gate = 1;
+        var drift, freqs, sig, gateEnv;
+        drift = LFNoise1.kr(lfoRate.clip(0.03, 0.7)).range(-0.08, 0.08);
+        freqs = ([55, 62, 67, 74] + drift).midicps;
+        sig = Splay.ar(SinOsc.ar(freqs * [1, 1.002, 0.998, 1.004])) * 0.18;
+        sig = RLPF.ar(sig, cutoff.clip(500, 5200), 0.42);
+        gateEnv = EnvGen.kr(Env.asr(1.2, 1, 1.8), gate, doneAction: 2);
+        sig = FreeVerb.ar(sig, reverbMix.clip(0.25, 0.95), 0.9, 0.55) * gateEnv * amp;
+        Out.ar(0, sig);
+    }).add;
+
     SynthDef(\pycodedj_base, {
         arg cutoff = 800, lfoRate = 0.5, reverbMix = 0.2, amp = 0.3, gate = 1;
         var sig, env, lfo;
@@ -99,6 +165,11 @@ s.waitForBoot({
             "neon_stab", { \pycodedj_neon_stab },
             "acid_lead", { \pycodedj_acid_lead },
             "warehouse_air", { \pycodedj_warehouse_air },
+            "kick_pulse", { \pycodedj_kick_pulse },
+            "glitch_ticks", { \pycodedj_glitch_ticks },
+            "soft_pluck", { \pycodedj_soft_pluck },
+            "dub_chord", { \pycodedj_dub_chord },
+            "shimmer_pad", { \pycodedj_shimmer_pad },
             { \pycodedj_base }
         );
     };

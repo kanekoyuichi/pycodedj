@@ -134,7 +134,7 @@ From here, just write code and save.
 | File | Contents |
 | :--- | :--- |
 | `examples/demo.py` | Intro demo with bass / melody / pad |
-| `examples/club_set.py` | Club-style demo: sub_bass / hat_engine / neon_stab / acid_lead / warehouse_air |
+| `examples/club_set.py` | Club-style demo with 10 dedicated sounds: sub_bass / hat_engine / neon_stab / acid_lead / warehouse_air / kick_pulse / glitch_ticks / soft_pluck / dub_chord / shimmer_pad |
 
 ---
 

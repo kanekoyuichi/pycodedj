@@ -495,7 +495,7 @@ pycodedj eval myfile.py::bass
 
 ## 8. Club set example — running club_set.py
 
-`examples/club_set.py` contains five club-music-style parts, each with a distinct sound shaped by its code structure.
+`examples/club_set.py` contains ten club-music-style parts, each with a distinct sound shaped by its code structure.
 
 ### Block overview
 
@@ -506,6 +506,11 @@ pycodedj eval myfile.py::bass
 | `neon_stab` | 3-voice chord stab | Three functions = three voices |
 | `acid_lead` | Acid lead | Deep nesting and lots of control flow = bright and fast |
 | `warehouse_air` | Warehouse ambience | Comment-heavy = deep reverb |
+| `kick_pulse` | Kick / low pulse | Short low-end hits around the downbeat |
+| `glitch_ticks` | Glitch particles | Small noisy grains and fast movement |
+| `soft_pluck` | Soft pluck | Short melodic plucks |
+| `dub_chord` | Dub chord | Reverb-heavy chord hits |
+| `shimmer_pad` | Shimmer pad | Long bright pad texture |
 
 ### Getting it running
 
@@ -523,6 +528,11 @@ pycodedj eval examples/club_set.py::hat_engine
 pycodedj eval examples/club_set.py::neon_stab
 pycodedj eval examples/club_set.py::acid_lead
 pycodedj eval examples/club_set.py::warehouse_air
+pycodedj eval examples/club_set.py::kick_pulse
+pycodedj eval examples/club_set.py::glitch_ticks
+pycodedj eval examples/club_set.py::soft_pluck
+pycodedj eval examples/club_set.py::dub_chord
+pycodedj eval examples/club_set.py::shimmer_pad
 ```
 
 ### Performing with it

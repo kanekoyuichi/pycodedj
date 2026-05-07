@@ -497,7 +497,7 @@ pycodedj eval myfile.py::bass
 
 ## 8. クラブセット例 — club_set.py を動かす
 
-`examples/club_set.py` は、クラブミュージック風のパートを 5 つ組み合わせたデモファイルです。それぞれのブロックがコードの構造で異なる音色を持っています。
+`examples/club_set.py` は、クラブミュージック風のパートを 10 個組み合わせたデモファイルです。それぞれのブロックがコードの構造で異なる音色を持っています。
 
 ### ブロック一覧
 
@@ -508,6 +508,11 @@ pycodedj eval myfile.py::bass
 | `neon_stab` | 3 声のコードスタブ | 関数 3 つでポリフォニー |
 | `acid_lead` | アシッドリード | 深いネストと多い制御フローで明るく速い |
 | `warehouse_air` | 倉庫の空気感 | コメントだらけでリバーブが深い |
+| `kick_pulse` | キック/低音パルス | downbeat を強調する短い低音 |
+| `glitch_ticks` | グリッチ粒子 | 細かいノイズ粒と速い揺らぎ |
+| `soft_pluck` | 柔らかいプラック | 短い音価のメロディ |
+| `dub_chord` | ダブコード | 残響のあるコードヒット |
+| `shimmer_pad` | シマーパッド | 長く伸びる明るいパッド |
 
 ### 動かしてみる
 
@@ -525,6 +530,11 @@ pycodedj eval examples/club_set.py::hat_engine
 pycodedj eval examples/club_set.py::neon_stab
 pycodedj eval examples/club_set.py::acid_lead
 pycodedj eval examples/club_set.py::warehouse_air
+pycodedj eval examples/club_set.py::kick_pulse
+pycodedj eval examples/club_set.py::glitch_ticks
+pycodedj eval examples/club_set.py::soft_pluck
+pycodedj eval examples/club_set.py::dub_chord
+pycodedj eval examples/club_set.py::shimmer_pad
 ```
 
 ### 演奏してみる

@@ -6,6 +6,11 @@
 #   pycodedj eval examples/club_set.py::neon_stab
 #   pycodedj eval examples/club_set.py::acid_lead
 #   pycodedj eval examples/club_set.py::warehouse_air
+#   pycodedj eval examples/club_set.py::kick_pulse
+#   pycodedj eval examples/club_set.py::glitch_ticks
+#   pycodedj eval examples/club_set.py::soft_pluck
+#   pycodedj eval examples/club_set.py::dub_chord
+#   pycodedj eval examples/club_set.py::shimmer_pad
 #
 # These blocks are meant as code-structure performance material. Edit and save
 # them live, then re-run eval for a loop to push a new sound shape.
@@ -68,4 +73,55 @@ def acid_lead():
 # crowd heat
 # blue strobes
 def warehouse_air():
+    pass
+
+
+# @loop kick_pulse interval=1.0
+def kick_pulse():
+    for beat in range(4):
+        if beat == 0:
+            weight = "downbeat"
+        else:
+            weight = "ghost"
+        _ = weight
+
+
+# @loop glitch_ticks interval=0.25
+def glitch_ticks():
+    for grain in range(12):
+        if grain % 3 == 0:
+            cut = "sharp"
+        if grain in (5, 9):
+            cut = "scatter"
+        _ = cut
+
+
+# @loop soft_pluck interval=0.5
+def soft_pluck():
+    notes = ["root", "third", "fifth", "octave"]
+    for note in notes:
+        if note in ("fifth", "octave"):
+            color = "bright"
+        else:
+            color = "round"
+        _ = color
+
+
+# @loop dub_chord interval=2.0
+def dub_chord():
+    def root():
+        return "low"
+
+    def fifth():
+        return "wide"
+
+    return root(), fifth()
+
+
+# @loop shimmer_pad interval=4.0
+# high ceiling
+# silver trail
+# slow light
+# suspended air
+def shimmer_pad():
     pass
