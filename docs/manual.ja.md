@@ -182,7 +182,36 @@ PyCodeDJ synths loaded. Ready. OSC port: 57120
 
 `sc/synths.scd` は、PyCodeDJ 用の音色と OSC 受信処理を SuperCollider に登録するファイルです。SuperCollider を再起動した後は、もう一度このファイルを実行してください。
 
-### ステップ 3: 接続を確認する
+### ステップ 3: 出力先を変更した場合
+
+SuperCollider は audio server を起動した時点の出力先を使います。Mac/PC 側でスピーカー、イヤホン、オーディオインターフェースなどの出力先を変更した場合は、SuperCollider の audio server を起動し直してください。
+
+まず使えるデバイス名を確認します。
+
+```supercollider
+ServerOptions.devices;
+```
+
+Post window にデバイス名の一覧が表示されます。使いたい出力先の名前を確認したら、次のように指定します。
+
+```supercollider
+s.quit;
+s.options.outDevice = "ここに出力デバイス名を書く";
+s.options.numInputBusChannels = 0;
+s.boot;
+```
+
+入力を使わない場合は `numInputBusChannels = 0` にしておくと、入力デバイスとのサンプルレート不一致を避けやすくなります。
+
+boot 後、SuperCollider 単体で音が出るか確認します。
+
+```supercollider
+{ SinOsc.ar(110, 0, 0.03) ! 2 }.play;
+```
+
+音が出たら、`sc/synths.scd` をもう一度実行します（Ctrl+A → Ctrl+Enter、Mac は Cmd+A → Cmd+Enter）。
+
+### ステップ 4: 接続を確認する
 
 ターミナルに戻り、次を実行します。
 

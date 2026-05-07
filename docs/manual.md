@@ -180,7 +180,36 @@ If this message does not appear, see [Troubleshooting](#10-troubleshooting).
 
 `sc/synths.scd` registers the PyCodeDJ synth definitions and OSC receiver in SuperCollider. Run this file again after restarting SuperCollider.
 
-### Step 3: Confirm the connection
+### Step 3: If you change the audio output
+
+SuperCollider uses the audio output device that is active when the audio server boots. If you change the system output to speakers, headphones, or an audio interface, restart the SuperCollider audio server.
+
+First list the available device names:
+
+```supercollider
+ServerOptions.devices;
+```
+
+The device names appear in the Post window. After choosing the output device name, set it explicitly:
+
+```supercollider
+s.quit;
+s.options.outDevice = "output device name here";
+s.options.numInputBusChannels = 0;
+s.boot;
+```
+
+If you do not need audio input, keeping `numInputBusChannels = 0` helps avoid sample-rate mismatches with the input device.
+
+After booting, confirm that SuperCollider itself can make sound:
+
+```supercollider
+{ SinOsc.ar(110, 0, 0.03) ! 2 }.play;
+```
+
+If you hear sound, re-evaluate `sc/synths.scd` (Ctrl+A → Ctrl+Enter, or Cmd+A → Cmd+Enter on Mac).
+
+### Step 4: Confirm the connection
 
 Back in your terminal, run:
 
