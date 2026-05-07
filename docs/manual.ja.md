@@ -500,7 +500,7 @@ pycodedj eval myfile.py::bass
 
 ## 8. クラブセット例 — club_set.py を動かす
 
-`examples/club_set.py` は、クラブのグルーヴとして成立しやすい 6 パートに絞ったデモファイルです。音色カタログではなく、キック、サブベース、ハット、クラップ、コード、空気感を組み合わせたセットです。
+`examples/club_set.py` は、クラブのグルーヴとして成立しやすい多層デモファイルです。音色カタログではなく、硬いキック、低いランブル、揺れる Reese ベース、ハット、クラップ、レイブスタブ、Hoover リード、空間系 FX を組み合わせたセットです。
 
 `# @loop kick_floor interval=1.0` のような `@loop` 名は、SuperCollider 側では役割名として解釈されます。たとえば `kick_...` はキック系、`bass_...` はベース系、`hat_...` はハット系のシンセに割り当てられます。Python 側でグルーヴや構成を変えるだけなら、通常は `sc/synths.scd` を編集する必要はありません。まったく新しい音色エンジンを増やしたいときだけ、SuperCollider 側に SynthDef を追加します。
 
@@ -536,11 +536,16 @@ pycodedj eval myfile.py::bass
 
 | ループ名 | キャラクター | コードの特徴 |
 | :--- | :--- | :--- |
-| `kick_floor` | ドスドス響く四つ打ちキック | 低域の胴鳴りと短いアタック |
-| `bass_sub` | 重いサブベース | `if` のネストが深く、フィルターが開いている |
-| `hat_offbeat` | ハイハットのグリッド | `for` + `if` が多く、揺らぎが速い |
-| `clap_backbeat` | クラップ/スネア感 | バックビートのアクセント |
-| `chord_dub` | ダブコード | 残響のあるコードヒット |
+| `kick_hard` | 硬い四つ打ちキック | 8 小節のアクセントつき |
+| `bass_rumble` | キック下のランブル | 低域の尾を重ねる |
+| `bass_reese` | 揺れる Reese ベース | シンコペーションとスライド |
+| `hat_offbeat` | ハイハットのグリッド | 裏拍と遅れ気味のアクセント |
+| `hat_ride` | ライド/オープンハット | 後半で開く持続音 |
+| `clap_backbeat` | クラップ | バックビートとフィル |
+| `clap_snare` | スネア寄りのアクセント | フレーズ終端を強調 |
+| `chord_rave` | レイブスタブ | 短いコード反復 |
+| `lead_hoover` | Hoover 風リード | 疎らな応答フレーズ |
+| `fx_impact` | インパクト | 大きな区切りの低い衝撃 |
 | `fx_air` | 倉庫の空気感 | コメントだらけでリバーブが深い |
 
 ### 動かしてみる
@@ -554,11 +559,16 @@ pycodedj watch examples/club_set.py
 個別にループを足したい場合は eval することもできます。
 
 ```bash
-pycodedj eval examples/club_set.py::kick_floor
-pycodedj eval examples/club_set.py::bass_sub
+pycodedj eval examples/club_set.py::kick_hard
+pycodedj eval examples/club_set.py::bass_rumble
+pycodedj eval examples/club_set.py::bass_reese
 pycodedj eval examples/club_set.py::hat_offbeat
+pycodedj eval examples/club_set.py::hat_ride
 pycodedj eval examples/club_set.py::clap_backbeat
-pycodedj eval examples/club_set.py::chord_dub
+pycodedj eval examples/club_set.py::clap_snare
+pycodedj eval examples/club_set.py::chord_rave
+pycodedj eval examples/club_set.py::lead_hoover
+pycodedj eval examples/club_set.py::fx_impact
 pycodedj eval examples/club_set.py::fx_air
 ```
 
@@ -592,7 +602,7 @@ def chord_fifth():
 # chord_seventh を削除
 ```
 
-`bass_sub` の `for pressure in range(3)` のネストを削除して、フラットにしてみましょう。フィルターが下がり、低音の押し出しが弱くなります。
+`bass_reese` の `for slide in range(2)` のネストを削除して、フラットにしてみましょう。フィルターが下がり、ベースの押し出しが弱くなります。
 
 このように、コードの構造を変えることが演奏になります。
 

@@ -134,7 +134,7 @@ pycodedj watch demo.py
 | ファイル | 内容 |
 | :--- | :--- |
 | `examples/demo.py` | bass / melody / pad の 3 ループ入門デモ |
-| `examples/club_set.py` | kick_floor / bass_sub / hat_offbeat / clap_backbeat / chord_dub / fx_air の 6 パートに絞ったクラブグルーヴ |
+| `examples/club_set.py` | kick_hard / bass_rumble / bass_reese などを重ねた多層クラブグルーヴ |
 
 ---
 

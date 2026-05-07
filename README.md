@@ -134,7 +134,7 @@ From here, just write code and save.
 | File | Contents |
 | :--- | :--- |
 | `examples/demo.py` | Intro demo with bass / melody / pad |
-| `examples/club_set.py` | Focused six-part dancefloor groove: kick_floor / bass_sub / hat_offbeat / clap_backbeat / chord_dub / fx_air |
+| `examples/club_set.py` | Layered club groove using kick_hard / bass_rumble / bass_reese and more |
 
 ---
 

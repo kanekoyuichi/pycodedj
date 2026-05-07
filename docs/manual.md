@@ -498,7 +498,7 @@ pycodedj eval myfile.py::bass
 
 ## 8. Club set example — running club_set.py
 
-`examples/club_set.py` is a focused six-part dancefloor groove. It is not a synth catalogue: it combines kick, sub bass, hats, clap, chord hits, and room ambience.
+`examples/club_set.py` is a layered dancefloor groove. It is not a synth catalogue: it combines hard kick, low rumble, moving Reese bass, hats, claps, rave stabs, Hoover lead, and room FX.
 
 Loop names such as `# @loop kick_floor interval=1.0` are interpreted as role names on the SuperCollider side. For example, `kick_...` maps to a kick synth, `bass_...` maps to a bass synth, and `hat_...` maps to a hat synth. If you are only changing the Python groove or arrangement, you usually do not need to edit `sc/synths.scd`. Edit SuperCollider only when you want to add a genuinely new sound engine.
 
@@ -534,11 +534,16 @@ For example, change `# @loop bass_sub interval=0.5` in `club_set.py` to `# @loop
 
 | Loop name | Character | Code features |
 | :--- | :--- | :--- |
-| `kick_floor` | Big four-on-the-floor kick | Low body and a short attack |
-| `bass_sub` | Heavy sub bass | Deep `if` nesting, filter wide open |
-| `hat_offbeat` | Hi-hat grid | Many `for` + `if`, fast LFO |
-| `clap_backbeat` | Clap / snare accent | Backbeat energy |
-| `chord_dub` | Dub chord | Reverb-heavy chord hits |
+| `kick_hard` | Hard four-on-the-floor kick | Eight-bar accents |
+| `bass_rumble` | Rumble under the kick | Layered low-end tails |
+| `bass_reese` | Moving Reese bass | Syncopation and slides |
+| `hat_offbeat` | Hi-hat grid | Offbeats and late accents |
+| `hat_ride` | Ride / open hat | Sustained lift in later bars |
+| `clap_backbeat` | Clap | Backbeat and fills |
+| `clap_snare` | Snare-like accent | Phrase-ending punctuation |
+| `chord_rave` | Rave stab | Short repeated chord hits |
+| `lead_hoover` | Hoover-style lead | Sparse answer phrases |
+| `fx_impact` | Impact | Low hit for larger sections |
 | `fx_air` | Warehouse ambience | Comment-heavy = deep reverb |
 
 ### Getting it running
@@ -552,11 +557,16 @@ pycodedj watch examples/club_set.py
 You can also evaluate individual loops:
 
 ```bash
-pycodedj eval examples/club_set.py::kick_floor
-pycodedj eval examples/club_set.py::bass_sub
+pycodedj eval examples/club_set.py::kick_hard
+pycodedj eval examples/club_set.py::bass_rumble
+pycodedj eval examples/club_set.py::bass_reese
 pycodedj eval examples/club_set.py::hat_offbeat
+pycodedj eval examples/club_set.py::hat_ride
 pycodedj eval examples/club_set.py::clap_backbeat
-pycodedj eval examples/club_set.py::chord_dub
+pycodedj eval examples/club_set.py::clap_snare
+pycodedj eval examples/club_set.py::chord_rave
+pycodedj eval examples/club_set.py::lead_hoover
+pycodedj eval examples/club_set.py::fx_impact
 pycodedj eval examples/club_set.py::fx_air
 ```
 
@@ -590,7 +600,7 @@ def chord_fifth():
 # chord_seventh removed
 ```
 
-Remove the inner `for pressure in range(3)` loop from `bass_sub`. The filter drops and the bass loses some forward pressure.
+Remove the inner `for slide in range(2)` loop from `bass_reese`. The filter drops and the bass loses some forward pressure.
 
 Changing code structure *is* the performance.
 
