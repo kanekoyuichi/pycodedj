@@ -48,16 +48,15 @@ logs/
 
 # AI Agent
 .claude/settings.local.json
-.claude/settings.json
 .claude/todos/
 .claude/mcp*.json
-.claude/memory/
-.claude/notes/
 .codex
+.claude/
 AGENT.md
 
 # Claude Code
 CLAUDE.local.md
+CLAUDE.md
 
 # LLM / Vector DB
 *.chroma/

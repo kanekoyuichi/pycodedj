@@ -1,0 +1,33 @@
+[project]
+name = "pycodedj"
+version = "0.1.0"
+requires-python = ">=3.10"
+dependencies = [
+    "python-osc>=1.8",
+]
+
+[project.optional-dependencies]
+dev = ["pytest", "ruff", "mypy"]
+watch = ["watchdog>=3.0"]
+
+[project.scripts]
+pycodedj = "pycodedj.__main__:main"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/pycodedj"]
+
+[tool.hatch.build.targets.wheel.force-include]
+"sc" = "pycodedj/sc"
+"examples" = "pycodedj/examples"
+
+[tool.ruff]
+line-length = 100
+target-version = "py310"
+
+[tool.mypy]
+python_version = "3.10"
+strict = true

@@ -56,8 +56,10 @@ BPMクロックは SuperCollider 側の `TempoClock` が保持します。Python
 - SuperCollider（scsynth が起動できる環境）
 
 ```bash
-pip install pycodedj
+pip install 'pycodedj[watch]'
 ```
+
+`[watch]` を付けると `pycodedj watch` コマンドも使えるようになります。
 
 開発用:
 
@@ -101,11 +103,36 @@ def pad():
 
 ```bash
 pycodedj eval demo.py::bass
-pycodedj eval demo.py::melody
-pycodedj eval demo.py::pad
 ```
 
-コマンドを実行した瞬間に、そのブロックのコード構造が解析されて音色が変わります。他のループはそのまま鳴り続けます。ファイルを保存する必要はありません。
+成功すると次のフィードバックが表示されます。
+
+```
+[pycodedj] bass  cutoff=418Hz  lfo=1.08Hz  reverb=0.00  voices=1
+```
+
+他のループはそのまま鳴り続けます。
+
+**4. watch モードでライブコーディング**
+
+毎回 eval を打つ代わりに、ファイル保存で全ループを自動再評価できます。
+
+```bash
+pycodedj watch demo.py
+```
+
+あとはエディタでコードを書いて保存するだけです。
+
+> **`interval` について（現在の MVP）:** `interval=2.0` のような値はパーサーが読み取りますが、現時点では OSC では送信されません。ループの繰り返し周期は SuperCollider 側の `TempoClock` で管理します。将来的に SC 側に interval を渡す仕組みを追加する予定です。
+
+---
+
+## サンプルファイル
+
+| ファイル | 内容 |
+| :--- | :--- |
+| `examples/demo.py` | bass / melody / pad の 3 ループ入門デモ |
+| `examples/club_set.py` | sub_bass / hat_engine / neon_stab / acid_lead / warehouse_air のクラブスタイルデモ |
 
 ---
 
@@ -150,10 +177,12 @@ SuperCollider との通信に使うアドレスです。
 
 | アドレス | 型 | 値域 | 対応パラメーター |
 | :--- | :--- | :--- | :--- |
-| `/pycodedj/cutoff` | float | 200–4000 Hz | フィルター Cutoff |
-| `/pycodedj/lfo_rate` | float | 0.1–5.0 Hz | LFO レート |
-| `/pycodedj/reverb` | float | 0.0–0.8 | リバーブ Depth |
-| `/pycodedj/voice_count` | int | 1–4 | ポリフォニー声部数 |
+| `/pycodedj/loop/<name>/cutoff` | float | 200–4000 Hz | フィルター Cutoff |
+| `/pycodedj/loop/<name>/lfo_rate` | float | 0.1–5.0 Hz | LFO レート |
+| `/pycodedj/loop/<name>/reverb` | float | 0.0–0.8 | リバーブ Depth |
+| `/pycodedj/loop/<name>/voice_count` | int | 1–4 | ポリフォニー声部数 |
+
+`<name>` はブロック名（`bass`、`melody` など）です。ループごとに独立したアドレスを持つため、複数ループが同じパラメーターを上書きしません。
 
 Hydra 等の外部ビジュアライザーへは同じパラメーターを別ポートに送信します。
 
@@ -171,8 +200,8 @@ Hydra 等の外部ビジュアライザーへは同じパラメーターを別�
 
 - [x] 仕様設計・マッピング設計
 - [ ] フェーズ0: マッピング仮説の聴取検証
-- [ ] フェーズ1: Python → SuperCollider OSC プロトタイプ
-- [ ] フェーズ2: ホットリロード・ライブループ実装
+- [x] フェーズ1: Python → SuperCollider OSC プロトタイプ
+- [x] フェーズ2: ホットリロード・ライブループ実装（`pycodedj watch`）
 - [ ] フェーズ3: Hydra ビジュアライザー統合
 
 ---
