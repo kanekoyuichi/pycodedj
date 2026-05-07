@@ -2,6 +2,7 @@
 name = "pycodedj"
 version = "0.1.1"
 requires-python = ">=3.10"
+license = {file = "LICENSE"}
 dependencies = [
     "python-osc>=1.8",
 ]

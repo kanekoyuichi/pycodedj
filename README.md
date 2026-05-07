@@ -210,4 +210,4 @@ External visualisers such as Hydra can receive the same parameters on a separate
 
 ## License
 
-MIT
+MIT + Commons Clause — free to use, modify, and perform (including paid live performances). Selling or commercially distributing the software itself is not permitted. See [LICENSE](LICENSE) for details.
