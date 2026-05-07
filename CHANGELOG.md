@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.1.4] - 2026-05-07
+
+### Fixes
+
+- Fix editable installs so `pycodedj.__main__` resolves from `src/pycodedj`
+- Fix SuperCollider OSC receiving and address parsing for `/pycodedj/loop/<name>/<param>` messages
+- Keep the SuperCollider OSC receiver active across repeated `synths.scd` reloads
+
 ## [0.1.3] - 2026-05-07
 
 ### Fixes
