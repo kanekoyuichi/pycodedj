@@ -216,10 +216,10 @@ boot 後、SuperCollider 単体で音が出るか確認します。
 ターミナルに戻り、次を実行します。
 
 ```bash
-python examples/hello_sc.py
+pycodedj eval examples/demo.py::bass
 ```
 
-ターミナルに `Sent OSC to 127.0.0.1:57120 — loop 'hello'` と表示され、SuperCollider から音が出れば接続成功です。
+ターミナルに `[pycodedj] bass ...` と表示され、SuperCollider から音が出れば接続成功です。
 
 SuperCollider はこのまま起動したままにしておいてください。
 

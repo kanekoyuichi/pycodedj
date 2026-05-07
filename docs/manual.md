@@ -214,10 +214,10 @@ If you hear sound, re-evaluate `sc/synths.scd` (Ctrl+A → Ctrl+Enter, or Cmd+A 
 Back in your terminal, run:
 
 ```bash
-python examples/hello_sc.py
+pycodedj eval examples/demo.py::bass
 ```
 
-If the terminal prints `Sent OSC to 127.0.0.1:57120 — loop 'hello'` and a sound comes from SuperCollider, the connection is working.
+If the terminal prints `[pycodedj] bass ...` and a sound comes from SuperCollider, the connection is working.
 
 Leave SuperCollider running while you work.
 
