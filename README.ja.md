@@ -1,6 +1,6 @@
 # PyCodeDJ
 
-[English README](https://github.com/kanekoyuichi/pycodedj/blob/main/README.md)
+[English README](https://github.com/kanekoyuichi/pycodedj/blob/main/README.md) · [マニュアル (JA)](https://github.com/kanekoyuichi/pycodedj/blob/main/docs/manual.ja.md) · [Full Manual (EN)](https://github.com/kanekoyuichi/pycodedj/blob/main/docs/manual.md)
 
 Pythonコードの構造をリアルタイムに音楽へ変換するライブコーディング環境。ファイルを保存するたびに演奏が変わる。
 

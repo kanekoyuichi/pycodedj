@@ -15,21 +15,15 @@
       display: flex;
       flex-direction: column;
     }
-
     #canvas { display: block; flex: 1; }
-
-    /* ── HUD overlay ── */
     #hud {
       position: fixed;
       top: 0; left: 0; right: 0; bottom: 0;
       pointer-events: none;
     }
-
-    /* top-left: loop name + code snapshot */
     #loop-info {
       position: absolute;
       top: 1.5rem; left: 1.5rem;
-      pointer-events: none;
     }
     .loop-name {
       font-size: 0.7rem;
@@ -48,8 +42,16 @@
     .loop-code .fn  { color: #89b4fa; }
     .loop-code .cm  { color: #45475a; font-style: italic; }
     .loop-code .num { color: #f9e2af; }
-
-    /* top-right: param meters */
+    #mode-tag {
+      position: absolute;
+      top: 1.5rem;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 0.62rem;
+      letter-spacing: 0.22em;
+      color: rgba(88,91,112,0.75);
+      white-space: nowrap;
+    }
     #params {
       position: absolute;
       top: 1.5rem; right: 1.5rem;
@@ -58,11 +60,7 @@
       gap: 0.75rem;
       width: 180px;
     }
-    .param {
-      display: flex;
-      flex-direction: column;
-      gap: 0.2rem;
-    }
+    .param { display: flex; flex-direction: column; gap: 0.2rem; }
     .param-header {
       display: flex;
       justify-content: space-between;
@@ -82,8 +80,6 @@
       border-radius: 2px;
       transition: width 1.4s cubic-bezier(0.4, 0, 0.2, 1);
     }
-
-    /* bottom: scene label */
     #scene-label {
       position: absolute;
       bottom: 1.75rem;
@@ -101,8 +97,6 @@
       margin-top: 0.3rem;
       color: rgba(88,91,112,0.4);
     }
-
-    /* bottom-right: PyCodeDJ badge */
     #badge {
       position: absolute;
       bottom: 1.5rem; right: 1.5rem;
@@ -114,15 +108,12 @@
 </head>
 <body>
 <canvas id="canvas"></canvas>
-
 <div id="hud">
-  <!-- loop code -->
   <div id="loop-info">
     <div class="loop-name" id="loopName">loop: bass</div>
     <div class="loop-code" id="loopCode"></div>
   </div>
-
-  <!-- params -->
+  <div id="mode-tag">&#9670; LISSAJOUS</div>
   <div id="params">
     <div class="param">
       <div class="param-header">
@@ -153,12 +144,10 @@
       <div class="param-track"><div class="param-fill" id="fVoices" style="width:25%;background:#f9e2af"></div></div>
     </div>
   </div>
-
   <div id="scene-label">
     <div id="sceneTitle">minimal</div>
     <span id="sceneDesc">def bass(): pass</span>
   </div>
-
   <div id="badge">PyCodeDJ / visualizer concept</div>
 </div>
 
@@ -174,167 +163,162 @@ resize();
 window.addEventListener('resize', resize);
 
 // ── Scene definitions ──────────────────────────────────────────────────────
+const MODE_LABELS = ['&#9670; LISSAJOUS', '&#9670; EXPLOSION', '&#9670; RIPPLE', '&#9670; GRID'];
+const SCENE_DURATION = 5000;
+
 const scenes = [
-  {
-    name: 'bass',
-    title: 'minimal',
-    desc: 'def bass(): pass',
-    cutoff: 0.10, lfo: 0.00, reverb: 0.34, voices: 1,
-    cutoffHz: '580 Hz', lfoHz: '0.10 Hz', reverbVal: '0.27',
-    code: '<span class="cm"># @loop bass interval=2.0</span>\n<span class="kw">def</span> <span class="fn">bass</span>():\n    <span class="kw">pass</span>',
-  },
-  {
-    name: 'bass',
-    title: 'filter opens',
-    desc: 'deeper nesting → brighter cutoff',
-    cutoff: 0.40, lfo: 0.20, reverb: 0.20, voices: 1,
-    cutoffHz: '1720 Hz', lfoHz: '1.08 Hz', reverbVal: '0.16',
-    code: '<span class="cm"># @loop bass interval=2.0</span>\n<span class="kw">def</span> <span class="fn">bass</span>():\n    <span class="kw">for</span> i <span class="kw">in</span> <span class="fn">range</span>(<span class="num">8</span>):\n        <span class="kw">if</span> i % <span class="num">2</span> == <span class="num">0</span>:\n            <span class="kw">pass</span>',
-  },
-  {
-    name: 'bass',
-    title: 'deep structure',
-    desc: 'triple nesting → wide open filter',
-    cutoff: 0.60, lfo: 0.30, reverb: 0.16, voices: 1,
-    cutoffHz: '2480 Hz', lfoHz: '1.57 Hz', reverbVal: '0.13',
-    code: '<span class="cm"># @loop bass interval=2.0</span>\n<span class="kw">def</span> <span class="fn">bass</span>():\n    <span class="kw">for</span> i <span class="kw">in</span> <span class="fn">range</span>(<span class="num">8</span>):\n        <span class="kw">for</span> j <span class="kw">in</span> <span class="fn">range</span>(<span class="num">4</span>):\n            <span class="kw">if</span> i == j:\n                <span class="kw">pass</span>',
-  },
-  {
-    name: 'chord',
-    title: '4 voices',
-    desc: 'four functions → four layers',
-    cutoff: 0.10, lfo: 0.00, reverb: 0.20, voices: 4,
-    cutoffHz: '580 Hz', lfoHz: '0.10 Hz', reverbVal: '0.16',
-    code: '<span class="cm"># @loop chord interval=1.0</span>\n<span class="kw">def</span> <span class="fn">voice_a</span>(): <span class="kw">pass</span>\n<span class="kw">def</span> <span class="fn">voice_b</span>(): <span class="kw">pass</span>\n<span class="kw">def</span> <span class="fn">voice_c</span>(): <span class="kw">pass</span>\n<span class="kw">def</span> <span class="fn">voice_d</span>(): <span class="kw">pass</span>',
-  },
-  {
-    name: 'pad',
-    title: 'warehouse air',
-    desc: 'comments only → deep reverb space',
-    cutoff: 0.10, lfo: 0.00, reverb: 0.84, voices: 1,
-    cutoffHz: '580 Hz', lfoHz: '0.10 Hz', reverbVal: '0.67',
-    code: '<span class="cm"># @loop pad interval=4.0</span>\n<span class="cm"># smoke above the kick</span>\n<span class="cm"># late reflections</span>\n<span class="cm"># concrete room tail</span>\n<span class="kw">def</span> <span class="fn">pad</span>(): <span class="kw">pass</span>',
-  },
+  // ── Mode 0: Lissajous ───────────────────────────────────────────────────
+  { mode:0, name:'bass', title:'minimal', desc:'def bass(): pass',
+    cutoff:0.10, lfo:0.00, reverb:0.34, voices:1,
+    cutoffHz:'580 Hz', lfoHz:'0.10 Hz', reverbVal:'0.27',
+    code:'<span class="cm"># @loop bass interval=2.0</span>\n<span class="kw">def</span> <span class="fn">bass</span>():\n    <span class="kw">pass</span>' },
+  { mode:0, name:'bass', title:'filter opens', desc:'deeper nesting → brighter cutoff',
+    cutoff:0.40, lfo:0.20, reverb:0.20, voices:1,
+    cutoffHz:'1720 Hz', lfoHz:'1.08 Hz', reverbVal:'0.16',
+    code:'<span class="cm"># @loop bass interval=2.0</span>\n<span class="kw">def</span> <span class="fn">bass</span>():\n    <span class="kw">for</span> i <span class="kw">in</span> <span class="fn">range</span>(<span class="num">8</span>):\n        <span class="kw">if</span> i % <span class="num">2</span> == <span class="num">0</span>:\n            <span class="kw">pass</span>' },
+  { mode:0, name:'chord', title:'4 voices', desc:'four functions → four layers',
+    cutoff:0.10, lfo:0.00, reverb:0.20, voices:4,
+    cutoffHz:'580 Hz', lfoHz:'0.10 Hz', reverbVal:'0.16',
+    code:'<span class="cm"># @loop chord interval=1.0</span>\n<span class="kw">def</span> <span class="fn">voice_a</span>(): <span class="kw">pass</span>\n<span class="kw">def</span> <span class="fn">voice_b</span>(): <span class="kw">pass</span>\n<span class="kw">def</span> <span class="fn">voice_c</span>(): <span class="kw">pass</span>\n<span class="kw">def</span> <span class="fn">voice_d</span>(): <span class="kw">pass</span>' },
+  { mode:0, name:'pad', title:'warehouse air', desc:'comments → deep reverb space',
+    cutoff:0.10, lfo:0.00, reverb:0.84, voices:1,
+    cutoffHz:'580 Hz', lfoHz:'0.10 Hz', reverbVal:'0.67',
+    code:'<span class="cm"># @loop pad interval=4.0</span>\n<span class="cm"># smoke above the kick</span>\n<span class="cm"># late reflections</span>\n<span class="cm"># concrete room tail</span>\n<span class="kw">def</span> <span class="fn">pad</span>(): <span class="kw">pass</span>' },
+
+  // ── Mode 1: Explosion ───────────────────────────────────────────────────
+  { mode:1, name:'bass', title:'explosion · single', desc:'one voice → one radial jet',
+    cutoff:0.20, lfo:0.00, reverb:0.40, voices:1,
+    cutoffHz:'962 Hz', lfoHz:'0.10 Hz', reverbVal:'0.32',
+    code:'<span class="cm"># @loop bass interval=2.0</span>\n<span class="kw">def</span> <span class="fn">bass</span>(): <span class="kw">pass</span>' },
+  { mode:1, name:'melody', title:'explosion · pulse', desc:'lfo → rhythmic burst',
+    cutoff:0.30, lfo:0.30, reverb:0.20, voices:1,
+    cutoffHz:'1340 Hz', lfoHz:'1.57 Hz', reverbVal:'0.16',
+    code:'<span class="cm"># @loop melody interval=0.5</span>\n<span class="kw">def</span> <span class="fn">melody</span>():\n    <span class="kw">for</span> i <span class="kw">in</span> <span class="fn">range</span>(<span class="num">4</span>):\n        <span class="kw">if</span> i % <span class="num">2</span>: <span class="kw">pass</span>' },
+  { mode:1, name:'chord', title:'explosion · 4-star', desc:'four voices → four radial jets',
+    cutoff:0.20, lfo:0.15, reverb:0.25, voices:4,
+    cutoffHz:'962 Hz', lfoHz:'0.83 Hz', reverbVal:'0.20',
+    code:'<span class="cm"># @loop chord interval=1.0</span>\n<span class="kw">def</span> <span class="fn">v_a</span>(): <span class="kw">pass</span>\n<span class="kw">def</span> <span class="fn">v_b</span>(): <span class="kw">pass</span>\n<span class="kw">def</span> <span class="fn">v_c</span>(): <span class="kw">pass</span>\n<span class="kw">def</span> <span class="fn">v_d</span>(): <span class="kw">pass</span>' },
+
+  // ── Mode 2: Ripple / Interference ──────────────────────────────────────
+  { mode:2, name:'bass', title:'ripple · single', desc:'one source, slow waves',
+    cutoff:0.10, lfo:0.00, reverb:0.50, voices:1,
+    cutoffHz:'580 Hz', lfoHz:'0.10 Hz', reverbVal:'0.40',
+    code:'<span class="cm"># @loop bass interval=2.0</span>\n<span class="kw">def</span> <span class="fn">bass</span>(): <span class="kw">pass</span>' },
+  { mode:2, name:'melody', title:'ripple · fast', desc:'high lfo → rapid ring expansion',
+    cutoff:0.40, lfo:0.40, reverb:0.30, voices:1,
+    cutoffHz:'1720 Hz', lfoHz:'2.06 Hz', reverbVal:'0.24',
+    code:'<span class="cm"># @loop melody interval=0.5</span>\n<span class="kw">def</span> <span class="fn">melody</span>():\n    <span class="kw">for</span> i <span class="kw">in</span> <span class="fn">range</span>(<span class="num">4</span>):\n        <span class="kw">if</span> i % <span class="num">2</span>: <span class="kw">pass</span>' },
+  { mode:2, name:'chord', title:'interference', desc:'4 sources → standing wave pattern',
+    cutoff:0.30, lfo:0.20, reverb:0.60, voices:4,
+    cutoffHz:'1340 Hz', lfoHz:'1.08 Hz', reverbVal:'0.48',
+    code:'<span class="cm"># @loop chord interval=1.0</span>\n<span class="kw">def</span> <span class="fn">v_a</span>(): <span class="kw">pass</span>\n<span class="kw">def</span> <span class="fn">v_b</span>(): <span class="kw">pass</span>\n<span class="kw">def</span> <span class="fn">v_c</span>(): <span class="kw">pass</span>\n<span class="kw">def</span> <span class="fn">v_d</span>(): <span class="kw">pass</span>' },
+
+  // ── Mode 3: Grid Deformation ────────────────────────────────────────────
+  { mode:3, name:'bass', title:'grid · calm', desc:'gentle single-wave distortion',
+    cutoff:0.10, lfo:0.00, reverb:0.34, voices:1,
+    cutoffHz:'580 Hz', lfoHz:'0.10 Hz', reverbVal:'0.27',
+    code:'<span class="cm"># @loop bass interval=2.0</span>\n<span class="kw">def</span> <span class="fn">bass</span>(): <span class="kw">pass</span>' },
+  { mode:3, name:'melody', title:'grid · warp', desc:'fast lfo → heavy wave distortion',
+    cutoff:0.50, lfo:0.40, reverb:0.16, voices:1,
+    cutoffHz:'2100 Hz', lfoHz:'2.06 Hz', reverbVal:'0.13',
+    code:'<span class="cm"># @loop melody interval=0.5</span>\n<span class="kw">def</span> <span class="fn">melody</span>():\n    <span class="kw">for</span> i <span class="kw">in</span> <span class="fn">range</span>(<span class="num">8</span>):\n        <span class="kw">if</span> i == <span class="num">3</span>:\n            <span class="kw">pass</span>' },
+  { mode:3, name:'chord', title:'grid · poly', desc:'4-voice interference grid',
+    cutoff:0.40, lfo:0.20, reverb:0.50, voices:4,
+    cutoffHz:'1720 Hz', lfoHz:'1.08 Hz', reverbVal:'0.40',
+    code:'<span class="cm"># @loop chord interval=1.0</span>\n<span class="kw">def</span> <span class="fn">v_a</span>(): <span class="kw">pass</span>\n<span class="kw">def</span> <span class="fn">v_b</span>(): <span class="kw">pass</span>\n<span class="kw">def</span> <span class="fn">v_c</span>(): <span class="kw">pass</span>\n<span class="kw">def</span> <span class="fn">v_d</span>(): <span class="kw">pass</span>' },
 ];
 
-// ── State ──────────────────────────────────────────────────────────────────
-let state = {
-  cutoff:  0.10,  // 0-1
-  lfo:     0.00,  // 0-1
-  reverb:  0.34,  // 0-1
-  voices:  1,
-};
-
-// smoothed state for rendering
+// ── Global state ───────────────────────────────────────────────────────────
+let state  = { cutoff:0.10, lfo:0.00, reverb:0.34, voices:1 };
 let smooth = { ...state };
-
+let currentMode = 0;
 let sceneIdx = 0;
 let t = 0;
-const SCENE_DURATION = 4000; // ms
+let last = performance.now();
 let lastSwitch = performance.now();
+let modeDirty = false;
 
-// ── Particles ──────────────────────────────────────────────────────────────
-const MAX_PARTICLES = 320;
-const particles = [];
-
-class Particle {
-  constructor(cx, cy) {
-    this.reset(cx, cy);
-  }
-  reset(cx, cy) {
-    const a = Math.random() * Math.PI * 2;
-    const r = 40 + Math.random() * 160;
-    this.x = cx + Math.cos(a) * r;
-    this.y = cy + Math.sin(a) * r;
-    this.vx = (Math.random() - 0.5) * 0.6;
-    this.vy = (Math.random() - 0.5) * 0.6;
-    this.life = 0;
-    this.maxLife = 120 + Math.random() * 200;
-    this.size = 1 + Math.random() * 2.5;
-    this.hue = 120 + Math.random() * 200; // green→mauve
-  }
-}
-
-// ── Rings ──────────────────────────────────────────────────────────────────
+// Mode 0 state
+const lissajousHistory = [];
+const LISSA_LEN = 320;
 const rings = Array.from({ length: 6 }, (_, i) => ({
   phase: (i / 6) * Math.PI * 2,
   baseR: 60 + i * 55,
   speed: 0.003 + i * 0.001,
 }));
+const lisParticles = [];
+const MAX_LIS = 320;
 
-// ── Lissajous trails ───────────────────────────────────────────────────────
-const lissajousHistory = [];
-const LISSA_LEN = 320;
+// Mode 1 state
+let exParticles = [];
+const MAX_EX = 600;
+let exPhase = 0;
 
-// ── HUD update ─────────────────────────────────────────────────────────────
+// Mode 2 state
+let ripples = [];
+let rippleCounters = [0, 0, 0, 0];
+let rippleFrame = 0;
+
+// ── Helpers ────────────────────────────────────────────────────────────────
+function lerp(a, b, k) { return a + (b - a) * k; }
+
+function getVoicePos(v, voices, cx, cy, W, H) {
+  if (voices <= 1) return { x: cx, y: cy };
+  const r = Math.min(W, H) * 0.18;
+  const a = (v / voices) * Math.PI * 2 - Math.PI / 2;
+  return { x: cx + Math.cos(a) * r, y: cy + Math.sin(a) * r };
+}
+
+// ── HUD ────────────────────────────────────────────────────────────────────
 function applyScene(s) {
+  const prevMode = currentMode;
   state = { cutoff: s.cutoff, lfo: s.lfo, reverb: s.reverb, voices: s.voices };
+  currentMode = s.mode;
 
-  document.getElementById('loopName').textContent = `loop: ${s.name}`;
-  document.getElementById('loopCode').innerHTML = s.code;
+  if (currentMode !== prevMode) {
+    modeDirty = true;
+    if (currentMode === 1) { exParticles = []; exPhase = 0; }
+    if (currentMode === 2) { ripples = []; rippleCounters = [0,0,0,0]; rippleFrame = 0; }
+  }
+
+  document.getElementById('loopName').textContent = 'loop: ' + s.name;
+  document.getElementById('loopCode').innerHTML   = s.code;
   document.getElementById('sceneTitle').textContent = s.title;
-  document.getElementById('sceneDesc').textContent = s.desc;
+  document.getElementById('sceneDesc').textContent  = s.desc;
+  document.getElementById('mode-tag').innerHTML     = MODE_LABELS[s.mode];
 
-  document.getElementById('vCutoff').textContent  = s.cutoffHz;
-  document.getElementById('vLfo').textContent     = s.lfoHz;
-  document.getElementById('vReverb').textContent  = s.reverbVal;
-  document.getElementById('vVoices').textContent  = String(s.voices);
+  document.getElementById('vCutoff').textContent = s.cutoffHz;
+  document.getElementById('vLfo').textContent    = s.lfoHz;
+  document.getElementById('vReverb').textContent = s.reverbVal;
+  document.getElementById('vVoices').textContent = String(s.voices);
 
-  document.getElementById('fCutoff').style.width  = (s.cutoff  * 100) + '%';
-  document.getElementById('fLfo').style.width     = (s.lfo     * 100) + '%';
-  document.getElementById('fReverb').style.width  = (s.reverb  * 100) + '%';
-  document.getElementById('fVoices').style.width  = ((s.voices / 4) * 100) + '%';
+  document.getElementById('fCutoff').style.width = (s.cutoff * 100) + '%';
+  document.getElementById('fLfo').style.width    = (s.lfo * 100) + '%';
+  document.getElementById('fReverb').style.width = (s.reverb * 100) + '%';
+  document.getElementById('fVoices').style.width = ((s.voices / 4) * 100) + '%';
 }
 
 applyScene(scenes[0]);
 
-// ── Main render loop ───────────────────────────────────────────────────────
-function lerp(a, b, k) { return a + (b - a) * k; }
-
-let last = performance.now();
-
-function frame(now) {
-  const dt = Math.min(now - last, 32);
-  last = now;
-  t += dt * 0.001;
-
-  // scene switch
-  if (now - lastSwitch > SCENE_DURATION) {
-    sceneIdx = (sceneIdx + 1) % scenes.length;
-    applyScene(scenes[sceneIdx]);
-    lastSwitch = now;
-  }
-
-  // smooth params
-  const k = 1 - Math.pow(0.92, dt);
-  smooth.cutoff  = lerp(smooth.cutoff,  state.cutoff,  k);
-  smooth.lfo     = lerp(smooth.lfo,     state.lfo,     k);
-  smooth.reverb  = lerp(smooth.reverb,  state.reverb,  k);
-  smooth.voices  = lerp(smooth.voices,  state.voices,  k);
-
-  const W = canvas.width, H = canvas.height;
+// ── Mode 0: Lissajous + Rings + Particles ──────────────────────────────────
+function drawLissajous(s, t, W, H) {
   const cx = W / 2, cy = H / 2;
-
-  // ── background ──
-  const trailAlpha = 0.04 + smooth.reverb * 0.1; // more reverb = longer trails
-  ctx.fillStyle = `rgba(0,0,0,${trailAlpha < 0.06 ? 0.06 : trailAlpha})`;
+  const trailAlpha = Math.max(0.05, 0.04 + s.reverb * 0.10);
+  ctx.fillStyle = 'rgba(0,0,0,' + trailAlpha + ')';
   ctx.fillRect(0, 0, W, H);
 
-  // ── base radial glow ──
-  const glowR = 180 + smooth.cutoff * 220;
-  const hue = 120 + smooth.cutoff * 160; // green(120) → mauve(280)
+  const hue = 120 + s.cutoff * 160;
+  const glowR = 180 + s.cutoff * 220;
   const grd = ctx.createRadialGradient(cx, cy, 0, cx, cy, glowR);
-  grd.addColorStop(0,   `hsla(${hue},60%,55%,${0.04 + smooth.cutoff * 0.06})`);
-  grd.addColorStop(0.5, `hsla(${hue},50%,40%,${0.02})`);
+  grd.addColorStop(0,   'hsla(' + hue + ',60%,55%,' + (0.04 + s.cutoff * 0.06) + ')');
+  grd.addColorStop(0.5, 'hsla(' + hue + ',50%,40%,0.02)');
   grd.addColorStop(1,   'transparent');
   ctx.fillStyle = grd;
   ctx.fillRect(0, 0, W, H);
 
-  // ── Lissajous ──
-  const lfoSpeed = 0.3 + smooth.lfo * 3.5;
-  const lx = Math.sin(t * lfoSpeed * 1.00) * (cx * 0.55);
+  const lfoSpeed = 0.3 + s.lfo * 3.5;
+  const lx = Math.sin(t * lfoSpeed) * (cx * 0.55);
   const ly = Math.sin(t * lfoSpeed * 1.31 + 0.7) * (cy * 0.45);
-
   lissajousHistory.push({ x: cx + lx, y: cy + ly });
   if (lissajousHistory.length > LISSA_LEN) lissajousHistory.shift();
 
@@ -342,92 +326,309 @@ function frame(now) {
     ctx.beginPath();
     ctx.moveTo(lissajousHistory[0].x, lissajousHistory[0].y);
     for (let i = 1; i < lissajousHistory.length; i++) {
-      const p = lissajousHistory[i];
-      const alpha = i / lissajousHistory.length;
-      ctx.lineTo(p.x, p.y);
+      ctx.lineTo(lissajousHistory[i].x, lissajousHistory[i].y);
     }
-    ctx.strokeStyle = `hsla(${hue},70%,65%,0.45)`;
+    ctx.strokeStyle = 'hsla(' + hue + ',70%,65%,0.45)';
     ctx.lineWidth = 1.2;
     ctx.stroke();
   }
 
-  // ── Rings (voice_count layers) ──
-  const voiceLayers = Math.round(smooth.voices);
+  const voiceLayers = Math.round(s.voices);
   for (let v = 0; v < voiceLayers; v++) {
     const ring = rings[v % rings.length];
-    const phaseOffset = (v / voiceLayers) * Math.PI * 2;
-    const pulse = 1 + Math.sin(t * lfoSpeed + ring.phase + phaseOffset) * (0.08 + smooth.cutoff * 0.12);
-    const r = ring.baseR * pulse * (0.7 + smooth.cutoff * 0.5);
-    const ringHue = hue + v * 30;
-    const alpha = 0.25 + smooth.cutoff * 0.35;
-
+    const phOff = (v / voiceLayers) * Math.PI * 2;
+    const pulse = 1 + Math.sin(t * lfoSpeed + ring.phase + phOff) * (0.08 + s.cutoff * 0.12);
+    const r = ring.baseR * pulse * (0.7 + s.cutoff * 0.5);
+    const rHue = hue + v * 30;
     ctx.beginPath();
     ctx.arc(cx, cy, r, 0, Math.PI * 2);
-    ctx.strokeStyle = `hsla(${ringHue},65%,60%,${alpha})`;
-    ctx.lineWidth = 1 + smooth.reverb * 2;
+    ctx.strokeStyle = 'hsla(' + rHue + ',65%,60%,' + (0.25 + s.cutoff * 0.35) + ')';
+    ctx.lineWidth = 1 + s.reverb * 2;
     ctx.stroke();
-
-    // inner glow dot at ring intersection with lissajous angle
-    const ang = t * ring.speed + ring.phase + phaseOffset;
-    const dx = cx + Math.cos(ang) * r;
-    const dy = cy + Math.sin(ang) * r;
+    const ang = t * ring.speed + ring.phase + phOff;
     ctx.beginPath();
-    ctx.arc(dx, dy, 3 + smooth.cutoff * 4, 0, Math.PI * 2);
-    ctx.fillStyle = `hsla(${ringHue},80%,70%,${0.6 + smooth.cutoff * 0.3})`;
+    ctx.arc(cx + Math.cos(ang) * r, cy + Math.sin(ang) * r, 3 + s.cutoff * 4, 0, Math.PI * 2);
+    ctx.fillStyle = 'hsla(' + rHue + ',80%,70%,' + (0.6 + s.cutoff * 0.3) + ')';
     ctx.fill();
   }
 
-  // ── Particles ──
-  // spawn
-  const spawnRate = Math.round(1 + smooth.lfo * 5 + smooth.voices * 1.5);
+  const spawnRate = Math.round(1 + s.lfo * 5 + s.voices * 1.5);
   for (let i = 0; i < spawnRate; i++) {
-    if (particles.length < MAX_PARTICLES) {
-      particles.push(new Particle(cx, cy));
+    if (lisParticles.length < MAX_LIS) {
+      lisParticles.push(newLisParticle(cx, cy));
     } else {
-      // recycle oldest dead particle
-      const dead = particles.find(p => p.life >= p.maxLife);
-      if (dead) dead.reset(cx, cy);
+      const dead = lisParticles.find(p => p.life >= p.maxLife);
+      if (dead) resetLisParticle(dead, cx, cy);
     }
   }
-
-  // update & draw
-  for (const p of particles) {
+  for (const p of lisParticles) {
     p.life++;
-    const progress = p.life / p.maxLife;
-    if (progress > 1) continue;
-
-    const speed = 0.4 + smooth.lfo * 2.5;
-    p.x += p.vx * speed;
-    p.y += p.vy * speed;
-
-    const alpha = Math.sin(progress * Math.PI) * (0.4 + smooth.cutoff * 0.4);
-    const size  = p.size * (1 - progress * 0.5);
-
+    const prog = p.life / p.maxLife;
+    if (prog > 1) continue;
+    p.x += p.vx * (0.4 + s.lfo * 2.5);
+    p.y += p.vy * (0.4 + s.lfo * 2.5);
+    const alpha = Math.sin(prog * Math.PI) * (0.4 + s.cutoff * 0.4);
     ctx.beginPath();
-    ctx.arc(p.x, p.y, size, 0, Math.PI * 2);
-    ctx.fillStyle = `hsla(${p.hue + smooth.cutoff * 60},70%,65%,${alpha})`;
+    ctx.arc(p.x, p.y, p.size * (1 - prog * 0.5), 0, Math.PI * 2);
+    ctx.fillStyle = 'hsla(' + (p.hue + s.cutoff * 60) + ',70%,65%,' + alpha + ')';
     ctx.fill();
   }
 
-  // ── Reverb shimmer — horizontal scan lines ──
-  if (smooth.reverb > 0.1) {
-    const lineCount = Math.round(smooth.reverb * 18);
-    for (let i = 0; i < lineCount; i++) {
-      const y = ((t * 60 * (i % 3 === 0 ? 1 : -0.7) + i * (H / lineCount)) % H + H) % H;
-      const a = smooth.reverb * 0.06 * (1 - Math.abs(y / H - 0.5) * 2);
-      ctx.fillStyle = `hsla(${hue + i * 12},50%,65%,${a})`;
+  if (s.reverb > 0.1) {
+    const n = Math.round(s.reverb * 18);
+    for (let i = 0; i < n; i++) {
+      const y = ((t * 60 * (i % 3 === 0 ? 1 : -0.7) + i * (H / n)) % H + H) % H;
+      const a = s.reverb * 0.06 * (1 - Math.abs(y / H - 0.5) * 2);
+      ctx.fillStyle = 'hsla(' + (hue + i * 12) + ',50%,65%,' + a + ')';
       ctx.fillRect(0, y, W, 1);
     }
   }
 
-  // ── Center crosshair ──
-  const chAlpha = 0.12 + smooth.cutoff * 0.08;
-  ctx.strokeStyle = `rgba(166,227,161,${chAlpha})`;
+  ctx.strokeStyle = 'rgba(166,227,161,' + (0.12 + s.cutoff * 0.08) + ')';
   ctx.lineWidth = 0.5;
   ctx.setLineDash([4, 8]);
   ctx.beginPath(); ctx.moveTo(cx - 30, cy); ctx.lineTo(cx + 30, cy); ctx.stroke();
   ctx.beginPath(); ctx.moveTo(cx, cy - 30); ctx.lineTo(cx, cy + 30); ctx.stroke();
   ctx.setLineDash([]);
+}
+
+function newLisParticle(cx, cy) {
+  const p = {};
+  resetLisParticle(p, cx, cy);
+  return p;
+}
+function resetLisParticle(p, cx, cy) {
+  const a = Math.random() * Math.PI * 2;
+  const r = 40 + Math.random() * 160;
+  p.x = cx + Math.cos(a) * r;
+  p.y = cy + Math.sin(a) * r;
+  p.vx = (Math.random() - 0.5) * 0.6;
+  p.vy = (Math.random() - 0.5) * 0.6;
+  p.life = 0;
+  p.maxLife = 120 + Math.random() * 200;
+  p.size = 1 + Math.random() * 2.5;
+  p.hue = 120 + Math.random() * 200;
+}
+
+// ── Mode 1: Particle Explosion ─────────────────────────────────────────────
+function makeExParticle(cx, cy, baseAngle, s, v) {
+  const spread = Math.PI * 0.22;
+  const a = baseAngle + (Math.random() - 0.5) * spread * 2;
+  const spd = (1.5 + s.cutoff * 4) * (0.5 + Math.random() * 0.8);
+  return {
+    x: cx, y: cy,
+    vx: Math.cos(a) * spd,
+    vy: Math.sin(a) * spd,
+    life: 0,
+    maxLife: 45 + Math.random() * 80,
+    hue: 120 + s.cutoff * 160 + v * 55,
+    size: 1.5 + s.cutoff * 2.5,
+  };
+}
+
+function drawExplosion(s, t, dt, W, H) {
+  const cx = W / 2, cy = H / 2;
+  const fadeAlpha = Math.max(0.04, 0.03 + (1 - s.reverb) * 0.08);
+  ctx.fillStyle = 'rgba(0,0,0,' + fadeAlpha + ')';
+  ctx.fillRect(0, 0, W, H);
+
+  const hue = 120 + s.cutoff * 160;
+  const voices = Math.round(s.voices);
+
+  exPhase += dt * 0.001 * (0.5 + s.lfo * 5);
+  const lfoPulse = s.lfo > 0.02 ? Math.max(0, Math.sin(exPhase * Math.PI * 2)) : 0;
+
+  // spawn
+  for (let v = 0; v < voices; v++) {
+    const baseAngle = voices === 1 ? -Math.PI / 2 : (v / voices) * Math.PI * 2 - Math.PI / 2;
+    const count = 3 + Math.round(lfoPulse * s.lfo * 22);
+    for (let i = 0; i < count; i++) {
+      if (exParticles.length < MAX_EX) {
+        exParticles.push(makeExParticle(cx, cy, baseAngle, s, v));
+      } else {
+        for (let j = 0; j < exParticles.length; j++) {
+          if (exParticles[j].life >= exParticles[j].maxLife) {
+            exParticles[j] = makeExParticle(cx, cy, baseAngle, s, v);
+            break;
+          }
+        }
+      }
+    }
+  }
+
+  // center glow
+  const glowR = 25 + s.cutoff * 70 + lfoPulse * 40 * s.lfo;
+  const grd = ctx.createRadialGradient(cx, cy, 0, cx, cy, glowR);
+  grd.addColorStop(0, 'hsla(' + hue + ',80%,70%,' + (0.25 + lfoPulse * 0.35) + ')');
+  grd.addColorStop(1, 'transparent');
+  ctx.fillStyle = grd;
+  ctx.fillRect(0, 0, W, H);
+
+  // directional beams
+  for (let v = 0; v < voices; v++) {
+    const baseAngle = voices === 1 ? -Math.PI / 2 : (v / voices) * Math.PI * 2 - Math.PI / 2;
+    const vHue = hue + v * 55;
+    const lineLen = (0.18 + s.cutoff * 0.32 + lfoPulse * s.lfo * 0.20) * Math.min(W, H) * 0.5;
+    ctx.save();
+    ctx.translate(cx, cy);
+    ctx.rotate(baseAngle);
+    const beamGrd = ctx.createLinearGradient(0, 0, lineLen, 0);
+    beamGrd.addColorStop(0, 'hsla(' + vHue + ',80%,65%,' + (0.5 + lfoPulse * 0.35) + ')');
+    beamGrd.addColorStop(1, 'transparent');
+    ctx.strokeStyle = beamGrd;
+    ctx.lineWidth = 1 + s.cutoff * 1.5;
+    ctx.beginPath(); ctx.moveTo(0, 0); ctx.lineTo(lineLen, 0); ctx.stroke();
+    ctx.restore();
+  }
+
+  // update & draw particles
+  for (const p of exParticles) {
+    p.life++;
+    if (p.life >= p.maxLife) continue;
+    p.x += p.vx; p.y += p.vy;
+    p.vx *= 0.985; p.vy *= 0.985;
+    const prog = p.life / p.maxLife;
+    const alpha = Math.sin(prog * Math.PI) * (0.5 + s.cutoff * 0.35);
+    ctx.beginPath();
+    ctx.arc(p.x, p.y, p.size * (1 - prog * 0.4), 0, Math.PI * 2);
+    ctx.fillStyle = 'hsla(' + p.hue + ',75%,65%,' + alpha + ')';
+    ctx.fill();
+  }
+
+  // center dot
+  ctx.beginPath();
+  ctx.arc(cx, cy, 3 + s.cutoff * 3, 0, Math.PI * 2);
+  ctx.fillStyle = 'hsla(' + hue + ',90%,80%,0.9)';
+  ctx.fill();
+}
+
+// ── Mode 2: Ripple / Wave Interference ────────────────────────────────────
+function drawRipple(s, dt, W, H) {
+  const cx = W / 2, cy = H / 2;
+  const fadeAlpha = Math.max(0.03, 0.02 + (1 - s.reverb) * 0.07);
+  ctx.fillStyle = 'rgba(0,0,0,' + fadeAlpha + ')';
+  ctx.fillRect(0, 0, W, H);
+
+  const hue = 120 + s.cutoff * 160;
+  const voices = Math.round(s.voices);
+  rippleFrame++;
+
+  const emitInterval = Math.max(4, Math.round(55 / (1 + s.lfo * 10)));
+  for (let v = 0; v < voices; v++) {
+    rippleCounters[v] = (rippleCounters[v] || 0) + 1;
+    if (rippleCounters[v] >= emitInterval) {
+      rippleCounters[v] = 0;
+      const pos = getVoicePos(v, voices, cx, cy, W, H);
+      const spd = 1.5 + s.lfo * 5;
+      const maxR = Math.hypot(W, H) * (0.45 + s.reverb * 0.30);
+      ripples.push({ x: pos.x, y: pos.y, r: 2, speed: spd, maxR: maxR,
+        maxLife: Math.ceil(maxR / spd), life: 0, hue: hue + v * 55 });
+    }
+  }
+
+  // update
+  for (const r of ripples) { r.r += r.speed; r.life++; }
+  // cull dead
+  for (let i = ripples.length - 1; i >= 0; i--) {
+    if (ripples[i].life > ripples[i].maxLife) ripples.splice(i, 1);
+  }
+  if (ripples.length > 250) ripples.splice(0, ripples.length - 250);
+
+  // draw ripples
+  for (const r of ripples) {
+    const prog = r.life / r.maxLife;
+    const alpha = (1 - prog) * (0.18 + s.reverb * 0.45) * (0.3 + s.cutoff * 0.5);
+    ctx.beginPath();
+    ctx.arc(r.x, r.y, r.r, 0, Math.PI * 2);
+    ctx.strokeStyle = 'hsla(' + r.hue + ',65%,60%,' + alpha + ')';
+    ctx.lineWidth = (1.5 + s.reverb * 2) * (1 - prog * 0.5);
+    ctx.stroke();
+  }
+
+  // voice source dots
+  for (let v = 0; v < voices; v++) {
+    const pos = getVoicePos(v, voices, cx, cy, W, H);
+    const vHue = hue + v * 55;
+    const pulse = 0.5 + 0.5 * Math.sin(rippleFrame * 0.10 + v * Math.PI * 2 / voices);
+    ctx.beginPath();
+    ctx.arc(pos.x, pos.y, 4 + pulse * 3 + s.cutoff * 4, 0, Math.PI * 2);
+    ctx.fillStyle = 'hsla(' + vHue + ',80%,70%,' + (0.6 + pulse * 0.3) + ')';
+    ctx.fill();
+    ctx.beginPath();
+    ctx.arc(pos.x, pos.y, 12 + s.cutoff * 8, 0, Math.PI * 2);
+    ctx.strokeStyle = 'hsla(' + vHue + ',70%,60%,' + (0.12 + pulse * 0.08) + ')';
+    ctx.lineWidth = 1;
+    ctx.stroke();
+  }
+}
+
+// ── Mode 3: Grid Deformation ───────────────────────────────────────────────
+function drawGrid(s, t, W, H) {
+  const fadeAlpha = Math.max(0.04, 0.03 + (1 - s.reverb) * 0.09);
+  ctx.fillStyle = 'rgba(0,0,0,' + fadeAlpha + ')';
+  ctx.fillRect(0, 0, W, H);
+
+  const cols = 24;
+  const rows = 17;
+  const cellW = W / cols;
+  const cellH = H / rows;
+  const hue = 120 + s.cutoff * 160;
+  const waveSpeed = 0.7 + s.lfo * 6;
+  const waveAmp  = 5 + s.cutoff * 24;
+  const voices = Math.max(1, Math.round(s.voices));
+
+  for (let r = 0; r <= rows; r++) {
+    for (let c = 0; c <= cols; c++) {
+      let dx = 0, dy = 0;
+      for (let v = 0; v < voices; v++) {
+        const phase = (v / voices) * Math.PI * 2;
+        const freq  = 1 + v * 0.4;
+        dx += Math.sin(t * waveSpeed * freq       + r * 0.38 + phase) * (waveAmp / voices);
+        dy += Math.cos(t * waveSpeed * freq * 1.29 + c * 0.38 + phase) * (waveAmp / voices);
+      }
+      const px = c * cellW + dx;
+      const py = r * cellH + dy;
+      const norm = Math.min(1, Math.hypot(dx, dy) / Math.max(waveAmp, 0.01));
+      ctx.beginPath();
+      ctx.arc(px, py, 1.0 + norm * 3.0, 0, Math.PI * 2);
+      ctx.fillStyle = 'hsla(' + (hue + norm * 90) + ',72%,62%,' + (0.18 + norm * 0.72) + ')';
+      ctx.fill();
+    }
+  }
+}
+
+// ── Main render loop ───────────────────────────────────────────────────────
+function frame(now) {
+  const dt = Math.min(now - last, 32);
+  last = now;
+  t += dt * 0.001;
+
+  if (now - lastSwitch > SCENE_DURATION) {
+    sceneIdx = (sceneIdx + 1) % scenes.length;
+    applyScene(scenes[sceneIdx]);
+    lastSwitch = now;
+  }
+
+  if (modeDirty) {
+    ctx.fillStyle = '#000';
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    modeDirty = false;
+  }
+
+  const k = 1 - Math.pow(0.92, dt);
+  smooth.cutoff = lerp(smooth.cutoff, state.cutoff, k);
+  smooth.lfo    = lerp(smooth.lfo,    state.lfo,    k);
+  smooth.reverb = lerp(smooth.reverb, state.reverb, k);
+  smooth.voices = lerp(smooth.voices, state.voices, k);
+
+  const W = canvas.width, H = canvas.height;
+
+  switch (currentMode) {
+    case 0: drawLissajous(smooth, t, W, H);       break;
+    case 1: drawExplosion(smooth, t, dt, W, H);   break;
+    case 2: drawRipple(smooth, dt, W, H);          break;
+    case 3: drawGrid(smooth, t, W, H);             break;
+  }
 
   requestAnimationFrame(frame);
 }
