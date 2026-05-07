@@ -5,6 +5,7 @@ from dataclasses import dataclass
 
 _DEFAULT_INTERVAL = 1.0
 _DEFAULT_VOLUME = 0.3
+_DEFAULT_EQ = "flat"
 
 
 @dataclass
@@ -13,6 +14,10 @@ class LoopBlock:
     interval: float
     source: str
     volume: float = _DEFAULT_VOLUME
+    eq: str = _DEFAULT_EQ
+    low: float | None = None
+    mid: float | None = None
+    high: float | None = None
 
 
 def _extract_loop_decorator(node: ast.FunctionDef) -> tuple[str, float] | None:
@@ -34,14 +39,21 @@ def _extract_loop_decorator(node: ast.FunctionDef) -> tuple[str, float] | None:
     return None
 
 
-def _extract_volume(node: ast.FunctionDef) -> float:
+def _default_arg_map(node: ast.FunctionDef) -> dict[str, object]:
     args = node.args.args
     defaults = node.args.defaults
     offset = len(args) - len(defaults)
+    values: dict[str, object] = {}
     for i, default in enumerate(defaults):
-        if args[offset + i].arg == "volume" and isinstance(default, ast.Constant):
-            return float(default.value)
-    return _DEFAULT_VOLUME
+        if isinstance(default, ast.Constant):
+            values[args[offset + i].arg] = default.value
+    return values
+
+
+def _optional_float(value: object) -> float | None:
+    if isinstance(value, (int, float)):
+        return float(value)
+    return None
 
 
 def parse_blocks(source: str) -> list[LoopBlock]:
@@ -60,13 +72,19 @@ def parse_blocks(source: str) -> list[LoopBlock]:
         if result is None:
             continue
         loop_name, interval = result
-        volume = _extract_volume(node)
+        arg_defaults = _default_arg_map(node)
+        volume = _optional_float(arg_defaults.get("volume"))
+        eq = arg_defaults.get("eq")
         func_source = "".join(lines[node.lineno - 1 : node.end_lineno])
         blocks.append(LoopBlock(
             name=loop_name,
             interval=interval,
             source=func_source,
-            volume=volume,
+            volume=volume if volume is not None else _DEFAULT_VOLUME,
+            eq=eq if isinstance(eq, str) else _DEFAULT_EQ,
+            low=_optional_float(arg_defaults.get("low")),
+            mid=_optional_float(arg_defaults.get("mid")),
+            high=_optional_float(arg_defaults.get("high")),
         ))
 
     return blocks

@@ -46,6 +46,7 @@ BPM clock is held by SuperCollider's `TempoClock`. Python only sends parameter u
 | Function definition count | Polyphony voice count (1–4) | Functions = independent voices |
 | Comment ratio | Reverb depth (0.0–0.8) | More whitespace = more space |
 | `volume=` argument | Amplitude (0.0–1.0) | Direct performer control over loudness |
+| `eq=` / `low=` / `mid=` / `high=` arguments | Simple 3-band EQ | Per-loop tone shaping |
 
 Tempo (BPM) and root pitch are controlled explicitly by the performer, to prevent the foundation of the piece from shifting on every save.
 

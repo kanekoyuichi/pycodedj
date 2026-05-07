@@ -76,6 +76,34 @@ def test_amp_default() -> None:
     assert p.amp == 0.3
 
 
+def test_eq_preset() -> None:
+    p = map_features(_features(), eq="edm")
+    assert p.low == 1.35
+    assert p.mid == 0.95
+    assert p.high == 1.18
+
+
+def test_eq_override() -> None:
+    p = map_features(_features(), eq="edm", low=1.5)
+    assert p.low == 1.5
+    assert p.mid == 0.95
+    assert p.high == 1.18
+
+
+def test_unknown_eq_is_flat() -> None:
+    p = map_features(_features(), eq="unknown")
+    assert p.low == 1.0
+    assert p.mid == 1.0
+    assert p.high == 1.0
+
+
+def test_eq_clamped() -> None:
+    p = map_features(_features(), low=-1, mid=3, high=1.2)
+    assert p.low == 0.0
+    assert p.mid == 2.0
+    assert p.high == 1.2
+
+
 def test_all_params_in_range() -> None:
     for depth in [0, 5, 10, 20]:
         for cf in [0, 3, 10, 50]:
@@ -86,3 +114,6 @@ def test_all_params_in_range() -> None:
                     assert 0.1 <= p.lfo_rate <= 5.0
                     assert 0.0 <= p.reverb_mix <= 0.8
                     assert 1 <= p.voice_count <= 4
+                    assert 0.0 <= p.low <= 2.0
+                    assert 0.0 <= p.mid <= 2.0
+                    assert 0.0 <= p.high <= 2.0

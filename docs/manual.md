@@ -376,6 +376,7 @@ PyCodeDJ converts the **structure** of your Python code into five musical parame
 | Function count (`def` count) | Polyphony voice count | More = more voices (max 4) |
 | Comment ratio (comment lines ÷ total lines) | Spatial width (Reverb depth) | More = more reverb |
 | `volume=` argument default value | Amplitude | Direct control. 0.0–1.0 |
+| `eq=` / `low=` / `mid=` / `high=` arguments | Simple 3-band EQ | Per-loop tone shaping |
 
 ### Examples
 
@@ -469,6 +470,28 @@ def bg_shimmer(volume=0.05):  # quiet, in the background
     ...
 ```
 
+#### Simple EQ
+
+Use `eq=` to choose a genre-like EQ preset. Override only the bands you need with `low=`, `mid=`, and `high=`.
+
+```python
+@loop("bass_reese", interval=0.5)
+def bass(volume=0.45, eq="edm"):
+    ...
+
+@loop("hat_engine", interval=0.25)
+def hats(volume=0.08, eq="edm", low=0.5, high=1.25):
+    ...
+```
+
+| `eq` | Character |
+| :--- | :--- |
+| `"flat"` | No correction |
+| `"rock"` / `"pop"` | Slight low/high boost with a small mid cut |
+| `"edm"` / `"hiphop"` | Stronger low end and some high lift |
+| `"classic"` / `"jazz"` | Flat-oriented |
+| `"acoustic"` | Less low end, slightly more upper mids/highs |
+
 ---
 
 ## 7. Running multiple loops at once
@@ -559,6 +582,14 @@ pycodedj eval examples/club_set.py::chord_rave
 ```python
 @loop("lead_hoover", interval=4.0)
 def hoover(volume=0.4):   # push it forward
+    ...
+```
+
+**Change EQ:** Choose a preset with `eq=`, then adjust only the bands you need with `low=`, `mid=`, and `high=`.
+
+```python
+@loop("bass_reese", interval=0.5)
+def bass(volume=0.45, eq="edm", low=1.5):
     ...
 ```
 
@@ -960,7 +991,7 @@ pycodedj watch myfile.py --sc-host 192.168.1.10
 from pycodedj import loop
 
 @loop("loop-name", interval=seconds)
-def function_name(volume=amplitude):
+def function_name(volume=amplitude, eq="preset"):
     # function body maps to musical parameters
     ...
 ```
@@ -970,6 +1001,8 @@ def function_name(volume=amplitude):
 | `"loop-name"` | Name sent over OSC. Alphanumeric and underscores. e.g. `bass`, `kick_hard` |
 | `interval=seconds` | Update interval in seconds. Default: `1.0` |
 | `volume=amplitude` | Volume. Float from 0.0 to 1.0. Default: `0.3` |
+| `eq="preset"` | Simple EQ. Default: `"flat"` |
+| `low=multiplier`, `mid=multiplier`, `high=multiplier` | Manual EQ adjustment. 0.0–2.0. Overrides only the specified preset bands |
 | function name | Free to choose. Independent from the loop name |
 
 ---
@@ -985,6 +1018,7 @@ def function_name(volume=amplitude):
 | Reverb | Comment ratio 0.0–1.0 | 0.0–0.8 | Linear |
 | Voice count | Function count (clamped) | 1–4 | Clamp |
 | Amplitude | `volume=` argument | pass-through | — |
+| EQ | `eq=` preset + `low/mid/high` | 0.0–2.0 | Preset, manual values are clamped |
 
 ### OSC addresses
 

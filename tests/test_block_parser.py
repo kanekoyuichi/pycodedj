@@ -29,6 +29,12 @@ def my_kick(volume=0.8):
     pass
 """
 
+_WITH_EQ = """\
+@loop("bass", interval=0.5)
+def my_bass(volume=0.5, eq="edm", low=1.5, high=0.8):
+    pass
+"""
+
 _NO_VOLUME = """\
 @loop("hat")
 def my_hat():
@@ -89,10 +95,23 @@ def test_volume_extracted() -> None:
     assert blocks[0].volume == 0.8
 
 
+def test_eq_defaults_extracted() -> None:
+    blocks = parse_blocks(_WITH_EQ)
+    assert len(blocks) == 1
+    assert blocks[0].eq == "edm"
+    assert blocks[0].low == 1.5
+    assert blocks[0].mid is None
+    assert blocks[0].high == 0.8
+
+
 def test_volume_default() -> None:
     blocks = parse_blocks(_NO_VOLUME)
     assert len(blocks) == 1
     assert blocks[0].volume == 0.3
+    assert blocks[0].eq == "flat"
+    assert blocks[0].low is None
+    assert blocks[0].mid is None
+    assert blocks[0].high is None
 
 
 def test_non_loop_functions_ignored() -> None:

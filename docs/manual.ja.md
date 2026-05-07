@@ -378,6 +378,7 @@ PyCodeDJ は Python コードの「構造」を 5 つの音楽パラメーター
 | 関数の数（`def` の数） | 音の重なり（ポリフォニー声部数） | 多いほど音が重なる（最大 4） |
 | コメントの割合（コメント行 ÷ 全行） | 空間の広さ（リバーブの深さ） | 多いほど残響が増える |
 | `volume=` 引数のデフォルト値 | 音量（Amplitude） | 直接指定。0.0〜1.0 |
+| `eq=` / `low=` / `mid=` / `high=` 引数 | 簡易 3 バンド EQ | ループごとの音質補正 |
 
 ### 実例で見る
 
@@ -470,6 +471,28 @@ def my_kick(volume=0.9):   # 大きい
 def bg_shimmer(volume=0.05):  # 奥で小さく
     ...
 ```
+
+#### 簡易 EQ
+
+`eq=` でジャンル寄りの EQ プリセットを選べます。必要なら `low=`, `mid=`, `high=` で一部だけ上書きできます。
+
+```python
+@loop("bass_reese", interval=0.5)
+def bass(volume=0.45, eq="edm"):
+    ...
+
+@loop("hat_engine", interval=0.25)
+def hats(volume=0.08, eq="edm", low=0.5, high=1.25):
+    ...
+```
+
+| `eq` | 傾向 |
+| :--- | :--- |
+| `"flat"` | 補正なし |
+| `"rock"` / `"pop"` | 低音と高音を少し上げ、中域を少し下げる |
+| `"edm"` / `"hiphop"` | 低音を強め、高音も少し上げる |
+| `"classic"` / `"jazz"` | フラット志向 |
+| `"acoustic"` | 低音を控えめにして中高域を少し上げる |
 
 ---
 
@@ -569,6 +592,14 @@ pycodedj eval examples/club_set.py::chord_rave
 ```python
 @loop("lead_hoover", interval=4.0)
 def hoover(volume=0.4):   # ← 前に出したいとき
+    ...
+```
+
+**EQ を変える:** `eq=` でプリセットを選び、必要な帯域だけ `low=`, `mid=`, `high=` で調整できます。
+
+```python
+@loop("bass_reese", interval=0.5)
+def bass(volume=0.45, eq="edm", low=1.5):
     ...
 ```
 
@@ -962,7 +993,7 @@ pycodedj watch myfile.py --sc-host 192.168.1.10
 from pycodedj import loop
 
 @loop("ループ名", interval=秒)
-def 関数名(volume=音量):
+def 関数名(volume=音量, eq="プリセット"):
     # 関数の中身が音楽パラメーターに変換される
     ...
 ```
@@ -972,6 +1003,8 @@ def 関数名(volume=音量):
 | `"ループ名"` | SuperCollider に送られる名前。英数字とアンダースコア。例: `bass`, `kick_hard` |
 | `interval=秒` | ループの更新間隔（秒）。省略時は 1.0 |
 | `volume=音量` | 音量。0.0〜1.0 の浮動小数点数。省略時は 0.3 |
+| `eq="プリセット"` | 簡易 EQ。省略時は `"flat"` |
+| `low=倍率`, `mid=倍率`, `high=倍率` | EQ の手動調整。0.0〜2.0。プリセットの一部だけ上書きできる |
 | 関数名 | 自由につけられる。ループ名とは独立している |
 
 ---
@@ -987,6 +1020,7 @@ def 関数名(volume=音量):
 | リバーブ | コメント率 0.0–1.0 | 0.0–0.8 | リニア |
 | 声部数 | 関数数（クランプ） | 1–4 | クランプ |
 | 音量 | `volume=` 引数 | そのまま | パススルー |
+| EQ | `eq=` プリセット + `low/mid/high` | 0.0–2.0 | プリセット、手動値はクランプ |
 
 ### OSC アドレス
 

@@ -21,7 +21,7 @@ from pycodedj import loop
 # --- Foundation: dead simple, bone-dry ---
 
 @loop("kick_hard", interval=1.0)
-def four_on_floor(volume=0.9):
+def four_on_floor(volume=0.9, eq="edm", low=1.25):
     hit = "down"
     _ = hit
 
@@ -29,7 +29,7 @@ def four_on_floor(volume=0.9):
 # --- Sub: minimal pulse, barely more than the kick ---
 
 @loop("sub_bass", interval=1.0)
-def sub_layer(volume=0.4):
+def sub_layer(volume=0.4, eq="edm", low=1.45, high=0.7):
     for beat in range(4):
         sub = "low"
         _ = sub
@@ -38,7 +38,7 @@ def sub_layer(volume=0.4):
 # --- Groove: syncopated acid sequence with accents ---
 
 @loop("bass_acid", interval=0.5)
-def acid_line(volume=0.22):
+def acid_line(volume=0.22, eq="edm", low=1.2, mid=1.05):
     pattern = [
         ("hit", True), ("skip", False), ("slide", True),
         ("hit", True), ("skip", False), ("accent", True),
@@ -57,7 +57,7 @@ def acid_line(volume=0.22):
 # --- Hats: mechanical 16th-note grid ---
 
 @loop("hat_engine", interval=0.25)
-def closed_hats(volume=0.13):
+def closed_hats(volume=0.13, eq="edm", low=0.45, high=1.25):
     for bar in range(2):
         for tick in range(16):
             if tick % 4 == 0:
@@ -85,7 +85,7 @@ def closed_hats(volume=0.13):
 # --- Backbeat: decisive 2 & 4 with fill on bar 4 ---
 
 @loop("clap_snare", interval=1.0)
-def backbeat(volume=0.26):
+def backbeat(volume=0.26, eq="pop", low=0.75, high=1.15):
     for bar in range(4):
         for beat in range(4):
             if beat == 1:
@@ -103,7 +103,7 @@ def backbeat(volume=0.26):
 # --- Harmonic: stacked chord voices across phrases ---
 
 @loop("chord_rave", interval=2.0)
-def rave_stabs(volume=0.14):
+def rave_stabs(volume=0.14, eq="edm", mid=0.9):
     for phrase in range(4):
         for voice in range(3):
             for harmonic in range(2):
@@ -124,7 +124,7 @@ def rave_stabs(volume=0.14):
 # --- Lead: phrase-based, slight air ---
 
 @loop("lead_hoover", interval=4.0)
-def hoover(volume=0.11):
+def hoover(volume=0.11, eq="edm", high=1.25):
     # classic rave swell
     # builds and drops
     for phrase in range(4):
@@ -140,7 +140,7 @@ def hoover(volume=0.11):
 # --- Space: pure atmosphere, no code at all ---
 
 @loop("shimmer_pad", interval=8.0)
-def shimmer(volume=0.06):
+def shimmer(volume=0.06, eq="acoustic", low=0.65):
     # wide hall reverb
     # slow harmonic drift
     # always underneath everything

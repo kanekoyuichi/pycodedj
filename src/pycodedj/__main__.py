@@ -44,6 +44,7 @@ def _print_params(loop_name: str, params: object) -> None:
         f"  lfo={params.lfo_rate:.2f}Hz"
         f"  reverb={params.reverb_mix:.2f}"
         f"  voices={params.voice_count}"
+        f"  eq={params.low:.2f}/{params.mid:.2f}/{params.high:.2f}"
     )
 
 

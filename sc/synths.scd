@@ -5,8 +5,16 @@ s.waitForBoot({
     // Shared controls:
     // cutoff = tone/brightness, lfoRate = pattern/modulation speed,
     // reverbMix = space, gate = fade out when a loop is restarted/stopped.
+    // low/mid/high = simple per-loop 3-band EQ multipliers.
+    ~applySimpleEQ = { |sig, eqLow = 1, eqMid = 1, eqHigh = 1|
+        sig = BLowShelf.ar(sig, 120, 1, eqLow.clip(0.001, 2).ampdb);
+        sig = BPeakEQ.ar(sig, 900, 1, eqMid.clip(0.001, 2).ampdb);
+        sig = BHiShelf.ar(sig, 5000, 1, eqHigh.clip(0.001, 2).ampdb);
+        Limiter.ar(sig, 0.98);
+    };
+
     SynthDef(\pycodedj_sub_bass, {
-        arg cutoff = 900, lfoRate = 1.0, reverbMix = 0.05, amp = 0.5, gate = 1;
+        arg cutoff = 900, lfoRate = 1.0, reverbMix = 0.05, amp = 0.5, gate = 1, eqLow = 1, eqMid = 1, eqHigh = 1;
         var trig, pumpTrig, freq, env, pump, click, sub, mid, sig;
         trig = Impulse.kr((lfoRate * 0.85).clip(1.2, 3.4));
         pumpTrig = Impulse.kr(2.133); // 128 BPM quarter-note pump
@@ -20,11 +28,11 @@ s.waitForBoot({
         sig = RLPF.ar(sig.tanh, cutoff.clip(80, 1700), 0.22);
         env = EnvGen.kr(Env.asr(0.1, 1, 0.2), gate, doneAction: 2);
         sig = FreeVerb.ar(sig, reverbMix.clip(0, 0.8)) * env * amp;
-        Out.ar(0, sig ! 2);
+        Out.ar(0, ~applySimpleEQ.value(sig ! 2, eqLow, eqMid, eqHigh));
     }).add;
 
     SynthDef(\pycodedj_hat_engine, {
-        arg cutoff = 6500, lfoRate = 1.5, reverbMix = 0.08, amp = 0.13, gate = 1;
+        arg cutoff = 6500, lfoRate = 1.5, reverbMix = 0.08, amp = 0.13, gate = 1, eqLow = 1, eqMid = 1, eqHigh = 1;
         var trig, openTrig, closedEnv, openEnv, tone, sig, env;
         trig = Impulse.kr((lfoRate * 3.2).clip(6, 16));
         openTrig = PulseDivider.kr(trig, 4);
@@ -35,11 +43,11 @@ s.waitForBoot({
         sig = BPF.ar(sig, tone, 0.45) * (closedEnv + (openEnv * 0.75));
         env = EnvGen.kr(Env.asr(0.01, 1, 0.08), gate, doneAction: 2);
         sig = FreeVerb.ar(sig, reverbMix.clip(0, 0.45), 0.25, 0.15) * env * amp;
-        Out.ar(0, Pan2.ar(sig, SinOsc.kr(0.13).range(-0.25, 0.25)));
+        Out.ar(0, ~applySimpleEQ.value(Pan2.ar(sig, SinOsc.kr(0.13).range(-0.25, 0.25)), eqLow, eqMid, eqHigh));
     }).add;
 
     SynthDef(\pycodedj_clap_snap, {
-        arg cutoff = 4200, lfoRate = 1.0, reverbMix = 0.18, amp = 0.18, gate = 1;
+        arg cutoff = 4200, lfoRate = 1.0, reverbMix = 0.18, amp = 0.18, gate = 1, eqLow = 1, eqMid = 1, eqHigh = 1;
         var trig, flam, env, tone, sig, gateEnv;
         trig = Impulse.kr((lfoRate * 0.65).clip(0.8, 1.4));
         flam = trig + DelayN.kr(trig, 0.04, 0.018) + DelayN.kr(trig, 0.06, 0.037);
@@ -49,11 +57,11 @@ s.waitForBoot({
         sig = HPF.ar(sig, 900);
         gateEnv = EnvGen.kr(Env.asr(0.01, 1, 0.1), gate, doneAction: 2);
         sig = FreeVerb.ar(sig, reverbMix.clip(0.05, 0.5), 0.55, 0.25) * gateEnv * amp;
-        Out.ar(0, sig ! 2);
+        Out.ar(0, ~applySimpleEQ.value(sig ! 2, eqLow, eqMid, eqHigh));
     }).add;
 
     SynthDef(\pycodedj_neon_stab, {
-        arg cutoff = 1200, lfoRate = 0.25, reverbMix = 0.25, amp = 0.14, gate = 1;
+        arg cutoff = 1200, lfoRate = 0.25, reverbMix = 0.25, amp = 0.14, gate = 1, eqLow = 1, eqMid = 1, eqHigh = 1;
         var trig, root, freqs, env, sig, gateEnv;
         trig = Impulse.kr((lfoRate * 0.75).clip(0.08, 1.5));
         root = Demand.kr(trig, 0, Dseq([48, 43, 46, 41], inf));
@@ -63,11 +71,11 @@ s.waitForBoot({
         sig = RLPF.ar(sig, cutoff.clip(600, 4500), 0.32) * env;
         gateEnv = EnvGen.kr(Env.asr(0.05, 1, 0.25), gate, doneAction: 2);
         sig = FreeVerb.ar(sig, reverbMix.clip(0, 0.8), 0.55, 0.35) * gateEnv * amp;
-        Out.ar(0, sig);
+        Out.ar(0, ~applySimpleEQ.value(sig, eqLow, eqMid, eqHigh));
     }).add;
 
     SynthDef(\pycodedj_acid_lead, {
-        arg cutoff = 2100, lfoRate = 2.0, reverbMix = 0.12, amp = 0.15, gate = 1;
+        arg cutoff = 2100, lfoRate = 2.0, reverbMix = 0.12, amp = 0.15, gate = 1, eqLow = 1, eqMid = 1, eqHigh = 1;
         var trig, note, freq, env, filterEnv, sig, gateEnv;
         trig = Impulse.kr((lfoRate * 3).clip(2, 14));
         note = Demand.kr(trig, 0, Dseq([48, 51, 55, 58, 60, 58, 55, 51], inf));
@@ -78,11 +86,11 @@ s.waitForBoot({
         sig = RLPF.ar(sig, (cutoff + filterEnv).clip(500, 6200), 0.16).tanh * env;
         gateEnv = EnvGen.kr(Env.asr(0.02, 1, 0.12), gate, doneAction: 2);
         sig = FreeVerb.ar(sig, reverbMix.clip(0, 0.55), 0.35, 0.22) * gateEnv * amp;
-        Out.ar(0, Pan2.ar(sig, SinOsc.kr(0.21).range(-0.35, 0.35)));
+        Out.ar(0, ~applySimpleEQ.value(Pan2.ar(sig, SinOsc.kr(0.21).range(-0.35, 0.35)), eqLow, eqMid, eqHigh));
     }).add;
 
     SynthDef(\pycodedj_warehouse_air, {
-        arg cutoff = 700, lfoRate = 0.1, reverbMix = 0.6, amp = 0.08, gate = 1;
+        arg cutoff = 700, lfoRate = 0.1, reverbMix = 0.6, amp = 0.08, gate = 1, eqLow = 1, eqMid = 1, eqHigh = 1;
         var sweep, dust, tail, sig, env;
         sweep = LFNoise1.kr(lfoRate.clip(0.03, 0.8)).range(0, 1).exprange(180, cutoff.clip(350, 3600));
         dust = Decay2.kr(Dust.kr((lfoRate * 5).clip(0.5, 7)), 0.02, 1.2) * PinkNoise.ar(0.08);
@@ -90,11 +98,11 @@ s.waitForBoot({
         sig = HPF.ar(tail + dust, 140);
         sig = FreeVerb.ar(sig, reverbMix.clip(0.25, 0.9), 0.92, 0.65);
         env = EnvGen.kr(Env.asr(1.5, 1, 2.0), gate, doneAction: 2);
-        Out.ar(0, Pan2.ar(sig * env * amp, LFNoise1.kr(0.08)));
+        Out.ar(0, ~applySimpleEQ.value(Pan2.ar(sig * env * amp, LFNoise1.kr(0.08)), eqLow, eqMid, eqHigh));
     }).add;
 
     SynthDef(\pycodedj_kick_pulse, {
-        arg cutoff = 900, lfoRate = 1.0, reverbMix = 0.02, amp = 0.28, gate = 1;
+        arg cutoff = 900, lfoRate = 1.0, reverbMix = 0.02, amp = 0.28, gate = 1, eqLow = 1, eqMid = 1, eqHigh = 1;
         var trig, env, pitch, sig, gateEnv;
         trig = Impulse.kr(lfoRate.clip(0.5, 4.0));
         env = Decay2.kr(trig, 0.001, 0.22);
@@ -103,11 +111,11 @@ s.waitForBoot({
         sig = (sig + (BPF.ar(WhiteNoise.ar(0.08), cutoff.clip(500, 4500), 0.5) * Decay2.kr(trig, 0.001, 0.02))).tanh;
         gateEnv = EnvGen.kr(Env.asr(0.01, 1, 0.08), gate, doneAction: 2);
         sig = FreeVerb.ar(sig, reverbMix.clip(0, 0.25), 0.2, 0.1) * gateEnv * amp;
-        Out.ar(0, sig ! 2);
+        Out.ar(0, ~applySimpleEQ.value(sig ! 2, eqLow, eqMid, eqHigh));
     }).add;
 
     SynthDef(\pycodedj_floor_kick, {
-        arg cutoff = 1100, lfoRate = 1.0, reverbMix = 0.08, amp = 0.72, gate = 1;
+        arg cutoff = 1100, lfoRate = 1.0, reverbMix = 0.08, amp = 0.72, gate = 1, eqLow = 1, eqMid = 1, eqHigh = 1;
         var trig, bodyEnv, punchEnv, tailEnv, pitch, body, punch, tail, room, sig, gateEnv;
         trig = Impulse.kr(2.133); // 128 BPM four-on-the-floor
         bodyEnv = Decay2.kr(trig, 0.001, 0.28);
@@ -121,11 +129,11 @@ s.waitForBoot({
         sig = (body + punch + tail + room).tanh;
         gateEnv = EnvGen.kr(Env.asr(0.005, 1, 0.12), gate, doneAction: 2);
         sig = Compander.ar(sig, sig, 0.5, 1, 0.28, 0.002, 0.06) * gateEnv * amp;
-        Out.ar(0, sig ! 2);
+        Out.ar(0, ~applySimpleEQ.value(sig ! 2, eqLow, eqMid, eqHigh));
     }).add;
 
     SynthDef(\pycodedj_glitch_ticks, {
-        arg cutoff = 5000, lfoRate = 2.0, reverbMix = 0.08, amp = 0.06, gate = 1;
+        arg cutoff = 5000, lfoRate = 2.0, reverbMix = 0.08, amp = 0.06, gate = 1, eqLow = 1, eqMid = 1, eqHigh = 1;
         var trig, rate, env, sig, gateEnv;
         rate = (lfoRate * 8).clip(4, 28);
         trig = Dust.kr(rate);
@@ -134,11 +142,11 @@ s.waitForBoot({
         sig = Pan2.ar(sig, LFNoise1.kr(rate * 0.25).range(-0.8, 0.8));
         gateEnv = EnvGen.kr(Env.asr(0.005, 1, 0.05), gate, doneAction: 2);
         sig = FreeVerb.ar(sig, reverbMix.clip(0, 0.5), 0.35, 0.2) * gateEnv * amp;
-        Out.ar(0, sig);
+        Out.ar(0, ~applySimpleEQ.value(sig, eqLow, eqMid, eqHigh));
     }).add;
 
     SynthDef(\pycodedj_soft_pluck, {
-        arg cutoff = 1600, lfoRate = 1.0, reverbMix = 0.18, amp = 0.11, gate = 1;
+        arg cutoff = 1600, lfoRate = 1.0, reverbMix = 0.18, amp = 0.11, gate = 1, eqLow = 1, eqMid = 1, eqHigh = 1;
         var trig, note, freq, env, sig, gateEnv;
         trig = Impulse.kr(lfoRate.clip(0.2, 6.0));
         note = Demand.kr(trig, 0, Dseq([60, 64, 67, 72, 67, 64], inf));
@@ -148,11 +156,11 @@ s.waitForBoot({
         sig = RLPF.ar(sig, cutoff.clip(350, 7000), 0.38);
         gateEnv = EnvGen.kr(Env.asr(0.02, 1, 0.16), gate, doneAction: 2);
         sig = FreeVerb.ar(sig, reverbMix.clip(0, 0.75), 0.45, 0.28) * gateEnv * amp;
-        Out.ar(0, sig ! 2);
+        Out.ar(0, ~applySimpleEQ.value(sig ! 2, eqLow, eqMid, eqHigh));
     }).add;
 
     SynthDef(\pycodedj_dub_chord, {
-        arg cutoff = 1200, lfoRate = 0.5, reverbMix = 0.35, amp = 0.13, gate = 1;
+        arg cutoff = 1200, lfoRate = 0.5, reverbMix = 0.35, amp = 0.13, gate = 1, eqLow = 1, eqMid = 1, eqHigh = 1;
         var trig, root, freqs, env, sig, gateEnv;
         trig = Impulse.kr((lfoRate * 0.75).clip(0.08, 1.0));
         root = Demand.kr(trig, 0, Dseq([43, 46, 41, 48], inf));
@@ -162,11 +170,11 @@ s.waitForBoot({
         sig = RLPF.ar(sig, cutoff.clip(500, 5000), 0.24) * env;
         gateEnv = EnvGen.kr(Env.asr(0.05, 1, 0.3), gate, doneAction: 2);
         sig = FreeVerb.ar(sig, reverbMix.clip(0.1, 0.85), 0.75, 0.45) * gateEnv * amp;
-        Out.ar(0, sig);
+        Out.ar(0, ~applySimpleEQ.value(sig, eqLow, eqMid, eqHigh));
     }).add;
 
     SynthDef(\pycodedj_shimmer_pad, {
-        arg cutoff = 1400, lfoRate = 0.15, reverbMix = 0.55, amp = 0.08, gate = 1;
+        arg cutoff = 1400, lfoRate = 0.15, reverbMix = 0.55, amp = 0.08, gate = 1, eqLow = 1, eqMid = 1, eqHigh = 1;
         var drift, freqs, sig, gateEnv;
         drift = LFNoise1.kr(lfoRate.clip(0.03, 0.7)).range(-0.08, 0.08);
         freqs = ([55, 62, 67, 74] + drift).midicps;
@@ -174,11 +182,11 @@ s.waitForBoot({
         sig = RLPF.ar(sig, cutoff.clip(500, 5200), 0.42);
         gateEnv = EnvGen.kr(Env.asr(1.2, 1, 1.8), gate, doneAction: 2);
         sig = FreeVerb.ar(sig, reverbMix.clip(0.25, 0.95), 0.9, 0.55) * gateEnv * amp;
-        Out.ar(0, sig);
+        Out.ar(0, ~applySimpleEQ.value(sig, eqLow, eqMid, eqHigh));
     }).add;
 
     SynthDef(\pycodedj_kick_hard, {
-        arg cutoff = 1300, lfoRate = 1.0, reverbMix = 0.04, amp = 0.76, gate = 1;
+        arg cutoff = 1300, lfoRate = 1.0, reverbMix = 0.04, amp = 0.76, gate = 1, eqLow = 1, eqMid = 1, eqHigh = 1;
         var trig, bodyEnv, clickEnv, driveEnv, pitch, body, click, drive, sig, gateEnv;
         trig = Impulse.kr(2.133);
         bodyEnv = Decay2.kr(trig, 0.001, 0.34);
@@ -192,11 +200,11 @@ s.waitForBoot({
         sig = Compander.ar(sig, sig, 0.42, 1, 0.22, 0.001, 0.045);
         gateEnv = EnvGen.kr(Env.asr(0.005, 1, 0.1), gate, doneAction: 2);
         sig = FreeVerb.ar(sig, reverbMix.clip(0, 0.18), 0.25, 0.12) * gateEnv * amp;
-        Out.ar(0, sig ! 2);
+        Out.ar(0, ~applySimpleEQ.value(sig ! 2, eqLow, eqMid, eqHigh));
     }).add;
 
     SynthDef(\pycodedj_bass_reese, {
-        arg cutoff = 1100, lfoRate = 0.9, reverbMix = 0.08, amp = 0.28, gate = 1;
+        arg cutoff = 1100, lfoRate = 0.9, reverbMix = 0.08, amp = 0.28, gate = 1, eqLow = 1, eqMid = 1, eqHigh = 1;
         var trig, note, freq, env, wobble, sig, gateEnv;
         trig = Impulse.kr((lfoRate * 1.6).clip(0.8, 5.0));
         note = Demand.kr(trig, 0, Dseq([36, 36, 43, 34, 36, 31, 34, 36], inf));
@@ -208,11 +216,11 @@ s.waitForBoot({
         sig = (sig * 1.8).tanh * env;
         gateEnv = EnvGen.kr(Env.asr(0.06, 1, 0.18), gate, doneAction: 2);
         sig = FreeVerb.ar(sig, reverbMix.clip(0, 0.38), 0.36, 0.2) * gateEnv * amp;
-        Out.ar(0, sig);
+        Out.ar(0, ~applySimpleEQ.value(sig, eqLow, eqMid, eqHigh));
     }).add;
 
     SynthDef(\pycodedj_bass_rumble, {
-        arg cutoff = 500, lfoRate = 1.0, reverbMix = 0.28, amp = 0.34, gate = 1;
+        arg cutoff = 500, lfoRate = 1.0, reverbMix = 0.28, amp = 0.34, gate = 1, eqLow = 1, eqMid = 1, eqHigh = 1;
         var trig, kickEnv, rumbleEnv, pitch, kick, rumble, pump, sig, gateEnv;
         trig = Impulse.kr(2.133);
         kickEnv = Decay2.kr(trig, 0.001, 0.16);
@@ -223,11 +231,11 @@ s.waitForBoot({
         pump = 1 - (Decay2.kr(trig, 0.001, 0.22) * 0.45);
         sig = (kick + FreeVerb.ar(rumble, reverbMix.clip(0.15, 0.65), 0.9, 0.55)) * pump;
         gateEnv = EnvGen.kr(Env.asr(0.02, 1, 0.18), gate, doneAction: 2);
-        Out.ar(0, (sig.tanh * gateEnv * amp) ! 2);
+        Out.ar(0, ~applySimpleEQ.value((sig.tanh * gateEnv * amp) ! 2, eqLow, eqMid, eqHigh));
     }).add;
 
     SynthDef(\pycodedj_hat_ride, {
-        arg cutoff = 9000, lfoRate = 1.5, reverbMix = 0.18, amp = 0.1, gate = 1;
+        arg cutoff = 9000, lfoRate = 1.5, reverbMix = 0.18, amp = 0.1, gate = 1, eqLow = 1, eqMid = 1, eqHigh = 1;
         var trig, env, tone, metal, sig, gateEnv;
         trig = Impulse.kr((lfoRate * 1.6).clip(3, 12));
         env = Decay2.kr(trig, 0.002, 0.42);
@@ -237,11 +245,11 @@ s.waitForBoot({
         sig = BPF.ar(sig, tone, 0.34) * env;
         gateEnv = EnvGen.kr(Env.asr(0.01, 1, 0.12), gate, doneAction: 2);
         sig = FreeVerb.ar(sig, reverbMix.clip(0, 0.55), 0.55, 0.24) * gateEnv * amp;
-        Out.ar(0, Pan2.ar(sig, LFNoise1.kr(0.35).range(-0.45, 0.45)));
+        Out.ar(0, ~applySimpleEQ.value(Pan2.ar(sig, LFNoise1.kr(0.35).range(-0.45, 0.45)), eqLow, eqMid, eqHigh));
     }).add;
 
     SynthDef(\pycodedj_clap_snare, {
-        arg cutoff = 3600, lfoRate = 1.0, reverbMix = 0.16, amp = 0.2, gate = 1;
+        arg cutoff = 3600, lfoRate = 1.0, reverbMix = 0.16, amp = 0.2, gate = 1, eqLow = 1, eqMid = 1, eqHigh = 1;
         var trig, env, bodyEnv, noise, body, sig, gateEnv;
         trig = Impulse.kr((lfoRate * 0.65).clip(0.8, 1.8));
         env = Decay2.kr(trig, 0.001, 0.18);
@@ -251,11 +259,11 @@ s.waitForBoot({
         sig = HPF.ar(noise + body, 120);
         gateEnv = EnvGen.kr(Env.asr(0.01, 1, 0.11), gate, doneAction: 2);
         sig = FreeVerb.ar(sig, reverbMix.clip(0.04, 0.55), 0.52, 0.24) * gateEnv * amp;
-        Out.ar(0, sig ! 2);
+        Out.ar(0, ~applySimpleEQ.value(sig ! 2, eqLow, eqMid, eqHigh));
     }).add;
 
     SynthDef(\pycodedj_chord_rave, {
-        arg cutoff = 1800, lfoRate = 0.55, reverbMix = 0.28, amp = 0.15, gate = 1;
+        arg cutoff = 1800, lfoRate = 0.55, reverbMix = 0.28, amp = 0.15, gate = 1, eqLow = 1, eqMid = 1, eqHigh = 1;
         var trig, root, freqs, env, detune, sig, gateEnv;
         trig = Impulse.kr((lfoRate * 1.15).clip(0.15, 2.2));
         root = Demand.kr(trig, 0, Dseq([48, 51, 46, 43], inf));
@@ -266,11 +274,11 @@ s.waitForBoot({
         sig = RLPF.ar((sig * 1.7).tanh, cutoff.clip(650, 6200), 0.2) * env;
         gateEnv = EnvGen.kr(Env.asr(0.03, 1, 0.22), gate, doneAction: 2);
         sig = FreeVerb.ar(sig, reverbMix.clip(0.08, 0.75), 0.62, 0.34) * gateEnv * amp;
-        Out.ar(0, sig);
+        Out.ar(0, ~applySimpleEQ.value(sig, eqLow, eqMid, eqHigh));
     }).add;
 
     SynthDef(\pycodedj_lead_hoover, {
-        arg cutoff = 2400, lfoRate = 1.2, reverbMix = 0.18, amp = 0.13, gate = 1;
+        arg cutoff = 2400, lfoRate = 1.2, reverbMix = 0.18, amp = 0.13, gate = 1, eqLow = 1, eqMid = 1, eqHigh = 1;
         var trig, note, freq, env, detune, sig, gateEnv;
         trig = Impulse.kr((lfoRate * 1.8).clip(0.6, 7.0));
         note = Demand.kr(trig, 0, Dseq([60, 63, 58, 55, 60, 67, 65, 63], inf));
@@ -281,11 +289,11 @@ s.waitForBoot({
         sig = RLPF.ar((sig * 1.5).tanh, cutoff.clip(700, 7600), 0.24) * env;
         gateEnv = EnvGen.kr(Env.asr(0.04, 1, 0.2), gate, doneAction: 2);
         sig = FreeVerb.ar(sig, reverbMix.clip(0.04, 0.65), 0.48, 0.24) * gateEnv * amp;
-        Out.ar(0, sig);
+        Out.ar(0, ~applySimpleEQ.value(sig, eqLow, eqMid, eqHigh));
     }).add;
 
     SynthDef(\pycodedj_fx_impact, {
-        arg cutoff = 1600, lfoRate = 0.25, reverbMix = 0.55, amp = 0.16, gate = 1;
+        arg cutoff = 1600, lfoRate = 0.25, reverbMix = 0.55, amp = 0.16, gate = 1, eqLow = 1, eqMid = 1, eqHigh = 1;
         var trig, env, thump, noise, tail, sig, gateEnv;
         trig = Impulse.kr(lfoRate.clip(0.05, 1.0));
         env = Decay2.kr(trig, 0.001, 1.2);
@@ -294,14 +302,14 @@ s.waitForBoot({
         tail = FreeVerb.ar(noise + thump, reverbMix.clip(0.25, 0.9), 0.92, 0.62);
         sig = (thump + tail).tanh;
         gateEnv = EnvGen.kr(Env.asr(0.02, 1, 0.35), gate, doneAction: 2);
-        Out.ar(0, (sig ! 2) * gateEnv * amp);
+        Out.ar(0, ~applySimpleEQ.value((sig ! 2) * gateEnv * amp, eqLow, eqMid, eqHigh));
     }).add;
 
     // ── New DJ sounds ──────────────────────────────────────────────────
 
     // tom_drum: floor tom, MIDI pitch sweep, noise transient
     SynthDef(\pycodedj_tom_drum, {
-        arg cutoff = 1200, lfoRate = 1.0, reverbMix = 0.14, amp = 0.25, gate = 1;
+        arg cutoff = 1200, lfoRate = 1.0, reverbMix = 0.14, amp = 0.25, gate = 1, eqLow = 1, eqMid = 1, eqHigh = 1;
         var trig, pitch, bodyEnv, transEnv, body, trans, sig, gateEnv;
         trig = Impulse.kr(lfoRate.clip(0.5, 4.0));
         pitch = EnvGen.kr(Env([65, 38, 32], [0.018, 0.22], \exp), trig).midicps;
@@ -312,12 +320,12 @@ s.waitForBoot({
         sig = (body + trans).tanh;
         gateEnv = EnvGen.kr(Env.asr(0.01, 1, 0.1), gate, doneAction: 2);
         sig = FreeVerb.ar(sig, reverbMix.clip(0, 0.55), 0.45, 0.22) * gateEnv * amp;
-        Out.ar(0, sig ! 2);
+        Out.ar(0, ~applySimpleEQ.value(sig ! 2, eqLow, eqMid, eqHigh));
     }).add;
 
     // snare_roll: rapid triggered noise roll, rate driven by lfoRate
     SynthDef(\pycodedj_snare_roll, {
-        arg cutoff = 4000, lfoRate = 2.0, reverbMix = 0.22, amp = 0.2, gate = 1;
+        arg cutoff = 4000, lfoRate = 2.0, reverbMix = 0.22, amp = 0.2, gate = 1, eqLow = 1, eqMid = 1, eqHigh = 1;
         var rate, trig, env, sig, gateEnv;
         rate = (lfoRate * 8).clip(8, 32);
         trig = Impulse.kr(rate);
@@ -326,12 +334,12 @@ s.waitForBoot({
         sig = HPF.ar(sig, 200);
         gateEnv = EnvGen.kr(Env.asr(0.01, 1, 0.08), gate, doneAction: 2);
         sig = FreeVerb.ar(sig, reverbMix.clip(0, 0.5), 0.5, 0.22) * gateEnv * amp;
-        Out.ar(0, sig ! 2);
+        Out.ar(0, ~applySimpleEQ.value(sig ! 2, eqLow, eqMid, eqHigh));
     }).add;
 
     // noise_crash: metallic crash cymbal with long tail
     SynthDef(\pycodedj_noise_crash, {
-        arg cutoff = 8000, lfoRate = 0.5, reverbMix = 0.35, amp = 0.22, gate = 1;
+        arg cutoff = 8000, lfoRate = 0.5, reverbMix = 0.35, amp = 0.22, gate = 1, eqLow = 1, eqMid = 1, eqHigh = 1;
         var trig, env, tone, metal, sig, gateEnv;
         trig = Impulse.kr(lfoRate.clip(0.1, 2.0));
         env = Decay2.kr(trig, 0.003, 1.4);
@@ -341,12 +349,12 @@ s.waitForBoot({
         sig = BPF.ar(sig, tone, 0.65) * env;
         gateEnv = EnvGen.kr(Env.asr(0.01, 1, 0.35), gate, doneAction: 2);
         sig = FreeVerb.ar(sig, reverbMix.clip(0.1, 0.8), 0.75, 0.45) * gateEnv * amp;
-        Out.ar(0, sig ! 2);
+        Out.ar(0, ~applySimpleEQ.value(sig ! 2, eqLow, eqMid, eqHigh));
     }).add;
 
     // bass_acid: classic 303-style acid bass, low register, squelchy filter
     SynthDef(\pycodedj_bass_acid, {
-        arg cutoff = 1200, lfoRate = 3.0, reverbMix = 0.05, amp = 0.22, gate = 1;
+        arg cutoff = 1200, lfoRate = 3.0, reverbMix = 0.05, amp = 0.22, gate = 1, eqLow = 1, eqMid = 1, eqHigh = 1;
         var trig, note, freq, acc, env, filterEnv, sig, gateEnv;
         trig = Impulse.kr((lfoRate * 2).clip(2, 16));
         note = Demand.kr(trig, 0, Dseq([36, 36, 43, 36, 38, 34, 36, 31], inf));
@@ -358,12 +366,12 @@ s.waitForBoot({
         sig = RLPF.ar(sig.tanh, (cutoff + filterEnv).clip(300, 6200), 0.13) * env;
         gateEnv = EnvGen.kr(Env.asr(0.008, 1, 0.1), gate, doneAction: 2);
         sig = FreeVerb.ar(sig, reverbMix.clip(0, 0.3), 0.22, 0.12) * gateEnv * amp;
-        Out.ar(0, Pan2.ar(sig, 0));
+        Out.ar(0, ~applySimpleEQ.value(Pan2.ar(sig, 0), eqLow, eqMid, eqHigh));
     }).add;
 
     // stab_saw: classic detuned saw chord stab, tight attack
     SynthDef(\pycodedj_stab_saw, {
-        arg cutoff = 2400, lfoRate = 1.0, reverbMix = 0.18, amp = 0.2, gate = 1;
+        arg cutoff = 2400, lfoRate = 1.0, reverbMix = 0.18, amp = 0.2, gate = 1, eqLow = 1, eqMid = 1, eqHigh = 1;
         var trig, root, freqs, env, sig, gateEnv;
         trig = Impulse.kr((lfoRate * 0.5).clip(0.2, 2.0));
         root = Demand.kr(trig, 0, Dseq([48, 48, 55, 53], inf));
@@ -373,12 +381,12 @@ s.waitForBoot({
         sig = RLPF.ar((sig * 2.2).tanh, cutoff.clip(800, 7200), 0.17) * env;
         gateEnv = EnvGen.kr(Env.asr(0.005, 1, 0.1), gate, doneAction: 2);
         sig = FreeVerb.ar(sig, reverbMix.clip(0, 0.65), 0.55, 0.28) * gateEnv * amp;
-        Out.ar(0, sig);
+        Out.ar(0, ~applySimpleEQ.value(sig, eqLow, eqMid, eqHigh));
     }).add;
 
     // riser_noise: noise sweep that climbs over 8s — restart synth to retrigger
     SynthDef(\pycodedj_riser_noise, {
-        arg cutoff = 1000, lfoRate = 0.5, reverbMix = 0.35, amp = 0.15, gate = 1;
+        arg cutoff = 1000, lfoRate = 0.5, reverbMix = 0.35, amp = 0.15, gate = 1, eqLow = 1, eqMid = 1, eqHigh = 1;
         var startPitch, endPitch, sweep, env, sig, gateEnv;
         startPitch = cutoff.clip(120, 2000) * 0.2;
         endPitch = cutoff.clip(120, 2000) * 5;
@@ -388,12 +396,12 @@ s.waitForBoot({
         sig = BPF.ar(sig + (SinOsc.ar(sweep * 0.5) * 0.22), sweep, 0.55) * env;
         gateEnv = EnvGen.kr(Env.asr(0.5, 1, 1.5), gate, doneAction: 2);
         sig = FreeVerb.ar(sig, reverbMix.clip(0.1, 0.85), 0.75, 0.45) * gateEnv * amp;
-        Out.ar(0, sig ! 2);
+        Out.ar(0, ~applySimpleEQ.value(sig ! 2, eqLow, eqMid, eqHigh));
     }).add;
 
     // bell_rave: metallic FM bell with classic rave inharmonic ratios
     SynthDef(\pycodedj_bell_rave, {
-        arg cutoff = 3000, lfoRate = 1.0, reverbMix = 0.38, amp = 0.12, gate = 1;
+        arg cutoff = 3000, lfoRate = 1.0, reverbMix = 0.38, amp = 0.12, gate = 1, eqLow = 1, eqMid = 1, eqHigh = 1;
         var trig, note, freq, env, partials, sig, gateEnv;
         trig = Impulse.kr((lfoRate * 0.75).clip(0.15, 3.0));
         note = Demand.kr(trig, 0, Dseq([72, 75, 79, 84], inf));
@@ -410,12 +418,12 @@ s.waitForBoot({
         sig = RLPF.ar(partials * env, cutoff.clip(1000, 14000), 0.5);
         gateEnv = EnvGen.kr(Env.asr(0.01, 1, 0.3), gate, doneAction: 2);
         sig = FreeVerb.ar(sig, reverbMix.clip(0.1, 0.85), 0.72, 0.42) * gateEnv * amp;
-        Out.ar(0, sig ! 2);
+        Out.ar(0, ~applySimpleEQ.value(sig ! 2, eqLow, eqMid, eqHigh));
     }).add;
 
     // organ_chord: Hammond-style drawbar organ with harmonic stack
     SynthDef(\pycodedj_organ_chord, {
-        arg cutoff = 2200, lfoRate = 0.5, reverbMix = 0.22, amp = 0.14, gate = 1;
+        arg cutoff = 2200, lfoRate = 0.5, reverbMix = 0.22, amp = 0.14, gate = 1, eqLow = 1, eqMid = 1, eqHigh = 1;
         var trig, root, freq, sig, gateEnv;
         trig = Impulse.kr((lfoRate * 0.5).clip(0.1, 1.5));
         root = Demand.kr(trig, 0, Dseq([48, 51, 46, 43], inf));
@@ -432,12 +440,12 @@ s.waitForBoot({
         sig = RLPF.ar(sig.tanh, cutoff.clip(600, 6000), 0.35);
         gateEnv = EnvGen.kr(Env.asr(0.04, 1, 0.25), gate, doneAction: 2);
         sig = FreeVerb.ar(sig, reverbMix.clip(0, 0.7), 0.55, 0.32) * gateEnv * amp;
-        Out.ar(0, sig ! 2);
+        Out.ar(0, ~applySimpleEQ.value(sig ! 2, eqLow, eqMid, eqHigh));
     }).add;
 
     // synth_arp: fast arpeggio, filter opens with each trigger
     SynthDef(\pycodedj_synth_arp, {
-        arg cutoff = 2000, lfoRate = 2.0, reverbMix = 0.18, amp = 0.14, gate = 1;
+        arg cutoff = 2000, lfoRate = 2.0, reverbMix = 0.18, amp = 0.14, gate = 1, eqLow = 1, eqMid = 1, eqHigh = 1;
         var trig, note, freq, env, filterEnv, sig, gateEnv;
         trig = Impulse.kr((lfoRate * 4).clip(4, 20));
         note = Demand.kr(trig, 0, Dseq([60, 64, 67, 72, 74, 72, 67, 64], inf));
@@ -448,12 +456,12 @@ s.waitForBoot({
         sig = RLPF.ar(sig, (cutoff + filterEnv).clip(400, 8000), 0.22) * env;
         gateEnv = EnvGen.kr(Env.asr(0.02, 1, 0.12), gate, doneAction: 2);
         sig = FreeVerb.ar(sig, reverbMix.clip(0, 0.65), 0.48, 0.28) * gateEnv * amp;
-        Out.ar(0, Pan2.ar(sig, SinOsc.kr(0.15).range(-0.4, 0.4)));
+        Out.ar(0, ~applySimpleEQ.value(Pan2.ar(sig, SinOsc.kr(0.15).range(-0.4, 0.4)), eqLow, eqMid, eqHigh));
     }).add;
 
     // vox_ahh: formant-based vocal pad, three formant filters
     SynthDef(\pycodedj_vox_ahh, {
-        arg cutoff = 1200, lfoRate = 0.3, reverbMix = 0.28, amp = 0.1, gate = 1;
+        arg cutoff = 1200, lfoRate = 0.3, reverbMix = 0.28, amp = 0.1, gate = 1, eqLow = 1, eqMid = 1, eqHigh = 1;
         var trig, note, freq, fScale, f1, f2, f3, env, raw, sig, gateEnv;
         trig = Impulse.kr((lfoRate * 0.5).clip(0.08, 2.0));
         note = Demand.kr(trig, 0, Dseq([48, 51, 55, 58], inf));
@@ -468,18 +476,18 @@ s.waitForBoot({
         sig = sig * env;
         gateEnv = EnvGen.kr(Env.asr(0.12, 1, 0.3), gate, doneAction: 2);
         sig = FreeVerb.ar(sig, reverbMix.clip(0.08, 0.75), 0.6, 0.35) * gateEnv * amp;
-        Out.ar(0, sig ! 2);
+        Out.ar(0, ~applySimpleEQ.value(sig ! 2, eqLow, eqMid, eqHigh));
     }).add;
 
     SynthDef(\pycodedj_base, {
-        arg cutoff = 800, lfoRate = 0.5, reverbMix = 0.2, amp = 0.3, gate = 1;
+        arg cutoff = 800, lfoRate = 0.5, reverbMix = 0.2, amp = 0.3, gate = 1, eqLow = 1, eqMid = 1, eqHigh = 1;
         var sig, env, lfo;
         lfo = SinOsc.kr(lfoRate, 0, 0.3, 1);
         sig = Saw.ar(220 * lfo);
         sig = RLPF.ar(sig, cutoff.clip(200, 4000), 0.5);
         env = EnvGen.kr(Env.asr(0.1, 1, 0.2), gate, doneAction: 2);
         sig = FreeVerb.ar(sig, reverbMix.clip(0, 0.8)) * env * amp;
-        Out.ar(0, sig ! 2);
+        Out.ar(0, ~applySimpleEQ.value(sig ! 2, eqLow, eqMid, eqHigh));
     }).add;
 
     s.sync;
@@ -607,7 +615,7 @@ s.waitForBoot({
             ~loops[name].do({ |synth| synth.set(\gate, 0) });
         };
         params = ~loopParams[name] ?? {
-            (cutoff: 800, lfoRate: 0.5, reverbMix: 0.2, amp: 0.3)
+            (cutoff: 800, lfoRate: 0.5, reverbMix: 0.2, amp: 0.3, low: 1, mid: 1, high: 1)
         };
         ~loopParams[name] = params;
         synthName = ~synthForLoop.value(name);
@@ -616,7 +624,10 @@ s.waitForBoot({
                 \cutoff, params[\cutoff],
                 \lfoRate, params[\lfoRate],
                 \reverbMix, params[\reverbMix],
-                \amp, params[\amp]
+                \amp, params[\amp],
+                \eqLow, params[\low],
+                \eqMid, params[\mid],
+                \eqHigh, params[\high]
             ])
         });
         ~loops[name] = synths;
@@ -625,18 +636,23 @@ s.waitForBoot({
     ~setLoopParam = { |name, key, val|
         var params;
         params = ~loopParams[name] ?? {
-            (cutoff: 800, lfoRate: 0.5, reverbMix: 0.2, amp: 0.3)
+            (cutoff: 800, lfoRate: 0.5, reverbMix: 0.2, amp: 0.3, low: 1, mid: 1, high: 1)
         };
         params[key] = val;
         ~loopParams[name] = params;
         if (~loops[name].notNil) {
-            ~loops[name].do({ |synth| synth.set(key, val) });
+            switch (key,
+                \low,  { ~loops[name].do({ |synth| synth.set(\eqLow,  val) }) },
+                \mid,  { ~loops[name].do({ |synth| synth.set(\eqMid,  val) }) },
+                \high, { ~loops[name].do({ |synth| synth.set(\eqHigh, val) }) },
+                { ~loops[name].do({ |synth| synth.set(key, val) }) }
+            );
         };
     };
 
-    ~applyLoopParams = { |name, voiceCount, cutoff, lfoRate, reverbMix, amp|
+    ~applyLoopParams = { |name, voiceCount, cutoff, lfoRate, reverbMix, amp, low = 1, mid = 1, high = 1|
         var params;
-        params = (cutoff: cutoff, lfoRate: lfoRate, reverbMix: reverbMix, amp: amp);
+        params = (cutoff: cutoff, lfoRate: lfoRate, reverbMix: reverbMix, amp: amp, low: low, mid: mid, high: high);
         ~loopParams[name] = params;
         if (voiceCount.asInteger <= 0) {
             if (~loops[name].notNil) {
@@ -681,9 +697,22 @@ s.waitForBoot({
                 "lfo_rate",  { ~setLoopParam.value(name, \lfoRate,   val.asFloat) },
                 "reverb",    { ~setLoopParam.value(name, \reverbMix, val.asFloat) },
                 "amp",       { ~setLoopParam.value(name, \amp,       val.asFloat) },
+                "low",       { ~setLoopParam.value(name, \low,       val.asFloat) },
+                "mid",       { ~setLoopParam.value(name, \mid,       val.asFloat) },
+                "high",      { ~setLoopParam.value(name, \high,      val.asFloat) },
                 "params",    {
                     if (msg.size >= 6) {
-                        ~applyLoopParams.value(name, msg[1], msg[2].asFloat, msg[3].asFloat, msg[4].asFloat, msg[5].asFloat);
+                        ~applyLoopParams.value(
+                            name,
+                            msg[1],
+                            msg[2].asFloat,
+                            msg[3].asFloat,
+                            msg[4].asFloat,
+                            msg[5].asFloat,
+                            if (msg.size >= 9) { msg[6].asFloat } { 1 },
+                            if (msg.size >= 9) { msg[7].asFloat } { 1 },
+                            if (msg.size >= 9) { msg[8].asFloat } { 1 }
+                        );
                     };
                 }
             );
