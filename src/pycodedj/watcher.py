@@ -36,6 +36,10 @@ class _LoopFileHandler:
         self._timer = threading.Timer(self._debounce, self._eval_all)
         self._timer.start()
 
+    def eval_now(self) -> None:
+        """監視開始時など、保存イベントを待たずに全ループを評価する。"""
+        self._eval_all()
+
     def _eval_all(self) -> None:
         try:
             source = Path(self._path).read_text(encoding="utf-8")
@@ -101,6 +105,7 @@ def watch(
     observer = Observer()
     observer.schedule(_WatchdogAdapter(), watch_dir, recursive=False)
     observer.start()
+    handler_wrapper.eval_now()
     try:
         observer.join()
     except KeyboardInterrupt:

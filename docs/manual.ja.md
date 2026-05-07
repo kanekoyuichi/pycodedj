@@ -323,7 +323,7 @@ cutoff が上がって音が明るくなり、lfo も速くなりました。ネ
 
 ## 5. 保存するだけで音が変わる — watch モード
 
-毎回 `pycodedj eval` を打つのは面倒です。`watch` コマンドを使うと、**ファイルを保存するだけで自動的に全ループが再評価されます**。
+毎回 `pycodedj eval` を打つのは面倒です。`watch` コマンドを使うと、起動時に一度すべてのループを評価し、その後は**ファイルを保存するだけで自動的に全ループが再評価されます**。
 
 ### 起動方法
 
@@ -333,9 +333,10 @@ pycodedj watch examples/demo.py
 
 ```
 [pycodedj] watching demo.py — save to reload (Ctrl+C to stop)
+[pycodedj] reloaded demo.py (3 loop(s))
 ```
 
-あとはエディタでコードを書いて保存するだけです。保存のたびに次のように出力されます。
+起動直後に一度音が鳴ります。あとはエディタでコードを書いて保存するだけです。保存のたびに次のように出力されます。
 
 ```
 [pycodedj] reloaded demo.py (3 loop(s))
@@ -519,13 +520,13 @@ pycodedj eval myfile.py::bass
 
 ### 動かしてみる
 
-watch で起動して、エディタで各ブロックを編集しながら音を変えていきます。
+watch で起動して、エディタで各ブロックを編集しながら音を変えていきます。起動直後に全ループが一度評価されるので、保存しなくてもまず音が鳴ります。
 
 ```bash
 pycodedj watch examples/club_set.py
 ```
 
-まず全ループを一度評価してみましょう。watch が起動した状態でファイルを保存すると全ループが評価されます。あるいは個別に eval することもできます。
+個別にループを足したい場合は eval することもできます。
 
 ```bash
 pycodedj eval examples/club_set.py::sub_bass
@@ -846,7 +847,7 @@ pycodedj eval demo.py::pad --sc-port 57200
 
 ### `pycodedj watch`
 
-ファイルを監視し、保存のたびに全ループを自動で再評価します。Ctrl+C で停止します。
+ファイルを監視し、起動時と保存のたびに全ループを自動で再評価します。Ctrl+C で停止します。
 
 ```
 pycodedj watch FILE [--sc-host HOST] [--sc-port PORT] [--debounce SECS]

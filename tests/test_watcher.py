@@ -67,6 +67,16 @@ def test_eval_all_loops_in_file(tmp_path: Path) -> None:
     assert engine.eval_block.call_count == 2
 
 
+def test_eval_now_evaluates_without_file_event(tmp_path: Path) -> None:
+    target = tmp_path / "demo.py"
+    target.write_text("# @loop bass\ndef f(): pass\n")
+    handler, engine = _make_handler(path=str(target), debounce=0.0)
+
+    handler.eval_now()
+
+    assert engine.eval_block.call_count == 1
+
+
 def test_on_eval_callback_called(tmp_path: Path) -> None:
     target = tmp_path / "demo.py"
     target.write_text("# @loop bass\ndef f(): pass\n")
@@ -139,6 +149,7 @@ def test_adapter_on_moved_fires_eval(tmp_path: Path) -> None:
     engine = MagicMock()
 
     adapter = _make_watchdog_adapter(str(target), engine)
+    engine.reset_mock()
 
     event = MagicMock()
     event.dest_path = str(target)
@@ -154,6 +165,7 @@ def test_adapter_on_created_fires_eval(tmp_path: Path) -> None:
     engine = MagicMock()
 
     adapter = _make_watchdog_adapter(str(target), engine)
+    engine.reset_mock()
 
     event = MagicMock()
     event.src_path = str(target)
@@ -170,6 +182,7 @@ def test_adapter_on_moved_ignores_wrong_dest(tmp_path: Path) -> None:
     engine = MagicMock()
 
     adapter = _make_watchdog_adapter(str(target), engine)
+    engine.reset_mock()
 
     event = MagicMock()
     event.dest_path = str(other)

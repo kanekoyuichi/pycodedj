@@ -321,7 +321,7 @@ The cutoff went up and the LFO sped up. Deeper nesting opens the filter; more co
 
 ## 5. Save to reload — watch mode
 
-Running `pycodedj eval` by hand every time gets old fast. The `watch` command **automatically re-evaluates all loops every time you save the file**.
+Running `pycodedj eval` by hand every time gets old fast. The `watch` command evaluates all loops once when it starts, then **automatically re-evaluates all loops every time you save the file**.
 
 ### Starting watch
 
@@ -331,9 +331,10 @@ pycodedj watch examples/demo.py
 
 ```
 [pycodedj] watching demo.py — save to reload (Ctrl+C to stop)
+[pycodedj] reloaded demo.py (3 loop(s))
 ```
 
-From here, just write and save. On every save:
+You should hear sound immediately after watch starts. From here, just write and save. On every save:
 
 ```
 [pycodedj] reloaded demo.py (3 loop(s))
@@ -517,13 +518,13 @@ pycodedj eval myfile.py::bass
 
 ### Getting it running
 
-Start watch and edit the file while it plays:
+Start watch and edit the file while it plays. Watch evaluates all loops once at startup, so it should make sound before you save:
 
 ```bash
 pycodedj watch examples/club_set.py
 ```
 
-Save the file once to kick off the initial evaluation, or evaluate individual loops:
+You can also evaluate individual loops:
 
 ```bash
 pycodedj eval examples/club_set.py::sub_bass
@@ -844,7 +845,7 @@ pycodedj eval demo.py::pad --sc-port 57200
 
 ### `pycodedj watch`
 
-Watches a file and re-evaluates all loops on every save. Stop with Ctrl+C.
+Watches a file and re-evaluates all loops at startup and on every save. Stop with Ctrl+C.
 
 ```
 pycodedj watch FILE [--sc-host HOST] [--sc-port PORT] [--debounce SECS]
