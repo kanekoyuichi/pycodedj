@@ -1,5 +1,16 @@
 # Changelog
 
+## [0.1.2] - 2026-05-07
+
+### Features
+
+- License changed to MIT + Commons Clause — personal use, modification, and live performances (including paid shows) are permitted; selling or commercially distributing the software itself is not
+
+### Docs
+
+- Add project homepage at `docs/index.html` with live demo animation and accurate engine-computed parameter values
+- Add visualizer concept page at `docs/visualizer-concept.html` showing Canvas 2D animation synced to music parameters
+
 ## [0.1.1] - 2026-05-07
 
 ### Docs
