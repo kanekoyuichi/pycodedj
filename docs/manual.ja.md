@@ -262,6 +262,8 @@ def pad():
 pycodedj eval examples/demo.py::bass
 ```
 
+`eval` は evaluate（評価する）の略です。このコマンドは `examples/demo.py` の `bass` ループを今すぐ読み取り、コード構造を分析して SuperCollider に音のパラメーターを送ります。
+
 成功すると次のように表示されます。
 
 ```
@@ -810,6 +812,7 @@ pip install 'pycodedj[watch]'
 ### `pycodedj eval`
 
 指定したループを一度だけ評価して SuperCollider にパラメーターを送ります。
+`eval` は evaluate（評価する）の略で、「このループを今すぐ音に反映する」という意味です。
 
 ```
 pycodedj eval FILE::LOOP [--sc-host HOST] [--sc-port PORT]
@@ -820,6 +823,10 @@ pycodedj eval FILE::LOOP [--sc-host HOST] [--sc-port PORT]
 | `FILE::LOOP` | ファイルパスとループ名を `::` で区切る | — |
 | `--sc-host` | SuperCollider のホスト | `127.0.0.1` |
 | `--sc-port` | SuperCollider の受信ポート番号 | `57120` |
+
+`FILE::LOOP` は、`FILE` の中にある `# @loop LOOP` のブロックを指定します。たとえば `examples/demo.py::bass` は、`examples/demo.py` 内の `# @loop bass` ブロックを評価します。
+
+`eval` は 1 回だけ実行します。保存するたびに自動で全ループを更新したい場合は `pycodedj watch` を使います。
 
 成功すると stdout にフィードバックが出ます。
 

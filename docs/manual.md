@@ -260,6 +260,8 @@ Run this in the terminal:
 pycodedj eval examples/demo.py::bass
 ```
 
+`eval` is short for evaluate. This command reads the `bass` loop in `examples/demo.py` right now, analyses its code structure, and sends sound parameters to SuperCollider.
+
 On success:
 
 ```
@@ -808,6 +810,7 @@ The block with the error keeps its previous sound. Other loops are unaffected. F
 ### `pycodedj eval`
 
 Evaluates a single loop once and sends parameters to SuperCollider.
+`eval` is short for evaluate: it means "apply this loop to the sound now."
 
 ```
 pycodedj eval FILE::LOOP [--sc-host HOST] [--sc-port PORT]
@@ -818,6 +821,10 @@ pycodedj eval FILE::LOOP [--sc-host HOST] [--sc-port PORT]
 | `FILE::LOOP` | File path and loop name separated by `::` | — |
 | `--sc-host` | SuperCollider host | `127.0.0.1` |
 | `--sc-port` | SuperCollider receive port | `57120` |
+
+`FILE::LOOP` selects the `# @loop LOOP` block inside `FILE`. For example, `examples/demo.py::bass` evaluates the `# @loop bass` block in `examples/demo.py`.
+
+`eval` runs once. Use `pycodedj watch` when you want all loops to update automatically every time you save the file.
 
 On success, feedback is written to stdout:
 
