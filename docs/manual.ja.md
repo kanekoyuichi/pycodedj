@@ -520,7 +520,15 @@ eval で止めたい場合は、関数名の `def` だけを残して本体を�
 
 ## 8. クラブセット例 — club_set.py を動かす
 
-`examples/club_set.py` は、クラブのグルーヴとして成立しやすい多層デモファイルです。硬いキック、低いランブル、揺れる Reese ベース、ハット、クラップ、レイブスタブ、Hoover リード、空間系 FX を組み合わせたセットです。
+`examples/club_set.py` は、クラブのグルーヴとして成立しやすい多層デモファイルです。foundation / movement / body / harmonic / lead / hats / space / texture の 8 層 14 ループ構成で、各ループのコード構造が音域・変調速度・リバーブを決定します。
+
+全 30 音色を 1 音ずつ確認したい場合は `examples/sound_showcase.py` を使います。
+
+```bash
+pycodedj eval examples/sound_showcase.py::bass_acid
+pycodedj eval examples/sound_showcase.py::riser_noise
+pycodedj eval examples/sound_showcase.py::bell_rave
+```
 
 `@loop("kick_hard", ...)` のようなループ名は、SuperCollider 側では音色名として解釈されます。たとえば `kick_hard` はキック系、`bass_reese` はベース系のシンセに割り当てられます。Python 側でグルーヴや構成を変えるだけなら、通常は `sc/synths.scd` を編集する必要はありません。まったく新しい音色エンジンを増やしたいときだけ、SuperCollider 側に SynthDef を追加します。
 
@@ -528,47 +536,89 @@ eval で止めたい場合は、関数名の `def` だけを残して本体を�
 
 `@loop` の第一引数を変えると、SuperCollider 側で使う音色を選べます。
 
+**キック**
+
 | ループ名 | 音 |
 | :--- | :--- |
 | `kick_hard` | 硬めでアタックの強いキック |
 | `floor_kick` | 太い四つ打ちキック |
 | `kick_pulse` | 軽めのパルスキック |
-| `sub_bass` | サブベース |
-| `bass_reese` | 揺れる Reese 系ベース |
+
+**ベース**
+
+| ループ名 | 音 |
+| :--- | :--- |
 | `bass_rumble` | キック由来の低いランブル |
+| `bass_reese` | 揺れる Reese 系ベース |
+| `sub_bass` | サブベース |
+| `bass_acid` | 303スタイルのアシッドベース（スクウェルチ付き） |
+
+**パーカッション**
+
+| ループ名 | 音 |
+| :--- | :--- |
 | `hat_engine` | クローズ/オープンのハットグリッド |
 | `hat_ride` | 長めのライド/オープンハット |
 | `clap_snap` | 鋭いクラップ |
 | `clap_snare` | スネア寄りのクラップ |
-| `dub_chord` | ダブコード |
-| `neon_stab` | ネオン系スタブコード |
+| `tom_drum` | フロアタム（ピッチスイープあり） |
+| `snare_roll` | スネアロール（lfoRate で速度制御） |
+| `noise_crash` | クラッシュシンバル（長いテール） |
+
+**コード・スタブ**
+
+| ループ名 | 音 |
+| :--- | :--- |
 | `chord_rave` | 明るいレイブスタブ |
+| `neon_stab` | ネオン系スタブコード |
+| `dub_chord` | ダブコード |
+| `stab_saw` | デチューンソーコードスタブ |
+| `organ_chord` | ハモンドオルガン風コード |
+| `bell_rave` | インハーモニクスFMレイブベル |
+
+**リード**
+
+| ループ名 | 音 |
+| :--- | :--- |
 | `acid_lead` | アシッド系リード |
 | `lead_hoover` | Hoover 風リード |
 | `soft_pluck` | やわらかいプラック |
-| `warehouse_air` | 倉庫っぽい空気感 |
-| `glitch_ticks` | 細かいグリッチ音 |
+| `synth_arp` | アルペジオシンセ（高速ノートシーケンス） |
+
+**アトモスフィア**
+
+| ループ名 | 音 |
+| :--- | :--- |
 | `shimmer_pad` | 深いシマーパッド |
+| `warehouse_air` | 倉庫っぽい空気感 |
+| `vox_ahh` | フォルマントボーカルパッド |
+
+**FX**
+
+| ループ名 | 音 |
+| :--- | :--- |
 | `fx_impact` | 低いインパクト |
+| `riser_noise` | ノイズライザー（8秒でスイープ上昇） |
+| `glitch_ticks` | 細かいグリッチ音 |
 
 ### ブロック一覧
 
-| ループ名 | キャラクター | コードの特徴 |
+| ループ名 | レイヤー | キャラクター |
 | :--- | :--- | :--- |
-| `kick_hard` | 硬い四つ打ちキック | 8 小節のアクセントつき、ドライ |
-| `bass_rumble` | キック下のランブル | 低域の尾を重ねる |
-| `bass_reese` | 揺れる Reese ベース | シンコペーションとスライド |
-| `hat_engine` | ハイハットのグリッド | 速い制御フロー、ドライ |
-| `hat_ride` | ライド/オープンハット | 後半で開く持続音 |
-| `clap_snap` | スナップ | バックビートとフィル |
-| `clap_snare` | スネア寄りのアクセント | フレーズ終端を強調 |
-| `chord_rave` | レイブスタブ | 内部関数 4 つで 4 声 |
-| `neon_stab` | アンサースタブ | コメント 2 行で適度な残響 |
-| `lead_hoover` | Hoover 風リード | 疎らな応答フレーズ |
-| `shimmer_pad` | シマーパッド | コメントのみ、高リバーブ |
-| `glitch_ticks` | グリッチテクスチャ | 少量のデジタルノイズ |
-| `fx_impact` | インパクト | 大きな区切りの低い衝撃 |
-| `warehouse_air` | 倉庫の空気感 | コメントだけ、最大リバーブ |
+| `kick_hard` | foundation | 硬い四つ打ちキック（depth=1、ドライ） |
+| `bass_rumble` | foundation | キック下のランブル（depth=1、ドライ） |
+| `bass_reese` | movement | 揺れる Reese ベース（depth=4、中域） |
+| `hat_ride` | movement | ライド/オープンハット（depth=4） |
+| `clap_snap` | body | スナップクラップ（depth=4、速い LFO） |
+| `clap_snare` | body | スネア寄りのアクセント（depth=4） |
+| `chord_rave` | harmonic | レイブスタブ（depth=6、明るい） |
+| `neon_stab` | harmonic | アンサースタブ（depth=5） |
+| `lead_hoover` | lead | Hoover 風リード（depth=5、微リバーブ） |
+| `hat_engine` | hats | ハットグリッド（depth=6、最速 LFO） |
+| `shimmer_pad` | space | シマーパッド（コメント多め、高リバーブ） |
+| `warehouse_air` | space | 倉庫の空気感（コメントのみ、最大リバーブ） |
+| `glitch_ticks` | texture | グリッチテクスチャ（depth=4、速い LFO） |
+| `fx_impact` | texture | ドロップのインパクト（depth=5） |
 
 ### 動かしてみる
 

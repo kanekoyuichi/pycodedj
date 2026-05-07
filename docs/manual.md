@@ -516,7 +516,15 @@ To stop a loop, delete the entire `@loop`-decorated function from the file and s
 
 ## 8. Club set example — running club_set.py
 
-`examples/club_set.py` is a layered dancefloor groove. It is not a synth catalogue: it combines hard kick, low rumble, moving Reese bass, hats, claps, rave stabs, Hoover lead, and room FX.
+`examples/club_set.py` is a layered dancefloor groove with 8 layers and 14 loops. Code structure (nesting depth, branch count, comment ratio) determines brightness, modulation speed, and reverb for each layer.
+
+To audition all 30 available sounds one at a time, use `examples/sound_showcase.py`:
+
+```bash
+pycodedj eval examples/sound_showcase.py::bass_acid
+pycodedj eval examples/sound_showcase.py::riser_noise
+pycodedj eval examples/sound_showcase.py::bell_rave
+```
 
 Loop names such as `@loop("kick_hard", ...)` are interpreted as sound names on the SuperCollider side. For example, `kick_hard` maps to a kick synth and `bass_reese` maps to a bass synth. If you are only changing the Python groove or arrangement, you usually do not need to edit `sc/synths.scd`. Edit SuperCollider only when you want to add a genuinely new sound engine.
 
@@ -524,47 +532,89 @@ Loop names such as `@loop("kick_hard", ...)` are interpreted as sound names on t
 
 Change the first argument of `@loop` to choose the SuperCollider sound. The Python function name can be anything.
 
+**Kicks**
+
 | Loop name | Sound |
 | :--- | :--- |
 | `kick_hard` | Hard kick with a strong attack |
 | `floor_kick` | Big four-on-the-floor kick |
 | `kick_pulse` | Lighter pulse kick |
-| `sub_bass` | Sub bass |
-| `bass_reese` | Moving Reese-style bass |
+
+**Basses**
+
+| Loop name | Sound |
+| :--- | :--- |
 | `bass_rumble` | Low kick-derived rumble |
-| `hat_engine` | Closed/open hat grid |
+| `bass_reese` | Moving Reese-style bass |
+| `sub_bass` | Sub bass |
+| `bass_acid` | 303-style acid bass with squelch |
+
+**Percussion**
+
+| Loop name | Sound |
+| :--- | :--- |
+| `hat_engine` | Closed/open hi-hat grid |
 | `hat_ride` | Longer ride/open hat |
 | `clap_snap` | Sharp clap |
 | `clap_snare` | Snare-like clap |
-| `dub_chord` | Dub chord |
-| `neon_stab` | Neon-style chord stab |
+| `tom_drum` | Floor tom with pitch sweep |
+| `snare_roll` | Snare roll (lfoRate controls speed) |
+| `noise_crash` | Crash cymbal with long tail |
+
+**Chords & Stabs**
+
+| Loop name | Sound |
+| :--- | :--- |
 | `chord_rave` | Bright rave stab |
+| `neon_stab` | Neon-style chord stab |
+| `dub_chord` | Dub chord |
+| `stab_saw` | Detuned saw chord stab |
+| `organ_chord` | Hammond-style drawbar organ |
+| `bell_rave` | Inharmonic FM rave bell |
+
+**Leads**
+
+| Loop name | Sound |
+| :--- | :--- |
 | `acid_lead` | Acid-style lead |
 | `lead_hoover` | Hoover-style lead |
 | `soft_pluck` | Soft pluck |
-| `warehouse_air` | Warehouse ambience |
-| `glitch_ticks` | Small glitch ticks |
+| `synth_arp` | Arpeggio synth (fast note sequence) |
+
+**Atmospheric**
+
+| Loop name | Sound |
+| :--- | :--- |
 | `shimmer_pad` | Deep shimmer pad |
+| `warehouse_air` | Warehouse ambience |
+| `vox_ahh` | Formant vocal pad |
+
+**FX**
+
+| Loop name | Sound |
+| :--- | :--- |
 | `fx_impact` | Low impact hit |
+| `riser_noise` | Noise riser sweeping up over 8 seconds |
+| `glitch_ticks` | Small glitch ticks |
 
 ### Block overview
 
-| Loop name | Character | Code features |
+| Loop name | Layer | Character |
 | :--- | :--- | :--- |
-| `kick_hard` | Hard four-on-the-floor kick | Eight-bar accents, dry |
-| `bass_rumble` | Rumble under the kick | Layered low-end tails |
-| `bass_reese` | Moving Reese bass | Syncopation and slides |
-| `hat_engine` | Hi-hat grid | Fast control flow, dry |
-| `hat_ride` | Ride / open hat | Sustained lift in later bars |
-| `clap_snap` | Sharp snap | Backbeat and fills |
-| `clap_snare` | Snare-like accent | Phrase-ending punctuation |
-| `chord_rave` | Rave stab | Four inner functions = 4 voices |
-| `neon_stab` | Answer stab | Two comments = moderate reverb |
-| `lead_hoover` | Hoover-style lead | Sparse answer phrases |
-| `shimmer_pad` | Shimmer pad | Comments only, high reverb |
-| `glitch_ticks` | Digital texture | Sparse digital noise |
-| `fx_impact` | Impact hit | Low hit for larger sections |
-| `warehouse_air` | Warehouse ambience | Comments only, maximum reverb |
+| `kick_hard` | foundation | Hard four-on-the-floor kick (depth=1, dry) |
+| `bass_rumble` | foundation | Rumble under the kick (depth=1, dry) |
+| `bass_reese` | movement | Moving Reese bass (depth=4, mid-range) |
+| `hat_ride` | movement | Ride / open hat (depth=4) |
+| `clap_snap` | body | Sharp snap clap (depth=4, faster LFO) |
+| `clap_snare` | body | Snare-like accent (depth=4) |
+| `chord_rave` | harmonic | Rave stab (depth=6, bright) |
+| `neon_stab` | harmonic | Answer stab (depth=5) |
+| `lead_hoover` | lead | Hoover-style lead (depth=5, slight reverb) |
+| `hat_engine` | hats | Hi-hat grid (depth=6, fastest LFO) |
+| `shimmer_pad` | space | Shimmer pad (heavy comments, high reverb) |
+| `warehouse_air` | space | Warehouse ambience (comments only, max reverb) |
+| `glitch_ticks` | texture | Digital glitch texture (depth=4, fast LFO) |
+| `fx_impact` | texture | Drop impact hit (depth=5) |
 
 ### Getting it running
 
