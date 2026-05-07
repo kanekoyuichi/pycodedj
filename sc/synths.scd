@@ -125,13 +125,13 @@ s.waitForBoot({
     ~pycodedjOSC = OSCFunc({ |msg, time, addr|
         var parts, name, param, val;
         parts = msg[0].asString.split($/);
-        // parts: ["", "pycodedj", "loop", <name>, <param>]
-        if (parts.size != 5) { ^nil };
-        if (parts[1] != "pycodedj") { ^nil };
-        if (parts[2] != "loop") { ^nil };
+        // parts: ["pycodedj", "loop", <name>, <param>]
+        if (parts.size != 4) { ^nil };
+        if (parts[0] != "pycodedj") { ^nil };
+        if (parts[1] != "loop") { ^nil };
 
-        name  = parts[3];
-        param = parts[4];
+        name  = parts[2];
+        param = parts[3];
         val   = msg[1];
 
         switch (param,
