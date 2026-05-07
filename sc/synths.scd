@@ -6,16 +6,18 @@ s.waitForBoot({
     // cutoff = tone/brightness, lfoRate = pattern/modulation speed,
     // reverbMix = space, gate = fade out when a loop is restarted/stopped.
     SynthDef(\pycodedj_sub_bass, {
-        arg cutoff = 900, lfoRate = 1.0, reverbMix = 0.05, amp = 0.44, gate = 1;
-        var trig, freq, env, click, sub, mid, sig;
+        arg cutoff = 900, lfoRate = 1.0, reverbMix = 0.05, amp = 0.5, gate = 1;
+        var trig, pumpTrig, freq, env, pump, click, sub, mid, sig;
         trig = Impulse.kr((lfoRate * 0.85).clip(1.2, 3.4));
+        pumpTrig = Impulse.kr(2.133); // 128 BPM quarter-note pump
         freq = Demand.kr(trig, 0, Dseq([36, 36, 34, 36, 43, 36, 34, 31], inf)).midicps;
         env = Decay2.kr(trig, 0.002, 0.42);
+        pump = 1 - (Decay2.kr(pumpTrig, 0.002, 0.18) * 0.55);
         click = Decay2.kr(trig, 0.001, 0.012) * WhiteNoise.ar(0.05);
         sub = SinOsc.ar(freq) * 0.95;
-        mid = Saw.ar(freq * 0.5) * 0.18;
-        sig = (sub + mid + click) * env;
-        sig = RLPF.ar(sig.tanh, cutoff.clip(80, 1500), 0.24);
+        mid = (Saw.ar(freq) * 0.12) + (Pulse.ar(freq * 0.5, 0.45) * 0.16);
+        sig = (sub + mid + click) * env * pump;
+        sig = RLPF.ar(sig.tanh, cutoff.clip(80, 1700), 0.22);
         env = EnvGen.kr(Env.asr(0.1, 1, 0.2), gate, doneAction: 2);
         sig = FreeVerb.ar(sig, reverbMix.clip(0, 0.8)) * env * amp;
         Out.ar(0, sig ! 2);
@@ -105,21 +107,33 @@ s.waitForBoot({
     }).add;
 
     SynthDef(\pycodedj_floor_kick, {
-        arg cutoff = 1100, lfoRate = 1.0, reverbMix = 0.08, amp = 0.62, gate = 1;
+        arg cutoff = 1100, lfoRate = 1.0, reverbMix = 0.08, amp = 0.72, gate = 1;
         var trig, bodyEnv, punchEnv, tailEnv, pitch, body, punch, tail, room, sig, gateEnv;
-        trig = Impulse.kr((lfoRate * 1.35).clip(1.8, 2.6));
+        trig = Impulse.kr(2.133); // 128 BPM four-on-the-floor
         bodyEnv = Decay2.kr(trig, 0.001, 0.28);
         punchEnv = Decay2.kr(trig, 0.001, 0.035);
-        tailEnv = Decay2.kr(trig, 0.015, 0.55);
+        tailEnv = Decay2.kr(trig, 0.015, 0.62);
         pitch = EnvGen.kr(Env([92, 45, 34], [0.014, 0.18], \exp), trig).midicps;
         body = SinOsc.ar(pitch) * bodyEnv;
-        punch = BPF.ar(WhiteNoise.ar(0.28), cutoff.clip(900, 6200), 0.28) * punchEnv;
-        tail = LPF.ar(SinOsc.ar(45) + Saw.ar(22.5, 0.1), 130) * tailEnv * 0.3;
+        punch = BPF.ar(WhiteNoise.ar(0.36), cutoff.clip(900, 7200), 0.24) * punchEnv;
+        tail = LPF.ar(SinOsc.ar(45) + Saw.ar(22.5, 0.13), 145) * tailEnv * 0.36;
         room = FreeVerb.ar((body + tail) * 0.38, reverbMix.clip(0, 0.22), 0.48, 0.18);
         sig = (body + punch + tail + room).tanh;
         gateEnv = EnvGen.kr(Env.asr(0.005, 1, 0.12), gate, doneAction: 2);
         sig = Compander.ar(sig, sig, 0.5, 1, 0.28, 0.002, 0.06) * gateEnv * amp;
         Out.ar(0, sig ! 2);
+    }).add;
+
+    SynthDef(\pycodedj_build_riser, {
+        arg cutoff = 900, lfoRate = 0.2, reverbMix = 0.55, amp = 0.07, gate = 1;
+        var sweep, shimmer, pulse, sig, gateEnv;
+        pulse = LFPulse.kr(2.133, 0.5, 0.5).range(0.45, 1);
+        sweep = LFSaw.kr(lfoRate.clip(0.05, 0.4)).range(0, 1).exprange(500, cutoff.clip(1200, 9000));
+        shimmer = BPF.ar(WhiteNoise.ar(0.18), sweep, 0.18);
+        sig = HPF.ar(shimmer, 600) * pulse;
+        gateEnv = EnvGen.kr(Env.asr(2.0, 1, 2.0), gate, doneAction: 2);
+        sig = FreeVerb.ar(sig, reverbMix.clip(0.25, 0.9), 0.9, 0.45) * gateEnv * amp;
+        Out.ar(0, Pan2.ar(sig, SinOsc.kr(0.08).range(-0.35, 0.35)));
     }).add;
 
     SynthDef(\pycodedj_glitch_ticks, {
@@ -202,6 +216,7 @@ s.waitForBoot({
             "warehouse_air", { \pycodedj_warehouse_air },
             "kick_pulse", { \pycodedj_kick_pulse },
             "floor_kick", { \pycodedj_floor_kick },
+            "build_riser", { \pycodedj_build_riser },
             "glitch_ticks", { \pycodedj_glitch_ticks },
             "soft_pluck", { \pycodedj_soft_pluck },
             "dub_chord", { \pycodedj_dub_chord },

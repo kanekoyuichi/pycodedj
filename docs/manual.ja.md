@@ -500,7 +500,7 @@ pycodedj eval myfile.py::bass
 
 ## 8. クラブセット例 — club_set.py を動かす
 
-`examples/club_set.py` は、クラブのグルーヴとして成立しやすい 6 パートに絞ったデモファイルです。音色カタログではなく、キック、サブベース、ハット、クラップ、コード、空気感を組み合わせたセットです。
+`examples/club_set.py` は、クラブのグルーヴとして成立しやすい 7 パートに絞ったデモファイルです。音色カタログではなく、キック、サブベース、ハット、クラップ、コード、空気感、ビルドアップの緊張感を組み合わせたセットです。
 
 ### ブロック一覧
 
@@ -511,6 +511,7 @@ pycodedj eval myfile.py::bass
 | `hat_engine` | ハイハットのグリッド | `for` + `if` が多く、揺らぎが速い |
 | `clap_snap` | クラップ/スネア感 | バックビートのアクセント |
 | `dub_chord` | ダブコード | 残響のあるコードヒット |
+| `build_riser` | ビルドアップ用ライザー | フィルターが開く緊張感 |
 | `warehouse_air` | 倉庫の空気感 | コメントだらけでリバーブが深い |
 
 ### 動かしてみる
@@ -528,6 +529,7 @@ pycodedj eval examples/club_set.py::sub_bass
 pycodedj eval examples/club_set.py::hat_engine
 pycodedj eval examples/club_set.py::clap_snap
 pycodedj eval examples/club_set.py::dub_chord
+pycodedj eval examples/club_set.py::build_riser
 pycodedj eval examples/club_set.py::warehouse_air
 pycodedj eval examples/club_set.py::floor_kick
 ```

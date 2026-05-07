@@ -498,7 +498,7 @@ pycodedj eval myfile.py::bass
 
 ## 8. Club set example — running club_set.py
 
-`examples/club_set.py` is a focused six-part dancefloor groove. It is not a synth catalogue: it combines kick, sub bass, hats, clap, chord hits, and room ambience.
+`examples/club_set.py` is a focused seven-part dancefloor groove. It is not a synth catalogue: it combines kick, sub bass, hats, clap, chord hits, room ambience, and build-up tension.
 
 ### Block overview
 
@@ -509,6 +509,7 @@ pycodedj eval myfile.py::bass
 | `hat_engine` | Hi-hat grid | Many `for` + `if`, fast LFO |
 | `clap_snap` | Clap / snare accent | Backbeat energy |
 | `dub_chord` | Dub chord | Reverb-heavy chord hits |
+| `build_riser` | Build-up riser | Filter-opening tension |
 | `warehouse_air` | Warehouse ambience | Comment-heavy = deep reverb |
 
 ### Getting it running
@@ -526,6 +527,7 @@ pycodedj eval examples/club_set.py::sub_bass
 pycodedj eval examples/club_set.py::hat_engine
 pycodedj eval examples/club_set.py::clap_snap
 pycodedj eval examples/club_set.py::dub_chord
+pycodedj eval examples/club_set.py::build_riser
 pycodedj eval examples/club_set.py::warehouse_air
 pycodedj eval examples/club_set.py::floor_kick
 ```
