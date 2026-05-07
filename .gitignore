@@ -50,9 +50,10 @@ logs/
 .claude/settings.local.json
 .claude/todos/
 .claude/mcp*.json
-.codex
+.codex/
 .claude/
 AGENT.md
+.agents/
 
 # Claude Code
 CLAUDE.local.md
@@ -77,3 +78,4 @@ runs/
 tmp/
 temp/
 .cache/
+docs/visualizer-*.html
