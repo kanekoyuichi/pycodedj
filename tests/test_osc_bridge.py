@@ -29,7 +29,7 @@ def _send_mock(ep: OscEndpoint) -> Any:
 
 
 def _make_params() -> MusicParams:
-    return MusicParams(cutoff=800.0, lfo_rate=1.0, reverb_mix=0.3, voice_count=2)
+    return MusicParams(cutoff=800.0, lfo_rate=1.0, reverb_mix=0.3, voice_count=2, amp=0.5)
 
 
 def test_send_params_addresses(mock_endpoint: OscEndpoint) -> None:
@@ -45,7 +45,7 @@ def test_send_params_values(mock_endpoint: OscEndpoint) -> None:
     bridge.send_params("bass", _make_params())
 
     call_map = {c.args[0]: c.args[1] for c in _send_mock(mock_endpoint).call_args_list}
-    assert call_map["/pycodedj/loop/bass/params"] == [2, 800.0, 1.0, 0.3]
+    assert call_map["/pycodedj/loop/bass/params"] == [2, 800.0, 1.0, 0.3, 0.5]
 
 
 def test_no_visual_sends_only_audio(mock_endpoint: OscEndpoint) -> None:

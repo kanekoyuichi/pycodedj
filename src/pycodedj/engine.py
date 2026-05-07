@@ -17,7 +17,7 @@ class Engine:
     def eval_block(self, block: LoopBlock) -> MusicParams | None:
         try:
             features = analyze(block.source)
-            params = map_features(features)
+            params = map_features(features, volume=block.volume)
             self.bridge.send_params(block.name, params)
             self._loops[block.name] = params
             return params

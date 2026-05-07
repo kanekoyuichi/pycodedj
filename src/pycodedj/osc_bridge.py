@@ -46,6 +46,7 @@ class OscBridge:
             params.cutoff,
             params.lfo_rate,
             params.reverb_mix,
+            params.amp,
         )
         if self.visual is not None:
             self.visual.send(
@@ -54,4 +55,5 @@ class OscBridge:
                 params.cutoff,
                 params.lfo_rate,
                 params.reverb_mix,
+                params.amp,
             )

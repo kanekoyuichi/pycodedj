@@ -198,12 +198,14 @@
       min-height: 200px;
       white-space: pre-wrap;
     }
-    .c-comment { color: #585b70; font-style: italic; }
-    .c-keyword { color: var(--mauve); }
-    .c-fn      { color: var(--blue); }
-    .c-string  { color: var(--green); }
-    .c-num     { color: var(--yellow); }
-    .c-op      { color: var(--muted); }
+    .c-comment   { color: #585b70; font-style: italic; }
+    .c-keyword   { color: var(--mauve); }
+    .c-fn        { color: var(--blue); }
+    .c-string    { color: var(--green); }
+    .c-str       { color: var(--green); }
+    .c-num       { color: var(--yellow); }
+    .c-op        { color: var(--muted); }
+    .c-decorator { color: var(--pink); }
 
     .demo-params {
       padding: 1.25rem;
@@ -719,8 +721,10 @@
           <span class="example-tag"># bright + fast</span>
           <span class="example-effect">cutoff ↑ lfo ↑</span>
         </div>
-        <pre><span class="c-comment"># @loop bass interval=2.0</span>
-<span class="c-keyword">def</span> <span class="c-fn">bass</span>():
+        <pre><span class="c-keyword">from</span> pycodedj <span class="c-keyword">import</span> loop
+
+<span class="c-decorator">@loop</span>(<span class="c-str">"bass"</span>, interval=<span class="c-num">2.0</span>)
+<span class="c-keyword">def</span> <span class="c-fn">bass</span>(volume=<span class="c-num">0.4</span>):
     <span class="c-keyword">for</span> i <span class="c-keyword">in</span> <span class="c-fn">range</span>(<span class="c-num">8</span>):
         <span class="c-keyword">for</span> j <span class="c-keyword">in</span> <span class="c-fn">range</span>(<span class="c-num">4</span>):
             <span class="c-keyword">if</span> i <span class="c-op">==</span> j:
@@ -731,23 +735,29 @@
           <span class="example-tag"># 4-voice chord</span>
           <span class="example-effect">voices = 4</span>
         </div>
-        <pre><span class="c-comment"># @loop chord interval=1.0</span>
-<span class="c-keyword">def</span> <span class="c-fn">voice_a</span>(): <span class="c-keyword">pass</span>
-<span class="c-keyword">def</span> <span class="c-fn">voice_b</span>(): <span class="c-keyword">pass</span>
-<span class="c-keyword">def</span> <span class="c-fn">voice_c</span>(): <span class="c-keyword">pass</span>
-<span class="c-keyword">def</span> <span class="c-fn">voice_d</span>(): <span class="c-keyword">pass</span></pre>
+        <pre><span class="c-keyword">from</span> pycodedj <span class="c-keyword">import</span> loop
+
+<span class="c-decorator">@loop</span>(<span class="c-str">"chord"</span>, interval=<span class="c-num">1.0</span>)
+<span class="c-keyword">def</span> <span class="c-fn">chord</span>(volume=<span class="c-num">0.2</span>):
+    <span class="c-keyword">def</span> <span class="c-fn">voice_a</span>(): <span class="c-keyword">pass</span>
+    <span class="c-keyword">def</span> <span class="c-fn">voice_b</span>(): <span class="c-keyword">pass</span>
+    <span class="c-keyword">def</span> <span class="c-fn">voice_c</span>(): <span class="c-keyword">pass</span>
+    <span class="c-keyword">def</span> <span class="c-fn">voice_d</span>(): <span class="c-keyword">pass</span></pre>
       </div>
       <div class="example-card">
         <div class="example-card-header">
           <span class="example-tag"># deep space</span>
           <span class="example-effect">reverb ↑↑</span>
         </div>
-        <pre><span class="c-comment"># @loop pad interval=4.0</span>
-<span class="c-comment"># smoke above the kick</span>
-<span class="c-comment"># late reflections</span>
-<span class="c-comment"># concrete room tail</span>
-<span class="c-comment"># crowd heat</span>
-<span class="c-keyword">def</span> <span class="c-fn">pad</span>(): <span class="c-keyword">pass</span></pre>
+        <pre><span class="c-keyword">from</span> pycodedj <span class="c-keyword">import</span> loop
+
+<span class="c-decorator">@loop</span>(<span class="c-str">"pad"</span>, interval=<span class="c-num">4.0</span>)
+<span class="c-keyword">def</span> <span class="c-fn">pad</span>(volume=<span class="c-num">0.15</span>):
+    <span class="c-comment"># smoke above the kick</span>
+    <span class="c-comment"># late reflections</span>
+    <span class="c-comment"># concrete room tail</span>
+    <span class="c-comment"># crowd heat</span>
+    <span class="c-keyword">pass</span></pre>
       </div>
     </div>
   </div>
@@ -777,72 +787,74 @@
   const frames = [
     {
       code: [
-        '<span class="c-comment"># @loop bass interval=2.0</span>',
-        '<span class="c-keyword">def</span> <span class="c-fn">bass</span>():',
+        '<span class="c-decorator">@loop</span>(<span class="c-str">"bass"</span>, interval=<span class="c-num">2.0</span>)',
+        '<span class="c-keyword">def</span> <span class="c-fn">bass</span>(volume=<span class="c-num">0.4</span>):',
         '    <span class="c-keyword">pass</span>',
       ],
-      // depth=1 cf=0 fns=1 comment_ratio=0.33
+      // depth=1 cf=0 fns=1 comment_ratio=0.00
       cutoff: { pct: 10, val: '580 Hz' },
       lfo:    { pct:  0, val: '0.10 Hz' },
-      reverb: { pct: 34, val: '0.27' },
+      reverb: { pct:  0, val: '0.00' },
       voices: { pct: 25, val: '1 voice' },
     },
     {
       code: [
-        '<span class="c-comment"># @loop bass interval=2.0</span>',
-        '<span class="c-keyword">def</span> <span class="c-fn">bass</span>():',
+        '<span class="c-decorator">@loop</span>(<span class="c-str">"bass"</span>, interval=<span class="c-num">2.0</span>)',
+        '<span class="c-keyword">def</span> <span class="c-fn">bass</span>(volume=<span class="c-num">0.4</span>):',
         '    <span class="c-keyword">for</span> i <span class="c-keyword">in</span> <span class="c-fn">range</span>(<span class="c-num">8</span>):',
         '        <span class="c-keyword">if</span> i <span class="c-op">%</span> <span class="c-num">2</span> <span class="c-op">==</span> <span class="c-num">0</span>:',
         '            <span class="c-keyword">pass</span>',
       ],
-      // depth=3 cf=2 fns=1 comment_ratio=0.20
+      // depth=3 cf=2 fns=1 comment_ratio=0.00
       cutoff: { pct: 30, val: '1340 Hz' },
       lfo:    { pct: 20, val: '1.08 Hz' },
-      reverb: { pct: 20, val: '0.16' },
+      reverb: { pct:  0, val: '0.00' },
       voices: { pct: 25, val: '1 voice' },
     },
     {
       code: [
-        '<span class="c-comment"># @loop bass interval=2.0</span>',
-        '<span class="c-keyword">def</span> <span class="c-fn">bass</span>():',
+        '<span class="c-decorator">@loop</span>(<span class="c-str">"bass"</span>, interval=<span class="c-num">2.0</span>)',
+        '<span class="c-keyword">def</span> <span class="c-fn">bass</span>(volume=<span class="c-num">0.4</span>):',
         '    <span class="c-keyword">for</span> i <span class="c-keyword">in</span> <span class="c-fn">range</span>(<span class="c-num">8</span>):',
         '        <span class="c-keyword">for</span> j <span class="c-keyword">in</span> <span class="c-fn">range</span>(<span class="c-num">4</span>):',
         '            <span class="c-keyword">if</span> i <span class="c-op">==</span> j:',
         '                <span class="c-keyword">pass</span>',
       ],
-      // depth=4 cf=3 fns=1 comment_ratio=0.17
+      // depth=4 cf=3 fns=1 comment_ratio=0.00
       cutoff: { pct: 40, val: '1720 Hz' },
       lfo:    { pct: 30, val: '1.57 Hz' },
-      reverb: { pct: 16, val: '0.13' },
+      reverb: { pct:  0, val: '0.00' },
       voices: { pct: 25, val: '1 voice' },
     },
     {
       code: [
-        '<span class="c-comment"># @loop chord interval=1.0</span>',
-        '<span class="c-keyword">def</span> <span class="c-fn">voice_a</span>(): <span class="c-keyword">pass</span>',
-        '<span class="c-keyword">def</span> <span class="c-fn">voice_b</span>(): <span class="c-keyword">pass</span>',
-        '<span class="c-keyword">def</span> <span class="c-fn">voice_c</span>(): <span class="c-keyword">pass</span>',
-        '<span class="c-keyword">def</span> <span class="c-fn">voice_d</span>(): <span class="c-keyword">pass</span>',
+        '<span class="c-decorator">@loop</span>(<span class="c-str">"chord"</span>, interval=<span class="c-num">1.0</span>)',
+        '<span class="c-keyword">def</span> <span class="c-fn">chord</span>(volume=<span class="c-num">0.2</span>):',
+        '    <span class="c-keyword">def</span> <span class="c-fn">voice_a</span>(): <span class="c-keyword">pass</span>',
+        '    <span class="c-keyword">def</span> <span class="c-fn">voice_b</span>(): <span class="c-keyword">pass</span>',
+        '    <span class="c-keyword">def</span> <span class="c-fn">voice_c</span>(): <span class="c-keyword">pass</span>',
+        '    <span class="c-keyword">def</span> <span class="c-fn">voice_d</span>(): <span class="c-keyword">pass</span>',
       ],
-      // depth=1 cf=0 fns=4 comment_ratio=0.20
+      // depth=1 cf=0 fns=4 comment_ratio=0.00
       cutoff: { pct: 10,  val: '580 Hz' },
       lfo:    { pct:  0,  val: '0.10 Hz' },
-      reverb: { pct: 20,  val: '0.16' },
+      reverb: { pct:  0,  val: '0.00' },
       voices: { pct: 100, val: '4 voices' },
     },
     {
       code: [
-        '<span class="c-comment"># @loop pad interval=4.0</span>',
-        '<span class="c-comment"># smoke above the kick</span>',
-        '<span class="c-comment"># late reflections</span>',
-        '<span class="c-comment"># concrete room tail</span>',
-        '<span class="c-comment"># crowd heat</span>',
-        '<span class="c-keyword">def</span> <span class="c-fn">pad</span>(): <span class="c-keyword">pass</span>',
+        '<span class="c-decorator">@loop</span>(<span class="c-str">"pad"</span>, interval=<span class="c-num">4.0</span>)',
+        '<span class="c-keyword">def</span> <span class="c-fn">pad</span>(volume=<span class="c-num">0.15</span>):',
+        '    <span class="c-comment"># smoke above the kick</span>',
+        '    <span class="c-comment"># late reflections</span>',
+        '    <span class="c-comment"># concrete room tail</span>',
+        '    <span class="c-comment"># crowd heat</span>',
+        '    <span class="c-keyword">pass</span>',
       ],
-      // depth=1 cf=0 fns=1 comment_ratio=0.83
+      // depth=1 cf=0 fns=1 comment_ratio=0.67
       cutoff: { pct: 10, val: '580 Hz' },
       lfo:    { pct:  0, val: '0.10 Hz' },
-      reverb: { pct: 84, val: '0.67' },
+      reverb: { pct: 71, val: '0.57' },
       voices: { pct: 25, val: '1 voice' },
     },
   ];

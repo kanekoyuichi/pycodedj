@@ -1,5 +1,30 @@
 # Changelog
 
+## [0.2.0] - 2026-05-08
+
+### Breaking
+
+- `# @loop <name> interval=<sec>` コメント構文を廃止。`@loop("name", interval=sec)` デコレータ構文に移行
+- 既存のライブコーディングファイルはデコレータ構文への書き換えが必要
+
+### Features
+
+- `@loop("name", interval=sec)` デコレータ — ファイルをそのまま `python` で実行できる no-op デコレータとして `from pycodedj import loop` で提供
+- `volume=` 引数 — ループ関数のデフォルト引数として音量を直接指定できる（例: `def my_loop(volume=0.4):`）
+- Amplitude パラメーター（`amp`）を OSC で SuperCollider に送出。`/pycodedj/loop/<name>/params` は `voice_count, cutoff, lfo_rate, reverb, amp` の 5 値に拡張
+
+### Improvements
+
+- `sc/synths.scd` — `amp` パラメーターをすべての SynthDef と OSC ハンドラーに追加
+- `examples/club_set.py` — 6 層 14 ループ構成のクラブセットに刷新（foundation / movement / body / harmonic / space / texture）
+- `examples/demo.py` — 新デコレータ構文に更新
+
+### Docs
+
+- README.md / README.ja.md — 新デコレータ構文・`volume=` 引数・`amp` OSC パラメーターに全面更新
+- `docs/manual.md` / `docs/manual.ja.md` — 同上
+- `docs/index.html` — ライブデモアニメーションとコード例を新構文に更新
+
 ## [0.1.4] - 2026-05-07
 
 ### Fixes

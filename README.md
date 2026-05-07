@@ -45,6 +45,7 @@ BPM clock is held by SuperCollider's `TempoClock`. Python only sends parameter u
 | Control-flow count (if/for/while) | LFO rate (0.1–5.0 Hz) | More branches = faster modulation |
 | Function definition count | Polyphony voice count (1–4) | Functions = independent voices |
 | Comment ratio | Reverb depth (0.0–0.8) | More whitespace = more space |
+| `volume=` argument | Amplitude (0.0–1.0) | Direct performer control over loudness |
 
 Tempo (BPM) and root pitch are controlled explicitly by the performer, to prevent the foundation of the piece from shifting on every save.
 
@@ -82,20 +83,22 @@ Open `sc/synths.scd` in the SuperCollider IDE and evaluate it.
 **2. Write a live-coding file**
 
 ```python
-# @loop bass interval=2.0
-def bass():
+from pycodedj import loop
+
+@loop("bass", interval=2.0)
+def bass(volume=0.4):
     for i in range(8):
         if i % 2 == 0:
             pass
 
-# @loop melody interval=0.5
-def melody():
+@loop("melody", interval=0.5)
+def melody(volume=0.3):
     x = 1
     y = 2
     return x + y
 
-# @loop pad interval=4.0
-def pad():
+@loop("pad", interval=4.0)
+def pad(volume=0.15):
     # make space
     # a little more
     pass
@@ -110,7 +113,7 @@ pycodedj eval demo.py::bass
 On success, feedback is printed immediately:
 
 ```
-[pycodedj] bass  cutoff=418Hz  lfo=1.08Hz  reverb=0.00  voices=1
+[pycodedj] bass  cutoff=418Hz  lfo=1.08Hz  reverb=0.00  voices=1  amp=0.40
 ```
 
 Other loops keep playing without interruption.
@@ -124,8 +127,6 @@ pycodedj watch demo.py
 ```
 
 From here, just write code and save.
-
-> **Note on `interval` (current MVP):** Values like `interval=2.0` are parsed and stored, but are not yet sent over OSC. Loop repeat timing is managed by SuperCollider's `TempoClock`. A mechanism to pass interval to SC is planned for a future release.
 
 ---
 
@@ -143,8 +144,10 @@ From here, just write code and save.
 ### Deeper nesting opens the filter
 
 ```python
-# @loop bass interval=2.0
-def bass():
+from pycodedj import loop
+
+@loop("bass", interval=2.0)
+def bass(volume=0.4):
     for i in range(4):       # control flow +1
         for j in range(4):   # depth +1, control flow +1
             if i == j:       # depth +1, control flow +1
@@ -154,21 +157,27 @@ def bass():
 ### More functions = more polyphony
 
 ```python
-# @loop chord interval=1.0
-def voice_a(): pass
-def voice_b(): pass
-def voice_c(): pass
-def voice_d(): pass
+from pycodedj import loop
+
+@loop("chord", interval=1.0)
+def chord(volume=0.2):
+    def voice_a(): pass
+    def voice_b(): pass
+    def voice_c(): pass
+    def voice_d(): pass
 ```
 
 ### More comments = more space (reverb)
 
 ```python
-# @loop pad interval=4.0
-# leave space here
-# a little more
-# silence is music
-def pad(): pass
+from pycodedj import loop
+
+@loop("pad", interval=4.0)
+def pad(volume=0.15):
+    # leave space here
+    # a little more
+    # silence is music
+    pass
 ```
 
 ---
@@ -179,11 +188,12 @@ Addresses used to communicate with SuperCollider.
 
 | Address | Type | Range | Parameter |
 | :--- | :--- | :--- | :--- |
-| `/pycodedj/loop/<name>/params` | int, float, float, float | see parameter order | `voice_count`, `cutoff`, `lfo_rate`, `reverb` |
+| `/pycodedj/loop/<name>/params` | int, float, float, float, float | see parameter order | `voice_count`, `cutoff`, `lfo_rate`, `reverb`, `amp` |
 | `/pycodedj/loop/<name>/cutoff` | float | 200–4000 Hz | Filter Cutoff (compatibility) |
 | `/pycodedj/loop/<name>/lfo_rate` | float | 0.1–5.0 Hz | LFO rate (compatibility) |
 | `/pycodedj/loop/<name>/reverb` | float | 0.0–0.8 | Reverb depth (compatibility) |
 | `/pycodedj/loop/<name>/voice_count` | int | 1–4 | Polyphony voice count (compatibility) |
+| `/pycodedj/loop/<name>/amp` | float | 0.0–1.0 | Amplitude (compatibility) |
 
 `<name>` is the loop name (e.g. `bass`, `melody`). Each loop has its own address namespace, so multiple loops never overwrite each other's parameters.
 

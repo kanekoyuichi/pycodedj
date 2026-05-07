@@ -66,6 +66,16 @@ def test_voice_count_clamp_max() -> None:
     assert p.voice_count == 4
 
 
+def test_amp_from_volume() -> None:
+    p = map_features(_features(), volume=0.7)
+    assert p.amp == 0.7
+
+
+def test_amp_default() -> None:
+    p = map_features(_features())
+    assert p.amp == 0.3
+
+
 def test_all_params_in_range() -> None:
     for depth in [0, 5, 10, 20]:
         for cf in [0, 3, 10, 50]:

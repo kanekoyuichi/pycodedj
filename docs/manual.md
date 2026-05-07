@@ -37,16 +37,16 @@ Estimated time: 20–30 minutes including setup.
 
 **PyCodeDJ is an instrument where writing Python code changes the music in real time.**
 
-Add more `for` loops and the modulation speeds up. Write three functions and you get three-voice polyphony. Fill the file with comments and the reverb deepens, widening the sonic space.
+Add more `for` loops and the modulation speeds up. Write three functions and you get three-voice polyphony. Fill the file with comments and the reverb deepens. Set `volume=` to control how loud each loop is.
 
 ```python
-# @loop main interval=1.0
+from pycodedj import loop
 
-# more comments = more space
-# another line
-# one more
-
-def melody():
+@loop("main", interval=1.0)
+def my_sound(volume=0.4):
+    # more comments = more space
+    # another line
+    # one more
     for i in range(4):   # more for = faster modulation
         if i > 2:        # more if = even faster
             pass
@@ -55,7 +55,7 @@ def melody():
 Evaluate that code and the terminal prints:
 
 ```
-[pycodedj] main  cutoff=560Hz  lfo=1.08Hz  reverb=0.43  voices=1
+[pycodedj] main  cutoff=560Hz  lfo=1.08Hz  reverb=0.43  voices=1  amp=0.40
 ```
 
 SuperCollider switches to that sound immediately. Other loops keep playing.
@@ -230,27 +230,29 @@ Leave SuperCollider running while you work.
 Open `examples/demo.py`:
 
 ```python
-# @loop bass interval=2.0
-def bass():
+from pycodedj import loop
+
+@loop("bass", interval=2.0)
+def bass(volume=0.4):
     for i in range(8):
         if i % 2 == 0:
             pass
 
-# @loop melody interval=0.5
-def melody():
+@loop("melody", interval=0.5)
+def melody(volume=0.3):
     x = 1
     y = 2
     return x + y
 
-# @loop pad interval=4.0
-# leave space here
-# a little more
-# silence is music
-def pad():
+@loop("pad", interval=4.0)
+def pad(volume=0.15):
+    # leave space here
+    # a little more
+    # silence is music
     pass
 ```
 
-Everything from `# @loop bass` up to (but not including) `# @loop melody` is the **bass block**.
+A function decorated with `@loop("bass", ...)` is the **bass loop**. The function name (`bass`, `melody`, `pad`) can be anything — the name sent over OSC is the first argument to `@loop`.
 
 ### Step 2: Make a sound
 
@@ -265,12 +267,10 @@ pycodedj eval examples/demo.py::bass
 On success:
 
 ```
-[pycodedj] bass  cutoff=418Hz  lfo=1.08Hz  reverb=0.00  voices=1
+[pycodedj] bass  cutoff=418Hz  lfo=1.08Hz  reverb=0.00  voices=1  amp=0.40
 ```
 
-This is your first live-coded sound. The feedback line tells you exactly what sound shape is active right now.
-
-Evaluate melody and pad too:
+This is your first live-coded sound. Evaluate melody and pad too:
 
 ```bash
 pycodedj eval examples/demo.py::melody
@@ -286,8 +286,8 @@ Open `examples/demo.py` in a text editor and modify the bass block:
 **Before:**
 
 ```python
-# @loop bass interval=2.0
-def bass():
+@loop("bass", interval=2.0)
+def bass(volume=0.4):
     for i in range(8):
         if i % 2 == 0:
             pass
@@ -296,8 +296,8 @@ def bass():
 **After (deeper nesting):**
 
 ```python
-# @loop bass interval=2.0
-def bass():
+@loop("bass", interval=2.0)
+def bass(volume=0.4):
     for i in range(8):
         for j in range(4):      # added
             if i % 2 == 0:
@@ -312,10 +312,16 @@ pycodedj eval examples/demo.py::bass
 ```
 
 ```
-[pycodedj] bass  cutoff=1200Hz  lfo=2.16Hz  reverb=0.00  voices=1
+[pycodedj] bass  cutoff=1200Hz  lfo=2.16Hz  reverb=0.00  voices=1  amp=0.40
 ```
 
-The cutoff went up and the LFO sped up. Deeper nesting opens the filter; more control flow speeds up the modulation.
+The cutoff went up and the LFO sped up. To change the volume, change `volume=`:
+
+```python
+@loop("bass", interval=2.0)
+def bass(volume=0.7):   # louder
+    ...
+```
 
 ---
 
@@ -358,7 +364,7 @@ pycodedj watch demo.py --debounce 0.5
 
 ## 6. How code maps to sound
 
-PyCodeDJ converts the **structure** of your Python code into four musical parameters.
+PyCodeDJ converts the **structure** of your Python code into five musical parameters.
 
 ### Mapping table
 
@@ -368,21 +374,23 @@ PyCodeDJ converts the **structure** of your Python code into four musical parame
 | Control-flow count (`if`/`for`/`while` total) | Modulation speed (LFO rate) | More = faster wobble |
 | Function count (`def` count) | Polyphony voice count | More = more voices (max 4) |
 | Comment ratio (comment lines ÷ total lines) | Spatial width (Reverb depth) | More = more reverb |
+| `volume=` argument default value | Amplitude | Direct control. 0.0–1.0 |
 
 ### Examples
 
 #### Filter brightness (nesting depth)
 
 ```python
-# @loop test interval=1.0
-# depth 1 → filter minimum (muffled)
-def f(): pass
+@loop("test", interval=1.0)
+def f(volume=0.3):
+    # depth 1 → filter minimum (muffled)
+    pass
 ```
 
 ```python
-# @loop test interval=1.0
-# depth 4 → filter maximum (bright)
-def f():
+@loop("test", interval=1.0)
+def f(volume=0.3):
+    # depth 4 → filter maximum (bright)
     for i in range(4):
         for j in range(4):
             if i == j:
@@ -394,15 +402,15 @@ def f():
 #### Modulation speed (control-flow count)
 
 ```python
-# @loop test interval=1.0
-# 0 control flows → minimum LFO (slow drift)
-def f(): pass
+@loop("test", interval=1.0)
+def f(volume=0.3):
+    # 0 control flows → minimum LFO (slow drift)
+    pass
 ```
 
 ```python
-# @loop test interval=1.0
-# 3 control flows → medium LFO
-def f():
+@loop("test", interval=1.0)
+def f(volume=0.3):
     for i in range(4):   # 1
         if i > 2:        # 2
             while False: # 3
@@ -412,37 +420,52 @@ def f():
 #### Polyphony (function count)
 
 ```python
-# @loop test interval=1.0
-# 1 function → mono
-def solo(): pass
+@loop("test", interval=1.0)
+def solo(volume=0.3):
+    # 1 function → mono
+    pass
 ```
 
 ```python
-# @loop test interval=1.0
-# 4 functions → max polyphony
-def voice_a(): pass
-def voice_b(): pass
-def voice_c(): pass
-def voice_d(): pass
+@loop("test", interval=1.0)
+def f(volume=0.3):
+    # 4 functions → max polyphony
+    def voice_a(): pass
+    def voice_b(): pass
+    def voice_c(): pass
+    def voice_d(): pass
 ```
 
 #### Reverb depth (comment ratio)
 
 ```python
-# @loop test interval=1.0
-# no comments → dry sound
-def f():
+@loop("test", interval=1.0)
+def f(volume=0.3):
+    # no comments → dry sound
     x = 1
     return x
 ```
 
 ```python
-# @loop test interval=1.0
-# lots of comments → deep reverb
-# space
-# space
-# space
-def f(): pass
+@loop("test", interval=1.0)
+def f(volume=0.3):
+    # lots of comments → deep reverb
+    # space
+    # space
+    # space
+    pass
+```
+
+#### Volume (volume argument)
+
+```python
+@loop("kick", interval=1.0)
+def my_kick(volume=0.9):   # loud, floor-shaking
+    ...
+
+@loop("shimmer", interval=4.0)
+def bg_shimmer(volume=0.05):  # quiet, in the background
+    ...
 ```
 
 ---
@@ -453,22 +476,26 @@ The defining feature of PyCodeDJ is that **multiple loops run independently and 
 
 ### The basics
 
-Add `# @loop name` anywhere in the file to create a new loop:
+Add `@loop("name", ...)` to as many functions as you like:
 
 ```python
-# @loop bass interval=2.0
-def bass():
+from pycodedj import loop
+
+@loop("bass", interval=2.0)
+def my_bass(volume=0.4):
     for i in range(8):
         pass
 
-# @loop chord interval=1.0
-def chord_a(): pass
-def chord_b(): pass
+@loop("chord", interval=1.0)
+def my_chord(volume=0.2):
+    def chord_a(): pass
+    def chord_b(): pass
 
-# @loop texture interval=4.0
-# background
-# air
-def bg(): pass
+@loop("texture", interval=4.0)
+def bg(volume=0.06):
+    # background
+    # air
+    pass
 ```
 
 Evaluate each independently:
@@ -483,16 +510,7 @@ Or use `watch` and all loops update on every save.
 
 ### Stopping a loop
 
-To stop a loop, empty its block (remove the `def`) and re-evaluate:
-
-```python
-# @loop bass interval=2.0
-# (empty)
-```
-
-```bash
-pycodedj eval myfile.py::bass
-```
+To stop a loop, delete the entire `@loop`-decorated function from the file and save. In watch mode, the loop stops automatically. With `eval`, once the decorated function is gone, the loop is no longer found and SuperCollider fades it out.
 
 ---
 
@@ -500,51 +518,53 @@ pycodedj eval myfile.py::bass
 
 `examples/club_set.py` is a layered dancefloor groove. It is not a synth catalogue: it combines hard kick, low rumble, moving Reese bass, hats, claps, rave stabs, Hoover lead, and room FX.
 
-Loop names such as `# @loop kick_floor interval=1.0` are interpreted as role names on the SuperCollider side. For example, `kick_...` maps to a kick synth, `bass_...` maps to a bass synth, and `hat_...` maps to a hat synth. If you are only changing the Python groove or arrangement, you usually do not need to edit `sc/synths.scd`. Edit SuperCollider only when you want to add a genuinely new sound engine.
+Loop names such as `@loop("kick_hard", ...)` are interpreted as sound names on the SuperCollider side. For example, `kick_hard` maps to a kick synth and `bass_reese` maps to a bass synth. If you are only changing the Python groove or arrangement, you usually do not need to edit `sc/synths.scd`. Edit SuperCollider only when you want to add a genuinely new sound engine.
 
 ### Available sound names
 
-Change the `@loop` name to choose the SuperCollider sound. The Python function name can be anything; the OSC loop name comes from the `# @loop ...` marker.
+Change the first argument of `@loop` to choose the SuperCollider sound. The Python function name can be anything.
 
-| `@loop` name | Sound |
+| Loop name | Sound |
 | :--- | :--- |
-| `kick_floor` | Big four-on-the-floor kick |
-| `kick_hard` | Hard kick with a stronger attack |
+| `kick_hard` | Hard kick with a strong attack |
+| `floor_kick` | Big four-on-the-floor kick |
 | `kick_pulse` | Lighter pulse kick |
-| `bass_sub` | Sub bass |
+| `sub_bass` | Sub bass |
 | `bass_reese` | Moving Reese-style bass |
 | `bass_rumble` | Low kick-derived rumble |
-| `hat_offbeat` | Closed/open hat grid |
+| `hat_engine` | Closed/open hat grid |
 | `hat_ride` | Longer ride/open hat |
-| `clap_backbeat` | Clap |
+| `clap_snap` | Sharp clap |
 | `clap_snare` | Snare-like clap |
-| `chord_dub` | Dub chord |
-| `chord_stab` | Short chord stab |
+| `dub_chord` | Dub chord |
+| `neon_stab` | Neon-style chord stab |
 | `chord_rave` | Bright rave stab |
-| `lead_acid` | Acid-style lead |
+| `acid_lead` | Acid-style lead |
 | `lead_hoover` | Hoover-style lead |
-| `fx_air` | Warehouse ambience |
-| `fx_ticks` | Small glitch ticks |
-| `fx_pad` | Deep pad |
-| `fx_impact` | Low impact |
-
-For example, change `# @loop bass_sub interval=0.5` in `club_set.py` to `# @loop bass_reese interval=0.5` to change the bass sound.
+| `soft_pluck` | Soft pluck |
+| `warehouse_air` | Warehouse ambience |
+| `glitch_ticks` | Small glitch ticks |
+| `shimmer_pad` | Deep shimmer pad |
+| `fx_impact` | Low impact hit |
 
 ### Block overview
 
 | Loop name | Character | Code features |
 | :--- | :--- | :--- |
-| `kick_hard` | Hard four-on-the-floor kick | Eight-bar accents |
+| `kick_hard` | Hard four-on-the-floor kick | Eight-bar accents, dry |
 | `bass_rumble` | Rumble under the kick | Layered low-end tails |
 | `bass_reese` | Moving Reese bass | Syncopation and slides |
-| `hat_offbeat` | Hi-hat grid | Offbeats and late accents |
+| `hat_engine` | Hi-hat grid | Fast control flow, dry |
 | `hat_ride` | Ride / open hat | Sustained lift in later bars |
-| `clap_backbeat` | Clap | Backbeat and fills |
+| `clap_snap` | Sharp snap | Backbeat and fills |
 | `clap_snare` | Snare-like accent | Phrase-ending punctuation |
-| `chord_rave` | Rave stab | Short repeated chord hits |
+| `chord_rave` | Rave stab | Four inner functions = 4 voices |
+| `neon_stab` | Answer stab | Two comments = moderate reverb |
 | `lead_hoover` | Hoover-style lead | Sparse answer phrases |
-| `fx_impact` | Impact | Low hit for larger sections |
-| `fx_air` | Warehouse ambience | Comment-heavy = deep reverb |
+| `shimmer_pad` | Shimmer pad | Comments only, high reverb |
+| `glitch_ticks` | Digital texture | Sparse digital noise |
+| `fx_impact` | Impact hit | Low hit for larger sections |
+| `warehouse_air` | Warehouse ambience | Comments only, maximum reverb |
 
 ### Getting it running
 
@@ -558,49 +578,34 @@ You can also evaluate individual loops:
 
 ```bash
 pycodedj eval examples/club_set.py::kick_hard
-pycodedj eval examples/club_set.py::bass_rumble
 pycodedj eval examples/club_set.py::bass_reese
-pycodedj eval examples/club_set.py::hat_offbeat
-pycodedj eval examples/club_set.py::hat_ride
-pycodedj eval examples/club_set.py::clap_backbeat
-pycodedj eval examples/club_set.py::clap_snare
 pycodedj eval examples/club_set.py::chord_rave
-pycodedj eval examples/club_set.py::lead_hoover
-pycodedj eval examples/club_set.py::fx_impact
-pycodedj eval examples/club_set.py::fx_air
 ```
 
 ### Performing with it
 
-`fx_air` is a comment-only block. Adding or removing comments changes the reverb depth. The function can still be named `warehouse_air`; the OSC loop name comes from `# @loop fx_air ...`.
+**Change the volume:** Change `volume=` and save. The loop's amplitude updates immediately.
 
 ```python
-# @loop fx_air interval=4.0
-# smoke above the kick
-# late reflections
-# concrete room tail
-# crowd heat
-# blue strobes
-def warehouse_air():
+@loop("lead_hoover", interval=4.0)
+def hoover(volume=0.4):   # push it forward
+    ...
+```
+
+**Change the space:** Add or remove comments in `warehouse_air` or `shimmer_pad` to shift the reverb depth.
+
+```python
+@loop("warehouse_air", interval=4.0)
+def room_tone(volume=0.06):
+    # concrete walls
+    # low ceiling
+    # crowd warmth
     pass
 ```
 
-Try leaving only two comment lines and saving. The space dries out immediately.
+Leave only one comment line and save. The space dries out immediately.
 
-Remove one function from `chord_dub` and the chord drops from three voices to two:
-
-```python
-# @loop chord_dub interval=2.0
-def chord_root():
-    return "minor"
-
-def chord_fifth():
-    return "pressure"
-
-# chord_seventh removed
-```
-
-Remove the inner `for slide in range(2)` loop from `bass_reese`. The filter drops and the bass loses some forward pressure.
+**Change the voices:** Remove an inner function from `chord_rave` and the chord drops from four voices to three.
 
 Changing code structure *is* the performance.
 
@@ -614,22 +619,23 @@ Start with empty code and add elements one by one. With watch running, each save
 
 ```python
 # stage 1: near silence (minimum filter, 1 voice)
-# @loop main interval=1.0
-def f(): pass
+@loop("main", interval=1.0)
+def f(volume=0.3):
+    pass
 ```
 
 ```python
 # stage 2: add some movement
-# @loop main interval=1.0
-def f():
+@loop("main", interval=1.0)
+def f(volume=0.3):
     for i in range(4):
         pass
 ```
 
 ```python
 # stage 3: go deeper
-# @loop main interval=1.0
-def f():
+@loop("main", interval=1.0)
+def f(volume=0.3):
     for i in range(4):
         for j in range(2):
             if i > j:
@@ -638,16 +644,17 @@ def f():
 
 ```python
 # stage 4: add voices for the climax
-# @loop main interval=1.0
-def voice_a():
-    for i in range(4):
-        for j in range(2):
-            if i > j:
-                pass
+@loop("main", interval=1.0)
+def f(volume=0.5):
+    def voice_a():
+        for i in range(4):
+            for j in range(2):
+                if i > j:
+                    pass
 
-def voice_b():
-    for k in range(8):
-        pass
+    def voice_b():
+        for k in range(8):
+            pass
 ```
 
 ### Idea B: Play with contrast
@@ -657,26 +664,28 @@ Use two loops to set a busy part against a quiet one.
 **Busy bass:**
 
 ```python
-# @loop bass interval=2.0
-def layer_a():
-    for i in range(8):
-        for j in range(4):
-            if i == j:
-                pass
+@loop("bass", interval=2.0)
+def the_bass(volume=0.5):
+    def layer_a():
+        for i in range(8):
+            for j in range(4):
+                if i == j:
+                    pass
 
-def layer_b():
-    for k in range(8):
-        pass
+    def layer_b():
+        for k in range(8):
+            pass
 ```
 
 **Quiet pad:**
 
 ```python
-# @loop pad interval=4.0
-# silence
-# more silence
-# just space
-def space(): pass
+@loop("pad", interval=4.0)
+def space(volume=0.08):
+    # silence
+    # more silence
+    # just space
+    pass
 ```
 
 ### Idea C: Perform with comments alone
@@ -684,9 +693,10 @@ def space(): pass
 Keep a single function and vary only the comment count. More comments = deeper reverb. With watch running, each save shifts the space.
 
 ```python
-# @loop ambient interval=4.0
-# add and remove lines here to perform
-def f(): pass
+@loop("ambient", interval=4.0)
+def f(volume=0.15):
+    # add and remove lines here to perform
+    pass
 ```
 
 ### Idea D: Write code as a story
@@ -694,13 +704,14 @@ def f(): pass
 Sound is determined by code structure, not function names. Name things anything you like — your code can tell a story as it performs.
 
 ```python
-# @loop narrative interval=2.0
-def the_city_wakes_up():
+@loop("narrative", interval=2.0)
+def the_city_wakes_up(volume=0.3):
     for hour in range(6):
         if hour > 4:
             pass
 
-def rush_hour():
+@loop("texture", interval=1.0)
+def rush_hour(volume=0.2):
     for commuter in range(8):
         for train in range(3):
             if commuter % 2 == 0:
@@ -799,10 +810,10 @@ A successful eval always prints `[pycodedj] loop-name  cutoff=...Hz ...`. If not
 
 ### `loop 'xxx' not found`
 
-The loop name after `::` does not match the `# @loop` marker in the file. Names are case-sensitive.
+The loop name after `::` does not match the first argument of `@loop(...)` in the file. Names are case-sensitive.
 
 ```bash
-# if the file contains `# @loop bass`
+# if the file contains @loop("bass", ...)
 pycodedj eval demo.py::bass   # OK
 pycodedj eval demo.py::Bass   # wrong case
 ```
@@ -853,14 +864,14 @@ pycodedj eval FILE::LOOP [--sc-host HOST] [--sc-port PORT]
 | `--sc-host` | SuperCollider host | `127.0.0.1` |
 | `--sc-port` | SuperCollider receive port | `57120` |
 
-`FILE::LOOP` selects the `# @loop LOOP` block inside `FILE`. For example, `examples/demo.py::bass` evaluates the `# @loop bass` block in `examples/demo.py`.
+`FILE::LOOP` selects the function decorated with `@loop("LOOP", ...)` inside `FILE`. For example, `examples/demo.py::bass` evaluates the function with `@loop("bass", ...)` in `examples/demo.py`.
 
 `eval` runs once. Use `pycodedj watch` when you want all loops to update automatically every time you save the file.
 
 On success, feedback is written to stdout:
 
 ```
-[pycodedj] bass  cutoff=418Hz  lfo=1.08Hz  reverb=0.00  voices=1
+[pycodedj] bass  cutoff=418Hz  lfo=1.08Hz  reverb=0.00  voices=1  amp=0.40
 ```
 
 On failure (syntax error or OSC send failure), an error is written to stderr and the exit code is 1.
@@ -896,16 +907,23 @@ pycodedj watch club_set.py --debounce 0.5
 pycodedj watch myfile.py --sc-host 192.168.1.10
 ```
 
-### Block marker syntax
+### Loop syntax
 
-```
-# @loop <name> [interval=seconds]
+```python
+from pycodedj import loop
+
+@loop("loop-name", interval=seconds)
+def function_name(volume=amplitude):
+    # function body maps to musical parameters
+    ...
 ```
 
 | Element | Description |
 | :--- | :--- |
-| `<name>` | Alphanumeric characters and underscores. e.g. `bass`, `my_loop_1` |
-| `interval=seconds` | Optional. Parsed and stored; not yet sent over OSC (reserved for future use) |
+| `"loop-name"` | Name sent over OSC. Alphanumeric and underscores. e.g. `bass`, `kick_hard` |
+| `interval=seconds` | Update interval in seconds. Default: `1.0` |
+| `volume=amplitude` | Volume. Float from 0.0 to 1.0. Default: `0.3` |
+| function name | Free to choose. Independent from the loop name |
 
 ---
 
@@ -919,18 +937,20 @@ pycodedj watch myfile.py --sc-host 192.168.1.10
 | LFO rate | Control-flow count 0–10 | 0.1–5.0 Hz | Linear |
 | Reverb | Comment ratio 0.0–1.0 | 0.0–0.8 | Linear |
 | Voice count | Function count (clamped) | 1–4 | Clamp |
+| Amplitude | `volume=` argument | pass-through | — |
 
 ### OSC addresses
 
 Address format used to communicate with SuperCollider. Reference these when connecting an external visualiser such as Hydra.
 
-| Address | Type | Range |
+| Address | Type | Values |
 | :--- | :--- | :--- |
-| `/pycodedj/loop/<name>/params` | int, float, float, float | `voice_count`, `cutoff`, `lfo_rate`, `reverb` |
+| `/pycodedj/loop/<name>/params` | int, float, float, float, float | `voice_count`, `cutoff`, `lfo_rate`, `reverb`, `amp` |
 | `/pycodedj/loop/<name>/voice_count` | int | 1–4 (compatibility) |
 | `/pycodedj/loop/<name>/cutoff` | float | 200–4000 (compatibility) |
 | `/pycodedj/loop/<name>/lfo_rate` | float | 0.1–5.0 (compatibility) |
 | `/pycodedj/loop/<name>/reverb` | float | 0.0–0.8 (compatibility) |
+| `/pycodedj/loop/<name>/amp` | float | 0.0–1.0 (compatibility) |
 
 ### Using the Python API directly
 
@@ -949,7 +969,7 @@ blocks = {b.name: b for b in parse_blocks(source)}
 
 params = engine.eval_block(blocks["bass"])
 if params is not None:
-    print(f"cutoff={params.cutoff:.0f}Hz")
+    print(f"cutoff={params.cutoff:.0f}Hz  amp={params.amp:.2f}")
 ```
 
 `eval_block` returns a `MusicParams` on success, or `None` if there was a syntax error or OSC failure.
@@ -958,7 +978,8 @@ if params is not None:
 
 ```
 pycodedj/
-├── block_parser.py   # splits source into @loop blocks
+├── _loop.py          # @loop decorator (no-op at runtime)
+├── block_parser.py   # parses @loop decorators via AST to extract loop blocks
 ├── analyzer.py       # extracts structural features (depth, counts, ratio)
 ├── mapper.py         # maps features to musical parameters
 ├── engine.py         # orchestrates the full eval pipeline

@@ -37,16 +37,16 @@
 
 **Python のコードを書くと、リアルタイムに音が変わる楽器です。**
 
-`for` ループを増やすと音の揺らぎが速くなります。関数を 3 つ書くと 3 声のポリフォニーになります。コメントをたくさん書くと、リバーブが深くかかって空間が広がります。
+`for` ループを増やすと音の揺らぎが速くなります。関数を 3 つ書くと 3 声のポリフォニーになります。コメントをたくさん書くと、リバーブが深くかかって空間が広がります。`volume=` で音量を直接指定できます。
 
 ```python
-# @loop main interval=1.0
+from pycodedj import loop
 
-# コメントを増やすほど空間が広がる
-# もう一行
-# さらにもう一行
-
-def melody():
+@loop("main", interval=1.0)
+def my_sound(volume=0.4):
+    # コメントを増やすほど空間が広がる
+    # もう一行
+    # さらにもう一行
     for i in range(4):   # for を増やすと揺らぎが速くなる
         if i > 2:        # if を増やすとさらに速くなる
             pass
@@ -55,7 +55,7 @@ def melody():
 このコードを評価すると、ターミナルに次のように表示されます。
 
 ```
-[pycodedj] main  cutoff=560Hz  lfo=1.08Hz  reverb=0.43  voices=1
+[pycodedj] main  cutoff=560Hz  lfo=1.08Hz  reverb=0.43  voices=1  amp=0.40
 ```
 
 SuperCollider がすぐにその音色に切り替わります。他のループは止まりません。
@@ -232,27 +232,29 @@ SuperCollider はこのまま起動したままにしておいてください。
 `examples/demo.py` を開いてみましょう。
 
 ```python
-# @loop bass interval=2.0
-def bass():
+from pycodedj import loop
+
+@loop("bass", interval=2.0)
+def bass(volume=0.4):
     for i in range(8):
         if i % 2 == 0:
             pass
 
-# @loop melody interval=0.5
-def melody():
+@loop("melody", interval=0.5)
+def melody(volume=0.3):
     x = 1
     y = 2
     return x + y
 
-# @loop pad interval=4.0
-# ここに余白を置く
-# もう少し置く
-# 静寂も音楽
-def pad():
+@loop("pad", interval=4.0)
+def pad(volume=0.15):
+    # ここに余白を置く
+    # もう少し置く
+    # 静寂も音楽
     pass
 ```
 
-`# @loop bass` から `# @loop melody` の直前まで、これが「bass ブロック」です。
+`@loop("bass", ...)` が付いた関数が「bass ループ」です。関数名（`bass`, `melody`, `pad`）は自由につけられます。OSC に送られる名前は `@loop(...)` の第一引数です。
 
 ### ステップ 2: 音を出す
 
@@ -267,12 +269,10 @@ pycodedj eval examples/demo.py::bass
 成功すると次のように表示されます。
 
 ```
-[pycodedj] bass  cutoff=418Hz  lfo=1.08Hz  reverb=0.00  voices=1
+[pycodedj] bass  cutoff=418Hz  lfo=1.08Hz  reverb=0.00  voices=1  amp=0.40
 ```
 
-これがあなたの最初のライブコーディングです。このフィードバックで今どんな音色になっているかが一目でわかります。
-
-続けて melody と pad も評価してみましょう。
+これがあなたの最初のライブコーディングです。続けて melody と pad も評価してみましょう。
 
 ```bash
 pycodedj eval examples/demo.py::melody
@@ -288,8 +288,8 @@ pycodedj eval examples/demo.py::pad
 **変更前:**
 
 ```python
-# @loop bass interval=2.0
-def bass():
+@loop("bass", interval=2.0)
+def bass(volume=0.4):
     for i in range(8):
         if i % 2 == 0:
             pass
@@ -298,8 +298,8 @@ def bass():
 **変更後（ネストを深くする）:**
 
 ```python
-# @loop bass interval=2.0
-def bass():
+@loop("bass", interval=2.0)
+def bass(volume=0.4):
     for i in range(8):
         for j in range(4):      # 1 行追加
             if i % 2 == 0:
@@ -314,10 +314,16 @@ pycodedj eval examples/demo.py::bass
 ```
 
 ```
-[pycodedj] bass  cutoff=1200Hz  lfo=2.16Hz  reverb=0.00  voices=1
+[pycodedj] bass  cutoff=1200Hz  lfo=2.16Hz  reverb=0.00  voices=1  amp=0.40
 ```
 
-cutoff が上がって音が明るくなり、lfo も速くなりました。ネストが深くなるほどフィルターが開き、制御フローが増えるほど揺らぎが速くなります。
+cutoff が上がって音が明るくなり、lfo も速くなりました。音量を変えたいときは `volume=` の値を変えます。
+
+```python
+@loop("bass", interval=2.0)
+def bass(volume=0.7):   # ← 大きくする
+    ...
+```
 
 ---
 
@@ -360,7 +366,7 @@ pycodedj watch demo.py --debounce 0.5
 
 ## 6. コードと音の関係を知る
 
-PyCodeDJ は Python コードの「構造」を 4 つの音楽パラメーターに変換します。
+PyCodeDJ は Python コードの「構造」を 5 つの音楽パラメーターに変換します。
 
 ### 対応表
 
@@ -370,21 +376,23 @@ PyCodeDJ は Python コードの「構造」を 4 つの音楽パラメーター
 | 制御フローの数（`if` / `for` / `while` の合計） | 音の揺らぎの速さ（LFO レート） | 多いほど揺らぎが速くなる |
 | 関数の数（`def` の数） | 音の重なり（ポリフォニー声部数） | 多いほど音が重なる（最大 4） |
 | コメントの割合（コメント行 ÷ 全行） | 空間の広さ（リバーブの深さ） | 多いほど残響が増える |
+| `volume=` 引数のデフォルト値 | 音量（Amplitude） | 直接指定。0.0〜1.0 |
 
 ### 実例で見る
 
 #### フィルターの明るさ（ネストの深さ）
 
 ```python
-# @loop test interval=1.0
-# ネスト深さ 1 → フィルター最小（こもった音）
-def f(): pass
+@loop("test", interval=1.0)
+def f(volume=0.3):
+    # ネスト深さ 1 → フィルター最小（こもった音）
+    pass
 ```
 
 ```python
-# @loop test interval=1.0
-# ネスト深さ 4 → フィルター最大（明るい音）
-def f():
+@loop("test", interval=1.0)
+def f(volume=0.3):
+    # ネスト深さ 4 → フィルター最大（明るい音）
     for i in range(4):
         for j in range(4):
             if i == j:
@@ -396,15 +404,15 @@ def f():
 #### 揺らぎの速さ（制御フローの数）
 
 ```python
-# @loop test interval=1.0
-# 制御フロー 0 個 → 揺らぎ最小（ゆったり）
-def f(): pass
+@loop("test", interval=1.0)
+def f(volume=0.3):
+    # 制御フロー 0 個 → 揺らぎ最小（ゆったり）
+    pass
 ```
 
 ```python
-# @loop test interval=1.0
-# 制御フロー 3 個 → 揺らぎ中程度
-def f():
+@loop("test", interval=1.0)
+def f(volume=0.3):
     for i in range(4):   # 1 つ目
         if i > 2:        # 2 つ目
             while False: # 3 つ目
@@ -414,37 +422,52 @@ def f():
 #### 音の重なり（関数の数）
 
 ```python
-# @loop test interval=1.0
-# 関数 1 個 → 1 声（ソロ）
-def solo(): pass
+@loop("test", interval=1.0)
+def solo(volume=0.3):
+    # 関数 1 個 → 1 声（ソロ）
+    pass
 ```
 
 ```python
-# @loop test interval=1.0
-# 関数 4 個 → 4 声（最大ポリフォニー）
-def voice_a(): pass
-def voice_b(): pass
-def voice_c(): pass
-def voice_d(): pass
+@loop("test", interval=1.0)
+def f(volume=0.3):
+    # 関数 4 個 → 4 声（最大ポリフォニー）
+    def voice_a(): pass
+    def voice_b(): pass
+    def voice_c(): pass
+    def voice_d(): pass
 ```
 
 #### 空間の広さ（コメント率）
 
 ```python
-# @loop test interval=1.0
-# コメントなし → ドライな音
-def f():
+@loop("test", interval=1.0)
+def f(volume=0.3):
+    # コメントなし → ドライな音
     x = 1
     return x
 ```
 
 ```python
-# @loop test interval=1.0
-# コメントが多い → 深い残響
-# 余白
-# 余白
-# 余白
-def f(): pass
+@loop("test", interval=1.0)
+def f(volume=0.3):
+    # コメントが多い → 深い残響
+    # 余白
+    # 余白
+    # 余白
+    pass
+```
+
+#### 音量（volume 引数）
+
+```python
+@loop("kick", interval=1.0)
+def my_kick(volume=0.9):   # 大きい
+    ...
+
+@loop("shimmer", interval=4.0)
+def bg_shimmer(volume=0.05):  # 奥で小さく
+    ...
 ```
 
 ---
@@ -455,22 +478,26 @@ PyCodeDJ の最大の特徴は、**複数のループが独立して動き続け
 
 ### 基本の使い方
 
-ファイルに `# @loop 名前` を追加するだけで新しいループを作れます。
+`@loop("名前", ...)` デコレータを付けた関数を並べるだけで、複数のループを作れます。
 
 ```python
-# @loop bass interval=2.0
-def bass():
+from pycodedj import loop
+
+@loop("bass", interval=2.0)
+def my_bass(volume=0.4):
     for i in range(8):
         pass
 
-# @loop chord interval=1.0
-def chord_a(): pass
-def chord_b(): pass
+@loop("chord", interval=1.0)
+def my_chord(volume=0.2):
+    def chord_a(): pass
+    def chord_b(): pass
 
-# @loop texture interval=4.0
-# 背景
-# 空気
-def bg(): pass
+@loop("texture", interval=4.0)
+def bg(volume=0.06):
+    # 背景
+    # 空気
+    pass
 ```
 
 それぞれを別々に評価できます。
@@ -485,68 +512,63 @@ pycodedj eval myfile.py::texture
 
 ### ループを止めるには
 
-ループを止めたいときは、そのブロックの関数を削除して（`def` がなくなった状態にして）再評価します。
+ループを止めたいときは、その `@loop` デコレータごと関数を削除して保存します。watch モードなら保存時に自動で止まります。
 
-```python
-# @loop bass interval=2.0
-# （空にする）
-```
-
-```bash
-pycodedj eval myfile.py::bass
-```
+eval で止めたい場合は、関数名の `def` だけを残して本体を空にし、ファイルからブロックが消えたと判定されるよう `@loop` を削除します。
 
 ---
 
 ## 8. クラブセット例 — club_set.py を動かす
 
-`examples/club_set.py` は、クラブのグルーヴとして成立しやすい多層デモファイルです。音色カタログではなく、硬いキック、低いランブル、揺れる Reese ベース、ハット、クラップ、レイブスタブ、Hoover リード、空間系 FX を組み合わせたセットです。
+`examples/club_set.py` は、クラブのグルーヴとして成立しやすい多層デモファイルです。硬いキック、低いランブル、揺れる Reese ベース、ハット、クラップ、レイブスタブ、Hoover リード、空間系 FX を組み合わせたセットです。
 
-`# @loop kick_floor interval=1.0` のような `@loop` 名は、SuperCollider 側では役割名として解釈されます。たとえば `kick_...` はキック系、`bass_...` はベース系、`hat_...` はハット系のシンセに割り当てられます。Python 側でグルーヴや構成を変えるだけなら、通常は `sc/synths.scd` を編集する必要はありません。まったく新しい音色エンジンを増やしたいときだけ、SuperCollider 側に SynthDef を追加します。
+`@loop("kick_hard", ...)` のようなループ名は、SuperCollider 側では音色名として解釈されます。たとえば `kick_hard` はキック系、`bass_reese` はベース系のシンセに割り当てられます。Python 側でグルーヴや構成を変えるだけなら、通常は `sc/synths.scd` を編集する必要はありません。まったく新しい音色エンジンを増やしたいときだけ、SuperCollider 側に SynthDef を追加します。
 
 ### 使える音色名
 
-`@loop` 名を変えると、SuperCollider 側で使う音色を選べます。関数名は自由ですが、OSC に送られる名前は `# @loop ...` の部分です。
+`@loop` の第一引数を変えると、SuperCollider 側で使う音色を選べます。
 
-| `@loop` 名 | 音 |
+| ループ名 | 音 |
 | :--- | :--- |
-| `kick_floor` | 太い四つ打ちキック |
 | `kick_hard` | 硬めでアタックの強いキック |
+| `floor_kick` | 太い四つ打ちキック |
 | `kick_pulse` | 軽めのパルスキック |
-| `bass_sub` | サブベース |
+| `sub_bass` | サブベース |
 | `bass_reese` | 揺れる Reese 系ベース |
 | `bass_rumble` | キック由来の低いランブル |
-| `hat_offbeat` | クローズ/オープンのハットグリッド |
+| `hat_engine` | クローズ/オープンのハットグリッド |
 | `hat_ride` | 長めのライド/オープンハット |
-| `clap_backbeat` | クラップ |
+| `clap_snap` | 鋭いクラップ |
 | `clap_snare` | スネア寄りのクラップ |
-| `chord_dub` | ダブコード |
-| `chord_stab` | 短いスタブコード |
+| `dub_chord` | ダブコード |
+| `neon_stab` | ネオン系スタブコード |
 | `chord_rave` | 明るいレイブスタブ |
-| `lead_acid` | アシッド系リード |
+| `acid_lead` | アシッド系リード |
 | `lead_hoover` | Hoover 風リード |
-| `fx_air` | 倉庫っぽい空気感 |
-| `fx_ticks` | 細かいグリッチ音 |
-| `fx_pad` | 深いパッド |
+| `soft_pluck` | やわらかいプラック |
+| `warehouse_air` | 倉庫っぽい空気感 |
+| `glitch_ticks` | 細かいグリッチ音 |
+| `shimmer_pad` | 深いシマーパッド |
 | `fx_impact` | 低いインパクト |
-
-たとえば `club_set.py` の `# @loop bass_sub interval=0.5` を `# @loop bass_reese interval=0.5` に変えるだけで、ベースの音色を変えられます。
 
 ### ブロック一覧
 
 | ループ名 | キャラクター | コードの特徴 |
 | :--- | :--- | :--- |
-| `kick_hard` | 硬い四つ打ちキック | 8 小節のアクセントつき |
+| `kick_hard` | 硬い四つ打ちキック | 8 小節のアクセントつき、ドライ |
 | `bass_rumble` | キック下のランブル | 低域の尾を重ねる |
 | `bass_reese` | 揺れる Reese ベース | シンコペーションとスライド |
-| `hat_offbeat` | ハイハットのグリッド | 裏拍と遅れ気味のアクセント |
+| `hat_engine` | ハイハットのグリッド | 速い制御フロー、ドライ |
 | `hat_ride` | ライド/オープンハット | 後半で開く持続音 |
-| `clap_backbeat` | クラップ | バックビートとフィル |
+| `clap_snap` | スナップ | バックビートとフィル |
 | `clap_snare` | スネア寄りのアクセント | フレーズ終端を強調 |
-| `chord_rave` | レイブスタブ | 短いコード反復 |
+| `chord_rave` | レイブスタブ | 内部関数 4 つで 4 声 |
+| `neon_stab` | アンサースタブ | コメント 2 行で適度な残響 |
 | `lead_hoover` | Hoover 風リード | 疎らな応答フレーズ |
+| `shimmer_pad` | シマーパッド | コメントのみ、高リバーブ |
+| `glitch_ticks` | グリッチテクスチャ | 少量のデジタルノイズ |
 | `fx_impact` | インパクト | 大きな区切りの低い衝撃 |
-| `fx_air` | 倉庫の空気感 | コメントだらけでリバーブが深い |
+| `warehouse_air` | 倉庫の空気感 | コメントだけ、最大リバーブ |
 
 ### 動かしてみる
 
@@ -556,55 +578,38 @@ watch で起動して、エディタで各ブロックを編集しながら音�
 pycodedj watch examples/club_set.py
 ```
 
-個別にループを足したい場合は eval することもできます。
+個別にループを評価したい場合は eval を使います。
 
 ```bash
 pycodedj eval examples/club_set.py::kick_hard
-pycodedj eval examples/club_set.py::bass_rumble
 pycodedj eval examples/club_set.py::bass_reese
-pycodedj eval examples/club_set.py::hat_offbeat
-pycodedj eval examples/club_set.py::hat_ride
-pycodedj eval examples/club_set.py::clap_backbeat
-pycodedj eval examples/club_set.py::clap_snare
 pycodedj eval examples/club_set.py::chord_rave
-pycodedj eval examples/club_set.py::lead_hoover
-pycodedj eval examples/club_set.py::fx_impact
-pycodedj eval examples/club_set.py::fx_air
 ```
 
 ### 演奏してみる
 
-`fx_air` はコメントだけのブロックです。コメントを増やしたり減らしたりすると、リバーブの深さが変わります。関数名は `warehouse_air` のままでもかまいません。PyCodeDJ が OSC で使う名前は `# @loop fx_air ...` の部分です。
+**音量を変える:** `volume=` の値を変えて保存するだけで、そのループの音量が即座に変わります。
 
 ```python
-# @loop fx_air interval=4.0
-# smoke above the kick
-# late reflections
-# concrete room tail
-# crowd heat
-# blue strobes
-def warehouse_air():
+@loop("lead_hoover", interval=4.0)
+def hoover(volume=0.4):   # ← 前に出したいとき
+    ...
+```
+
+**空間を変える:** `warehouse_air` や `shimmer_pad` のコメントを増やしたり減らしたりすると、リバーブの深さが変わります。
+
+```python
+@loop("warehouse_air", interval=4.0)
+def room_tone(volume=0.06):
+    # concrete walls
+    # low ceiling pressing down
+    # crowd warmth
     pass
 ```
 
-コメントを 2 行だけ残して保存してみてください。空間が一気に乾いた音になります。
+コメントを 1 行だけ残して保存してみてください。空間が一気に乾いた音になります。
 
-`chord_dub` の関数を 1 つ減らしてみましょう。3 声から 2 声になって音が薄くなります。
-
-```python
-# @loop chord_dub interval=2.0
-def chord_root():
-    return "minor"
-
-def chord_fifth():
-    return "pressure"
-
-# chord_seventh を削除
-```
-
-`bass_reese` の `for slide in range(2)` のネストを削除して、フラットにしてみましょう。フィルターが下がり、ベースの押し出しが弱くなります。
-
-このように、コードの構造を変えることが演奏になります。
+**声部を変える:** `chord_rave` の内部関数を 1 つ減らすと、3 声から 2 声になって音が薄くなります。
 
 ---
 
@@ -616,22 +621,23 @@ def chord_fifth():
 
 ```python
 # 段階 1: ほぼ無音（フィルター最小、ポリフォニー 1）
-# @loop main interval=1.0
-def f(): pass
+@loop("main", interval=1.0)
+def f(volume=0.3):
+    pass
 ```
 
 ```python
 # 段階 2: 揺らぎを加える
-# @loop main interval=1.0
-def f():
+@loop("main", interval=1.0)
+def f(volume=0.3):
     for i in range(4):
         pass
 ```
 
 ```python
 # 段階 3: さらに深く
-# @loop main interval=1.0
-def f():
+@loop("main", interval=1.0)
+def f(volume=0.3):
     for i in range(4):
         for j in range(2):
             if i > j:
@@ -640,55 +646,55 @@ def f():
 
 ```python
 # 段階 4: 声部を増やしてクライマックス
-# @loop main interval=1.0
-def voice_a():
-    for i in range(4):
-        for j in range(2):
-            if i > j:
-                pass
+@loop("main", interval=1.0)
+def f(volume=0.5):
+    def voice_a():
+        for i in range(4):
+            for j in range(2):
+                if i > j:
+                    pass
 
-def voice_b():
-    for k in range(8):
-        pass
+    def voice_b():
+        for k in range(8):
+            pass
 ```
 
 ### アイデア B: コントラストをつける
 
 2 つのループを使って、にぎやかなパートと静かなパートを対比させます。
 
-**にぎやかな bass:**
-
 ```python
-# @loop bass interval=2.0
-def layer_a():
-    for i in range(8):
-        for j in range(4):
-            if i == j:
-                pass
+@loop("bass", interval=2.0)
+def the_bass(volume=0.5):
+    def layer_a():
+        for i in range(8):
+            for j in range(4):
+                if i == j:
+                    pass
 
-def layer_b():
-    for k in range(8):
-        pass
+    def layer_b():
+        for k in range(8):
+            pass
 ```
 
-**静かな pad:**
-
 ```python
-# @loop pad interval=4.0
-# 静寂
-# もっと静寂
-# ただの余白
-def space(): pass
+@loop("pad", interval=4.0)
+def space(volume=0.08):
+    # 静寂
+    # もっと静寂
+    # ただの余白
+    pass
 ```
 
 ### アイデア C: コメントだけで演奏する
 
-関数は 1 つだけ残して、コメントの量だけで演奏します。コメントが増えるほど残響が深くなり、音の空間が変化します。watch を使えば保存するたびに変化が聴こえます。
+関数は 1 つだけ残して、コメントの量だけで演奏します。コメントが増えるほど残響が深くなり、音の空間が変化します。
 
 ```python
-# @loop ambient interval=4.0
-# ここからコメントを増やしたり減らしたりするだけ
-def f(): pass
+@loop("ambient", interval=4.0)
+def f(volume=0.15):
+    # ここからコメントを増やしたり減らしたりするだけ
+    pass
 ```
 
 ### アイデア D: 関数名をストーリーとして書く
@@ -696,13 +702,14 @@ def f(): pass
 音は関数の中身の構造で決まります。関数名はどんな名前でも構いません。演奏しながらコードがストーリーになるような書き方もできます。
 
 ```python
-# @loop narrative interval=2.0
-def the_city_wakes_up():
+@loop("narrative", interval=2.0)
+def the_city_wakes_up(volume=0.3):
     for hour in range(6):
         if hour > 4:
             pass
 
-def rush_hour():
+@loop("texture", interval=1.0)
+def rush_hour(volume=0.2):
     for commuter in range(8):
         for train in range(3):
             if commuter % 2 == 0:
@@ -801,10 +808,10 @@ eval に成功すると `[pycodedj] ループ名  cutoff=...Hz ...` の行が出
 
 ### `loop 'xxx' not found` というエラーが出る
 
-ループ名の綴りが `# @loop` マーカーと一致していません。`::` の後ろの名前を確認してください。
+ループ名の綴りが `@loop(...)` の第一引数と一致していません。`::` の後ろの名前を確認してください。
 
 ```bash
-# ファイルの中に `# @loop bass` と書いてあれば
+# ファイルの中に @loop("bass", ...) と書いてあれば
 pycodedj eval demo.py::bass   # OK
 pycodedj eval demo.py::Bass   # NG（大文字小文字が違う）
 ```
@@ -855,14 +862,12 @@ pycodedj eval FILE::LOOP [--sc-host HOST] [--sc-port PORT]
 | `--sc-host` | SuperCollider のホスト | `127.0.0.1` |
 | `--sc-port` | SuperCollider の受信ポート番号 | `57120` |
 
-`FILE::LOOP` は、`FILE` の中にある `# @loop LOOP` のブロックを指定します。たとえば `examples/demo.py::bass` は、`examples/demo.py` 内の `# @loop bass` ブロックを評価します。
-
-`eval` は 1 回だけ実行します。保存するたびに自動で全ループを更新したい場合は `pycodedj watch` を使います。
+`FILE::LOOP` は、`FILE` の中にある `@loop("LOOP", ...)` のブロックを指定します。たとえば `examples/demo.py::bass` は、`@loop("bass", ...)` デコレータが付いた関数を評価します。
 
 成功すると stdout にフィードバックが出ます。
 
 ```
-[pycodedj] bass  cutoff=418Hz  lfo=1.08Hz  reverb=0.00  voices=1
+[pycodedj] bass  cutoff=418Hz  lfo=1.08Hz  reverb=0.00  voices=1  amp=0.40
 ```
 
 評価に失敗した場合（構文エラー / OSC 送信失敗）は stderr にエラーが出て終了コード 1 で終了します。
@@ -898,16 +903,23 @@ pycodedj watch club_set.py --debounce 0.5
 pycodedj watch myfile.py --sc-host 192.168.1.10
 ```
 
-### ブロックマーカーの構文
+### ループの書き方
 
-```
-# @loop <名前> [interval=秒]
+```python
+from pycodedj import loop
+
+@loop("ループ名", interval=秒)
+def 関数名(volume=音量):
+    # 関数の中身が音楽パラメーターに変換される
+    ...
 ```
 
 | 要素 | 説明 |
 | :--- | :--- |
-| `<名前>` | 英数字とアンダースコアが使える。例: `bass`, `my_loop_1` |
-| `interval=秒` | 省略可。現在は OSC で送信されず、将来の拡張用に記録される |
+| `"ループ名"` | SuperCollider に送られる名前。英数字とアンダースコア。例: `bass`, `kick_hard` |
+| `interval=秒` | ループの更新間隔（秒）。省略時は 1.0 |
+| `volume=音量` | 音量。0.0〜1.0 の浮動小数点数。省略時は 0.3 |
+| 関数名 | 自由につけられる。ループ名とは独立している |
 
 ---
 
@@ -921,18 +933,20 @@ pycodedj watch myfile.py --sc-host 192.168.1.10
 | LFO レート | 制御フロー数 0–10 | 0.1–5.0 Hz | リニア |
 | リバーブ | コメント率 0.0–1.0 | 0.0–0.8 | リニア |
 | 声部数 | 関数数（クランプ） | 1–4 | クランプ |
+| 音量 | `volume=` 引数 | そのまま | パススルー |
 
 ### OSC アドレス
 
 SuperCollider と通信するアドレスの形式です。Hydra などのビジュアルツールを繋ぐときに参照してください。
 
-| アドレス | 型 | 値域 |
+| アドレス | 型 | 値 |
 | :--- | :--- | :--- |
-| `/pycodedj/loop/<name>/params` | int, float, float, float | `voice_count`, `cutoff`, `lfo_rate`, `reverb` の順 |
+| `/pycodedj/loop/<name>/params` | int, float, float, float, float | `voice_count`, `cutoff`, `lfo_rate`, `reverb`, `amp` の順 |
 | `/pycodedj/loop/<name>/voice_count` | int | 1–4（互換用） |
 | `/pycodedj/loop/<name>/cutoff` | float | 200–4000（互換用） |
 | `/pycodedj/loop/<name>/lfo_rate` | float | 0.1–5.0（互換用） |
 | `/pycodedj/loop/<name>/reverb` | float | 0.0–0.8（互換用） |
+| `/pycodedj/loop/<name>/amp` | float | 0.0–1.0（互換用） |
 
 ### Python から直接使う
 
@@ -951,7 +965,7 @@ blocks = {b.name: b for b in parse_blocks(source)}
 
 params = engine.eval_block(blocks["bass"])
 if params is not None:
-    print(f"cutoff={params.cutoff:.0f}Hz")
+    print(f"cutoff={params.cutoff:.0f}Hz  amp={params.amp:.2f}")
 ```
 
 `eval_block` は成功すると `MusicParams` を返します。構文エラーや OSC 送信失敗の場合は `None` を返します。
@@ -960,7 +974,8 @@ if params is not None:
 
 ```
 pycodedj/
-├── block_parser.py   # @loop ブロックを分割する
+├── _loop.py          # @loop デコレータ（実行時は no-op）
+├── block_parser.py   # @loop デコレータを AST で解析してブロックを分割する
 ├── analyzer.py       # コードの特徴量（深さ・数・比率）を抽出する
 ├── mapper.py         # 特徴量を音楽パラメーターに変換する
 ├── engine.py         # ブロック評価のパイプライン全体を管理する

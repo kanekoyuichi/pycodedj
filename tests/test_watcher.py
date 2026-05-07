@@ -17,9 +17,14 @@ def _make_handler(
     return handler, engine
 
 
+_BASS_BLOCK = '@loop("bass")\ndef f(): pass\n'
+_BASS_PAD_BLOCK = '@loop("bass")\ndef bass(): pass\n@loop("pad")\ndef pad(): pass\n'
+_BASS_MELODY_BLOCK = '@loop("bass")\ndef bass(): pass\n@loop("melody")\ndef melody(): pass\n'
+
+
 def test_dispatch_calls_eval_for_target_file(tmp_path: Path) -> None:
     target = tmp_path / "demo.py"
-    target.write_text("# @loop bass\ndef f(): pass\n")
+    target.write_text(_BASS_BLOCK)
     handler, engine = _make_handler(path=str(target), debounce=0.0)
 
     handler.dispatch(str(target))
@@ -30,7 +35,7 @@ def test_dispatch_calls_eval_for_target_file(tmp_path: Path) -> None:
 
 def test_dispatch_ignores_other_files(tmp_path: Path) -> None:
     target = tmp_path / "demo.py"
-    target.write_text("# @loop bass\ndef f(): pass\n")
+    target.write_text(_BASS_BLOCK)
     other = tmp_path / "other.py"
     handler, engine = _make_handler(path=str(target), debounce=0.0)
 
@@ -42,7 +47,7 @@ def test_dispatch_ignores_other_files(tmp_path: Path) -> None:
 
 def test_debounce_collapses_rapid_events(tmp_path: Path) -> None:
     target = tmp_path / "demo.py"
-    target.write_text("# @loop bass\ndef f(): pass\n")
+    target.write_text(_BASS_BLOCK)
     handler, engine = _make_handler(path=str(target), debounce=0.1)
 
     for _ in range(5):
@@ -55,10 +60,7 @@ def test_debounce_collapses_rapid_events(tmp_path: Path) -> None:
 
 def test_eval_all_loops_in_file(tmp_path: Path) -> None:
     target = tmp_path / "demo.py"
-    target.write_text(
-        "# @loop bass\ndef bass(): pass\n"
-        "# @loop melody\ndef melody(): pass\n"
-    )
+    target.write_text(_BASS_MELODY_BLOCK)
     handler, engine = _make_handler(path=str(target), debounce=0.0)
 
     handler.dispatch(str(target))
@@ -69,7 +71,7 @@ def test_eval_all_loops_in_file(tmp_path: Path) -> None:
 
 def test_eval_now_evaluates_without_file_event(tmp_path: Path) -> None:
     target = tmp_path / "demo.py"
-    target.write_text("# @loop bass\ndef f(): pass\n")
+    target.write_text(_BASS_BLOCK)
     handler, engine = _make_handler(path=str(target), debounce=0.0)
 
     handler.eval_now()
@@ -79,7 +81,7 @@ def test_eval_now_evaluates_without_file_event(tmp_path: Path) -> None:
 
 def test_on_eval_callback_called(tmp_path: Path) -> None:
     target = tmp_path / "demo.py"
-    target.write_text("# @loop bass\ndef f(): pass\n")
+    target.write_text(_BASS_BLOCK)
     engine = MagicMock()
     callback = MagicMock()
     handler = _LoopFileHandler(
@@ -94,10 +96,7 @@ def test_on_eval_callback_called(tmp_path: Path) -> None:
 
 def test_eval_all_stops_removed_loop(tmp_path: Path) -> None:
     target = tmp_path / "demo.py"
-    target.write_text(
-        "# @loop bass\ndef bass(): pass\n"
-        "# @loop pad\ndef pad(): pass\n"
-    )
+    target.write_text(_BASS_PAD_BLOCK)
     handler, engine = _make_handler(path=str(target), debounce=0.0)
 
     # 1 回目: bass と pad を評価して _active_names を確立
@@ -105,7 +104,7 @@ def test_eval_all_stops_removed_loop(tmp_path: Path) -> None:
     time.sleep(0.05)
 
     # pad を削除して 2 回目
-    target.write_text("# @loop bass\ndef bass(): pass\n")
+    target.write_text(_BASS_BLOCK)
     handler.dispatch(str(target))
     time.sleep(0.05)
 
@@ -145,7 +144,7 @@ def _make_watchdog_adapter(target_path: str, engine: MagicMock) -> Any:
 
 def test_adapter_on_moved_fires_eval(tmp_path: Path) -> None:
     target = tmp_path / "demo.py"
-    target.write_text("# @loop bass\ndef f(): pass\n")
+    target.write_text(_BASS_BLOCK)
     engine = MagicMock()
 
     adapter = _make_watchdog_adapter(str(target), engine)
@@ -161,7 +160,7 @@ def test_adapter_on_moved_fires_eval(tmp_path: Path) -> None:
 
 def test_adapter_on_created_fires_eval(tmp_path: Path) -> None:
     target = tmp_path / "demo.py"
-    target.write_text("# @loop bass\ndef f(): pass\n")
+    target.write_text(_BASS_BLOCK)
     engine = MagicMock()
 
     adapter = _make_watchdog_adapter(str(target), engine)
@@ -177,7 +176,7 @@ def test_adapter_on_created_fires_eval(tmp_path: Path) -> None:
 
 def test_adapter_on_moved_ignores_wrong_dest(tmp_path: Path) -> None:
     target = tmp_path / "demo.py"
-    target.write_text("# @loop bass\ndef f(): pass\n")
+    target.write_text(_BASS_BLOCK)
     other = tmp_path / "other.py"
     engine = MagicMock()
 

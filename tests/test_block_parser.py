@@ -1,19 +1,20 @@
 from pycodedj.block_parser import parse_blocks
 
-
 _MULTI = """\
-# @loop bass interval=2.0
-def bass():
+from pycodedj import loop
+
+@loop("bass", interval=2.0)
+def my_bass():
     pass
 
-# @loop melody interval=0.5
-def melody():
+@loop("melody", interval=0.5)
+def my_melody():
     return 1
 """
 
 _NO_INTERVAL = """\
-# @loop pad
-def pad():
+@loop("pad")
+def my_pad():
     pass
 """
 
@@ -22,10 +23,33 @@ x = 1
 y = 2
 """
 
-_MARKER_THEN_BARE = """\
-# @loop solo
-def solo(): pass
+_WITH_VOLUME = """\
+@loop("kick", interval=1.0)
+def my_kick(volume=0.8):
+    pass
 """
+
+_NO_VOLUME = """\
+@loop("hat")
+def my_hat():
+    pass
+"""
+
+_MIXED = """\
+@loop("bass", interval=2.0)
+def the_bass(volume=0.6):
+    for i in range(4):
+        pass
+
+def helper():
+    pass
+
+@loop("lead", interval=1.0)
+def the_lead(volume=0.3):
+    pass
+"""
+
+_SYNTAX_ERROR = "def foo(:"
 
 
 def test_multiple_blocks() -> None:
@@ -55,12 +79,38 @@ def test_empty_source_returns_empty() -> None:
     assert parse_blocks("") == []
 
 
-def test_source_excludes_marker_line() -> None:
-    blocks = parse_blocks(_MARKER_THEN_BARE)
-    assert "# @loop" not in blocks[0].source
+def test_syntax_error_returns_empty() -> None:
+    assert parse_blocks(_SYNTAX_ERROR) == []
 
 
-def test_block_source_content() -> None:
+def test_volume_extracted() -> None:
+    blocks = parse_blocks(_WITH_VOLUME)
+    assert len(blocks) == 1
+    assert blocks[0].volume == 0.8
+
+
+def test_volume_default() -> None:
+    blocks = parse_blocks(_NO_VOLUME)
+    assert len(blocks) == 1
+    assert blocks[0].volume == 0.3
+
+
+def test_non_loop_functions_ignored() -> None:
+    blocks = parse_blocks(_MIXED)
+    assert len(blocks) == 2
+    assert blocks[0].name == "bass"
+    assert blocks[1].name == "lead"
+
+
+def test_source_contains_function() -> None:
     blocks = parse_blocks(_MULTI)
-    assert "def bass" in blocks[0].source
-    assert "def melody" not in blocks[0].source
+    assert "def my_bass" in blocks[0].source
+    assert "def my_bass" not in blocks[1].source
+
+
+def test_block_volume_and_interval() -> None:
+    blocks = parse_blocks(_MIXED)
+    assert blocks[0].volume == 0.6
+    assert blocks[0].interval == 2.0
+    assert blocks[1].volume == 0.3
+    assert blocks[1].interval == 1.0

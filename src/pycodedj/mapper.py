@@ -18,6 +18,8 @@ _REVERB_MAX = 0.8
 _VOICE_MIN = 1
 _VOICE_MAX = 4
 
+_AMP_DEFAULT = 0.3
+
 
 @dataclass
 class MusicParams:
@@ -25,6 +27,7 @@ class MusicParams:
     lfo_rate: float
     reverb_mix: float
     voice_count: int
+    amp: float = _AMP_DEFAULT
 
 
 def _lerp(value: float, in_max: float, out_min: float, out_max: float) -> float:
@@ -32,7 +35,7 @@ def _lerp(value: float, in_max: float, out_min: float, out_max: float) -> float:
     return out_min + t * (out_max - out_min)
 
 
-def map_features(features: CodeFeatures) -> MusicParams:
+def map_features(features: CodeFeatures, volume: float = _AMP_DEFAULT) -> MusicParams:
     cutoff = _lerp(features.max_depth, _CUTOFF_DEPTH_MAX, _CUTOFF_MIN, _CUTOFF_MAX)
     lfo_rate = _lerp(features.control_flow_count, _LFO_COUNT_MAX, _LFO_MIN, _LFO_MAX)
     reverb_mix = _lerp(features.comment_ratio, 1.0, _REVERB_MIN, _REVERB_MAX)
@@ -43,4 +46,5 @@ def map_features(features: CodeFeatures) -> MusicParams:
         lfo_rate=lfo_rate,
         reverb_mix=reverb_mix,
         voice_count=voice_count,
+        amp=volume,
     )

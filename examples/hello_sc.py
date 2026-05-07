@@ -20,7 +20,7 @@ def main() -> None:
     args = parser.parse_args()
 
     bridge = OscBridge(audio=OscEndpoint(host=args.host, port=args.port))
-    params = MusicParams(cutoff=1000.0, lfo_rate=0.5, reverb_mix=0.2, voice_count=1)
+    params = MusicParams(cutoff=1000.0, lfo_rate=0.5, reverb_mix=0.2, voice_count=1, amp=0.3)
     bridge.send_params("hello", params)
     print(f"Sent OSC to {args.host}:{args.port} — loop 'hello'")
 

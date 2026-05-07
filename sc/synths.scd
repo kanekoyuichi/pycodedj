@@ -406,7 +406,7 @@ s.waitForBoot({
             ~loops[name].do({ |synth| synth.set(\gate, 0) });
         };
         params = ~loopParams[name] ?? {
-            (cutoff: 800, lfoRate: 0.5, reverbMix: 0.2)
+            (cutoff: 800, lfoRate: 0.5, reverbMix: 0.2, amp: 0.3)
         };
         ~loopParams[name] = params;
         synthName = ~synthForLoop.value(name);
@@ -414,7 +414,8 @@ s.waitForBoot({
             Synth(synthName, [
                 \cutoff, params[\cutoff],
                 \lfoRate, params[\lfoRate],
-                \reverbMix, params[\reverbMix]
+                \reverbMix, params[\reverbMix],
+                \amp, params[\amp]
             ])
         });
         ~loops[name] = synths;
@@ -423,7 +424,7 @@ s.waitForBoot({
     ~setLoopParam = { |name, key, val|
         var params;
         params = ~loopParams[name] ?? {
-            (cutoff: 800, lfoRate: 0.5, reverbMix: 0.2)
+            (cutoff: 800, lfoRate: 0.5, reverbMix: 0.2, amp: 0.3)
         };
         params[key] = val;
         ~loopParams[name] = params;
@@ -432,9 +433,9 @@ s.waitForBoot({
         };
     };
 
-    ~applyLoopParams = { |name, voiceCount, cutoff, lfoRate, reverbMix|
+    ~applyLoopParams = { |name, voiceCount, cutoff, lfoRate, reverbMix, amp|
         var params;
-        params = (cutoff: cutoff, lfoRate: lfoRate, reverbMix: reverbMix);
+        params = (cutoff: cutoff, lfoRate: lfoRate, reverbMix: reverbMix, amp: amp);
         ~loopParams[name] = params;
         if (voiceCount.asInteger <= 0) {
             if (~loops[name].notNil) {
@@ -478,9 +479,10 @@ s.waitForBoot({
                 "cutoff",    { ~setLoopParam.value(name, \cutoff,    val.asFloat) },
                 "lfo_rate",  { ~setLoopParam.value(name, \lfoRate,   val.asFloat) },
                 "reverb",    { ~setLoopParam.value(name, \reverbMix, val.asFloat) },
+                "amp",       { ~setLoopParam.value(name, \amp,       val.asFloat) },
                 "params",    {
-                    if (msg.size >= 5) {
-                        ~applyLoopParams.value(name, msg[1], msg[2].asFloat, msg[3].asFloat, msg[4].asFloat);
+                    if (msg.size >= 6) {
+                        ~applyLoopParams.value(name, msg[1], msg[2].asFloat, msg[3].asFloat, msg[4].asFloat, msg[5].asFloat);
                     };
                 }
             );

@@ -45,6 +45,7 @@ BPMクロックは SuperCollider 側の `TempoClock` が保持します。Python
 | 制御フロー数（if/for/while） | LFO レート (0.1–5.0 Hz) | 分岐の多さ＝揺らぎの速さ |
 | 関数定義数 | ポリフォニー声部数 (1–4) | 関数＝独立した声部 |
 | コメント率 | リバーブ Depth (0.0–0.8) | 余白の多さ＝空間の広さ |
+| `volume=` 引数 | Amplitude (0.0–1.0) | 演奏者が直接音量を制御する |
 
 テンポ（BPM）と基音（Pitch）は演奏者が明示的に制御します。保存のたびに楽曲全体の土台が変わることを防ぐためです。
 
@@ -82,20 +83,22 @@ SuperCollider IDE で `sc/synths.scd` を開いて実行します。
 **2. ライブコーディングファイルを用意する**
 
 ```python
-# @loop bass interval=2.0
-def bass():
+from pycodedj import loop
+
+@loop("bass", interval=2.0)
+def bass(volume=0.4):
     for i in range(8):
         if i % 2 == 0:
             pass
 
-# @loop melody interval=0.5
-def melody():
+@loop("melody", interval=0.5)
+def melody(volume=0.3):
     x = 1
     y = 2
     return x + y
 
-# @loop pad interval=4.0
-def pad():
+@loop("pad", interval=4.0)
+def pad(volume=0.15):
     # 空間を作る
     # もう少し余白
     pass
@@ -110,7 +113,7 @@ pycodedj eval demo.py::bass
 成功すると次のフィードバックが表示されます。
 
 ```
-[pycodedj] bass  cutoff=418Hz  lfo=1.08Hz  reverb=0.00  voices=1
+[pycodedj] bass  cutoff=418Hz  lfo=1.08Hz  reverb=0.00  voices=1  amp=0.40
 ```
 
 他のループはそのまま鳴り続けます。
@@ -124,8 +127,6 @@ pycodedj watch demo.py
 ```
 
 あとはエディタでコードを書いて保存するだけです。
-
-> **`interval` について（現在の MVP）:** `interval=2.0` のような値はパーサーが読み取りますが、現時点では OSC では送信されません。ループの繰り返し周期は SuperCollider 側の `TempoClock` で管理します。将来的に SC 側に interval を渡す仕組みを追加する予定です。
 
 ---
 
@@ -143,8 +144,10 @@ pycodedj watch demo.py
 ### ネストを深くするとフィルターが開く
 
 ```python
-# @loop bass interval=2.0
-def bass():
+from pycodedj import loop
+
+@loop("bass", interval=2.0)
+def bass(volume=0.4):
     for i in range(4):       # 制御フロー +1
         for j in range(4):   # ネスト深さ +1、制御フロー +1
             if i == j:       # ネスト深さ +1、制御フロー +1
@@ -154,21 +157,27 @@ def bass():
 ### 関数を増やすとポリフォニーが広がる
 
 ```python
-# @loop chord interval=1.0
-def voice_a(): pass
-def voice_b(): pass
-def voice_c(): pass
-def voice_d(): pass
+from pycodedj import loop
+
+@loop("chord", interval=1.0)
+def chord(volume=0.2):
+    def voice_a(): pass
+    def voice_b(): pass
+    def voice_c(): pass
+    def voice_d(): pass
 ```
 
 ### コメントを増やすと空間（リバーブ）が広がる
 
 ```python
-# @loop pad interval=4.0
-# ここに余白を置く
-# もう少し置く
-# 静寂も音楽
-def pad(): pass
+from pycodedj import loop
+
+@loop("pad", interval=4.0)
+def pad(volume=0.15):
+    # ここに余白を置く
+    # もう少し置く
+    # 静寂も音楽
+    pass
 ```
 
 ---
@@ -179,11 +188,12 @@ SuperCollider との通信に使うアドレスです。
 
 | アドレス | 型 | 値域 | 対応パラメーター |
 | :--- | :--- | :--- | :--- |
-| `/pycodedj/loop/<name>/params` | int, float, float, float | パラメーター順を参照 | `voice_count`, `cutoff`, `lfo_rate`, `reverb` |
+| `/pycodedj/loop/<name>/params` | int, float, float, float, float | パラメーター順を参照 | `voice_count`, `cutoff`, `lfo_rate`, `reverb`, `amp` |
 | `/pycodedj/loop/<name>/cutoff` | float | 200–4000 Hz | フィルター Cutoff（互換用） |
 | `/pycodedj/loop/<name>/lfo_rate` | float | 0.1–5.0 Hz | LFO レート（互換用） |
 | `/pycodedj/loop/<name>/reverb` | float | 0.0–0.8 | リバーブ Depth（互換用） |
 | `/pycodedj/loop/<name>/voice_count` | int | 1–4 | ポリフォニー声部数（互換用） |
+| `/pycodedj/loop/<name>/amp` | float | 0.0–1.0 | Amplitude（互換用） |
 
 `<name>` はブロック名（`bass`、`melody` など）です。ループごとに独立したアドレスを持つため、複数ループが同じパラメーターを上書きしません。
 

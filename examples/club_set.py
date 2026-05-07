@@ -3,168 +3,216 @@
 # Load sc/synths.scd in SuperCollider, then run:
 #   pycodedj watch examples/club_set.py
 #
-# Design notes:
-# - kick_hard and bass_rumble make a physical four-on-the-floor foundation
-# - bass_reese adds moving low-mid pressure instead of a static bass tone
-# - hat_offbeat, hat_ride, clap_backbeat, and clap_snare create the body groove
-# - chord_rave, lead_hoover, fx_air, and fx_impact add club-scale space and release
+# Layers:
+#   foundation  — kick_hard + bass_rumble hold the floor
+#   movement    — bass_reese + hat_engine + hat_ride carry the groove
+#   body        — clap_snap + clap_snare mark the phrase
+#   harmonic    — chord_rave + neon_stab build the energy
+#   space       — lead_hoover + shimmer_pad open the room
+#   texture     — glitch_ticks + fx_impact + warehouse_air fill the edges
+
+from pycodedj import loop
 
 
-# @loop kick_hard interval=1.0
-def hard_floor_kick():
-    # Four on the floor, with bar accents so the loop breathes.
+# --- Foundation ---
+
+@loop("kick_hard", interval=1.0)
+def floor_kick(volume=0.9):
     for bar in range(8):
         for beat in range(4):
             if beat == 0:
-                hit = "downbeat_weight"
+                weight = "anchor"
+            elif beat == 2:
+                weight = "lift"
             else:
-                hit = "steady_drive"
+                weight = "steady"
             if bar in (3, 7) and beat == 3:
-                hit = "pickup_push"
-            _ = hit
+                weight = "push"
+            _ = weight
 
 
-# @loop bass_rumble interval=1.0
-def kick_rumble():
-    # A low tail that follows the kick and fills the room between beats.
+@loop("bass_rumble", interval=1.0)
+def sub_pulse(volume=0.36):
     for bar in range(4):
         for beat in range(4):
-            if beat in (0, 1, 2, 3):
-                for tail in range(3):
-                    if tail == 0:
-                        pressure = "thump"
-                    elif tail == 1:
-                        pressure = "sub_tail"
-                    else:
-                        pressure = "room_rumble"
-                    _ = pressure
+            if beat == 0:
+                layer = "punch"
+            else:
+                layer = "tail"
+            for harmonic in range(2):
+                sub = f"{layer}_{harmonic}"
+                _ = sub
 
 
-# @loop bass_reese interval=0.5
-def reese_bassline():
-    # Syncopated low-mid movement, leaving holes for the kick.
+# --- Movement ---
+
+@loop("bass_reese", interval=0.5)
+def reese_groove(volume=0.3):
     groove = [1, 0, 0, 1, 0, 1, 0, 0, 1, 0, 1, 0, 0, 1, 0, 0]
-    accents = {0: "root", 5: "push", 10: "answer", 13: "turnaround"}
-    for cycle in range(2):
-        for step, active in enumerate(groove):
-            if active:
-                phrase = accents.get(step, "ghost")
-                if step in (5, 13):
-                    for slide in range(2):
-                        phrase = f"{phrase}_slide_{slide}"
-                        _ = phrase
-                else:
+    accent = {0: "root", 3: "ghost", 5: "fifth", 9: "push", 13: "turn"}
+    for step, active in enumerate(groove):
+        if active:
+            phrase = accent.get(step, "mid")
+            if step in (5, 9):
+                for bend in range(2):
+                    phrase = f"{phrase}_{bend}"
                     _ = phrase
+            else:
+                _ = phrase
 
 
-# @loop hat_offbeat interval=0.25
-def offbeat_hats():
-    # Offbeat hats keep the body waiting for the next kick.
-    for tick in range(16):
-        if tick in (2, 6, 10, 14):
-            hat = "open_offbeat"
+@loop("hat_engine", interval=0.25)
+def closed_hats(volume=0.12):
+    for bar in range(2):
+        for tick in range(16):
+            if tick % 4 == 0:
+                hat = "downbeat"
+            elif tick % 2 == 0:
+                hat = "upbeat"
+            elif tick in (3, 7, 11, 15):
+                hat = "ghost"
+            else:
+                hat = "skip"
+            if tick in (6, 14):
+                hat = "open"
             _ = hat
-        if tick % 2 == 0:
-            hat = "closed_drive"
-            _ = hat
-        if tick in (7, 15):
-            hat = "late_shuffle"
-            _ = hat
 
 
-# @loop hat_ride interval=0.5
-def ride_layer():
-    # A longer metallic layer for lift without turning into a melody.
-    pattern = [0, 1, 0, 1, 1, 0, 1, 0]
+@loop("hat_ride", interval=0.5)
+def ride_layer(volume=0.09):
+    offbeat = [0, 1, 0, 1, 1, 0, 1, 0]
     for bar in range(4):
-        for step, active in enumerate(pattern):
-            if active:
-                if bar >= 2 and step in (4, 6):
-                    ride = "wide_open"
-                else:
-                    ride = "tight"
+        for step, on in enumerate(offbeat):
+            if on:
+                ride = "wide" if bar >= 2 and step in (4, 6) else "tight"
                 _ = ride
 
 
-# @loop clap_backbeat interval=1.0
-def backbeat_clap():
-    # Simple social backbeat: this stays readable.
+# --- Body ---
+
+@loop("clap_snap", interval=1.0)
+def snap_back(volume=0.2):
     for bar in range(8):
         for beat in range(4):
-            if beat == 2:
-                clap = "backbeat"
-                _ = clap
+            if beat in (1, 3):
+                snap = "crack"
+                _ = snap
             if bar in (3, 7) and beat == 3:
-                clap = "pre_drop_flam"
-                _ = clap
+                snap = "flam"
+                _ = snap
 
 
-# @loop clap_snare interval=1.0
-def snare_accent():
-    # Adds harder punctuation on phrase endings.
+@loop("clap_snare", interval=1.0)
+def heavy_two(volume=0.22):
     for bar in range(8):
         for beat in range(4):
-            if bar in (1, 3, 5, 7) and beat == 2:
-                snare = "hard_two"
-                _ = snare
+            if bar % 2 == 1 and beat == 2:
+                hit = "heavy"
+                _ = hit
             if bar == 7 and beat in (2, 3):
-                snare = "fill"
-                _ = snare
+                hit = "fill"
+                _ = hit
 
 
-# @loop chord_rave interval=2.0
-def rave_stabs():
-    # Short harmonic hits: repetition first, melody second.
-    def minor_root():
-        return "root"
+# --- Harmonic ---
 
-    def pressure_fifth():
-        return "fifth"
+@loop("chord_rave", interval=2.0)
+def rave_stabs(volume=0.14):
+    def root():
+        return "minor_root"
 
-    def club_seventh():
-        return "seventh"
+    def fifth():
+        return "power_fifth"
 
-    for phrase in range(4):
-        if phrase in (0, 2):
-            color = minor_root()
-        elif phrase == 1:
-            color = pressure_fifth()
-        else:
-            color = club_seventh()
-        _ = color
+    def seventh():
+        return "flat_seventh"
 
+    def resolve():
+        return "octave_drop"
 
-# @loop lead_hoover interval=4.0
-def hoover_answer():
-    # Sparse lead answer, not a constant siren.
     for phrase in range(4):
         if phrase == 0:
-            motion = "rise"
+            chord = root()
+        elif phrase == 1:
+            chord = fifth()
         elif phrase == 2:
-            motion = "fall"
+            chord = seventh()
         else:
-            motion = "hold_back"
+            chord = resolve()
+        _ = chord
+
+
+@loop("neon_stab", interval=2.0)
+def stab_layer(volume=0.1):
+    # darker stab answers the rave chord
+    # one bar behind, shifted a fifth below
+    for phrase in range(4):
+        if phrase in (1, 3):
+            stab = "answer"
+            _ = stab
+
+
+# --- Space ---
+
+@loop("lead_hoover", interval=4.0)
+def hoover(volume=0.12):
+    for phrase in range(4):
         if phrase in (0, 2):
-            for bend in range(2):
-                motion = f"{motion}_{bend}"
+            for step in range(3):
+                if step == 0:
+                    motion = "attack"
+                elif step == 1:
+                    motion = "hold"
+                else:
+                    motion = "fade"
                 _ = motion
+        else:
+            _ = "rest"
 
 
-# @loop fx_impact interval=8.0
-# pressure drop
-# room inhale
-# hands up
-def impact_drop():
-    # One impact per larger phrase.
+@loop("shimmer_pad", interval=8.0)
+def shimmer(volume=0.07):
+    # wide hall reverb
+    # slow harmonic drift across the stereo field
+    # always underneath everything
+    # never noticed until it stops
     pass
 
 
-# @loop fx_air interval=4.0
-# dark room
-# low ceiling
-# smoke
-# crowd heat
-# concrete reflections
-# blue strobes
-def warehouse_air():
+# --- Texture ---
+
+@loop("glitch_ticks", interval=0.5)
+def digital_noise(volume=0.05):
+    for tick in range(8):
+        if tick in (2, 5, 7):
+            glitch = "tick"
+            _ = glitch
+        elif tick == 4:
+            glitch = "stutter"
+            _ = glitch
+
+
+@loop("fx_impact", interval=8.0)
+def drop_hit(volume=0.18):
+    # pressure builds to the drop
+    # room holds its breath
+    # release
+    for layer in range(3):
+        if layer == 0:
+            hit = "thump"
+        elif layer == 1:
+            hit = "noise"
+        else:
+            hit = "tail"
+        _ = hit
+
+
+@loop("warehouse_air", interval=4.0)
+def room_tone(volume=0.06):
+    # concrete walls
+    # low ceiling pressing down
+    # crowd warmth from two hundred bodies
+    # sub frequencies bleeding through from the main room
+    # smoke machine haze diffusing the strobes
+    # the room is the instrument
     pass
