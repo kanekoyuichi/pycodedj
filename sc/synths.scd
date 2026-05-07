@@ -88,6 +88,24 @@ s.waitForBoot({
         Out.ar(0, sig ! 2);
     }).add;
 
+    SynthDef(\pycodedj_floor_kick, {
+        arg cutoff = 1100, lfoRate = 1.0, reverbMix = 0.08, amp = 0.52, gate = 1;
+        var trig, bodyEnv, punchEnv, tailEnv, pitch, body, punch, tail, room, sig, gateEnv;
+        trig = Impulse.kr(lfoRate.clip(0.8, 3.0));
+        bodyEnv = Decay2.kr(trig, 0.001, 0.34);
+        punchEnv = Decay2.kr(trig, 0.001, 0.035);
+        tailEnv = Decay2.kr(trig, 0.02, 0.7);
+        pitch = EnvGen.kr(Env([88, 43, 35], [0.018, 0.22], \exp), trig).midicps;
+        body = SinOsc.ar(pitch) * bodyEnv;
+        punch = BPF.ar(WhiteNoise.ar(0.32), cutoff.clip(700, 5200), 0.35) * punchEnv;
+        tail = LPF.ar(SinOsc.ar(46) + Saw.ar(23, 0.12), 160) * tailEnv * 0.34;
+        room = FreeVerb.ar((body + tail) * 0.5, reverbMix.clip(0, 0.3), 0.62, 0.25);
+        sig = (body + punch + tail + room).tanh;
+        gateEnv = EnvGen.kr(Env.asr(0.005, 1, 0.12), gate, doneAction: 2);
+        sig = Compander.ar(sig, sig, 0.45, 1, 0.35, 0.003, 0.08) * gateEnv * amp;
+        Out.ar(0, sig ! 2);
+    }).add;
+
     SynthDef(\pycodedj_glitch_ticks, {
         arg cutoff = 5000, lfoRate = 2.0, reverbMix = 0.08, amp = 0.16, gate = 1;
         var trig, rate, env, sig, gateEnv;
@@ -166,6 +184,7 @@ s.waitForBoot({
             "acid_lead", { \pycodedj_acid_lead },
             "warehouse_air", { \pycodedj_warehouse_air },
             "kick_pulse", { \pycodedj_kick_pulse },
+            "floor_kick", { \pycodedj_floor_kick },
             "glitch_ticks", { \pycodedj_glitch_ticks },
             "soft_pluck", { \pycodedj_soft_pluck },
             "dub_chord", { \pycodedj_dub_chord },

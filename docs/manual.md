@@ -495,7 +495,7 @@ pycodedj eval myfile.py::bass
 
 ## 8. Club set example — running club_set.py
 
-`examples/club_set.py` contains ten club-music-style parts, each with a distinct sound shaped by its code structure.
+`examples/club_set.py` contains eleven club-music-style parts, each with a distinct sound shaped by its code structure.
 
 ### Block overview
 
@@ -507,6 +507,7 @@ pycodedj eval myfile.py::bass
 | `acid_lead` | Acid lead | Deep nesting and lots of control flow = bright and fast |
 | `warehouse_air` | Warehouse ambience | Comment-heavy = deep reverb |
 | `kick_pulse` | Kick / low pulse | Short low-end hits around the downbeat |
+| `floor_kick` | Big four-on-the-floor kick | Low body and a short attack |
 | `glitch_ticks` | Glitch particles | Small noisy grains and fast movement |
 | `soft_pluck` | Soft pluck | Short melodic plucks |
 | `dub_chord` | Dub chord | Reverb-heavy chord hits |
@@ -529,6 +530,7 @@ pycodedj eval examples/club_set.py::neon_stab
 pycodedj eval examples/club_set.py::acid_lead
 pycodedj eval examples/club_set.py::warehouse_air
 pycodedj eval examples/club_set.py::kick_pulse
+pycodedj eval examples/club_set.py::floor_kick
 pycodedj eval examples/club_set.py::glitch_ticks
 pycodedj eval examples/club_set.py::soft_pluck
 pycodedj eval examples/club_set.py::dub_chord
