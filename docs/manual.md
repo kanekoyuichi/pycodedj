@@ -24,10 +24,11 @@ Estimated time: 20–30 minutes including setup.
 6. [How code maps to sound](#6-how-code-maps-to-sound)
 7. [Running multiple loops at once](#7-running-multiple-loops-at-once)
 8. [Club set example — running club_set.py](#8-club-set-example--running-club_setpy)
-9. [Performance ideas](#9-performance-ideas)
-10. [Troubleshooting](#10-troubleshooting)
-11. [Full command and option reference](#11-full-command-and-option-reference)
-12. [Under the hood](#12-under-the-hood)
+9. [Sound Reference](#9-sound-reference)
+10. [Performance ideas](#10-performance-ideas)
+11. [Troubleshooting](#11-troubleshooting)
+12. [Full command and option reference](#12-full-command-and-option-reference)
+13. [Under the hood](#13-under-the-hood)
 
 ---
 
@@ -518,19 +519,83 @@ To stop a loop, delete the entire `@loop`-decorated function from the file and s
 
 `examples/club_set.py` is a layered dancefloor groove with 8 layers and 14 loops. Code structure (nesting depth, branch count, comment ratio) determines brightness, modulation speed, and reverb for each layer.
 
-To audition all 30 available sounds one at a time, use `examples/sound_showcase.py`:
+For the full list of available sounds, see [Chapter 9: Sound Reference](#9-sound-reference).
+
+Loop names such as `@loop("kick_hard", ...)` are interpreted as sound names on the SuperCollider side. For example, `kick_hard` maps to a kick synth and `bass_reese` maps to a bass synth. If you are only changing the Python groove or arrangement, you usually do not need to edit `sc/synths.scd`. Edit SuperCollider only when you want to add a genuinely new sound engine.
+
+### club_set.py loop overview
+
+| Loop name | Layer | Character |
+| :--- | :--- | :--- |
+| `kick_hard` | foundation | Hard four-on-the-floor kick (depth=1, dry) |
+| `bass_rumble` | foundation | Rumble under the kick (depth=1, dry) |
+| `bass_reese` | movement | Moving Reese bass (depth=4, mid-range) |
+| `hat_ride` | movement | Ride / open hat (depth=4) |
+| `clap_snap` | body | Sharp snap clap (depth=4, faster LFO) |
+| `clap_snare` | body | Snare-like accent (depth=4) |
+| `chord_rave` | harmonic | Rave stab (depth=6, bright) |
+| `neon_stab` | harmonic | Answer stab (depth=5) |
+| `lead_hoover` | lead | Hoover-style lead (depth=5, slight reverb) |
+| `hat_engine` | hats | Hi-hat grid (depth=6, fastest LFO) |
+| `shimmer_pad` | space | Shimmer pad (heavy comments, high reverb) |
+| `warehouse_air` | space | Warehouse ambience (comments only, max reverb) |
+| `glitch_ticks` | texture | Digital glitch texture (depth=4, fast LFO) |
+| `fx_impact` | texture | Drop impact hit (depth=5) |
+
+### Getting it running
+
+Start watch and edit the file while it plays. Watch evaluates all loops once at startup, so it should make sound before you save:
+
+```bash
+pycodedj watch examples/club_set.py
+```
+
+You can also evaluate individual loops:
+
+```bash
+pycodedj eval examples/club_set.py::kick_hard
+pycodedj eval examples/club_set.py::bass_reese
+pycodedj eval examples/club_set.py::chord_rave
+```
+
+### Performing with it
+
+**Change the volume:** Change `volume=` and save. The loop's amplitude updates immediately.
+
+```python
+@loop("lead_hoover", interval=4.0)
+def hoover(volume=0.4):   # push it forward
+    ...
+```
+
+**Change the space:** Add or remove comments in `warehouse_air` or `shimmer_pad` to shift the reverb depth.
+
+```python
+@loop("warehouse_air", interval=4.0)
+def room_tone(volume=0.06):
+    # concrete walls
+    # low ceiling
+    # crowd warmth
+    pass
+```
+
+Leave only one comment line and save. The space dries out immediately.
+
+**Change the voices:** Remove an inner function from `chord_rave` and the chord drops from four voices to three.
+
+Changing code structure *is* the performance.
+
+---
+
+## 9. Sound Reference
+
+Change the first argument of `@loop` to choose the SuperCollider sound. The Python function name can be anything. To audition sounds individually:
 
 ```bash
 pycodedj eval examples/sound_showcase.py::bass_acid
 pycodedj eval examples/sound_showcase.py::riser_noise
 pycodedj eval examples/sound_showcase.py::bell_rave
 ```
-
-Loop names such as `@loop("kick_hard", ...)` are interpreted as sound names on the SuperCollider side. For example, `kick_hard` maps to a kick synth and `bass_reese` maps to a bass synth. If you are only changing the Python groove or arrangement, you usually do not need to edit `sc/synths.scd`. Edit SuperCollider only when you want to add a genuinely new sound engine.
-
-### Available sound names
-
-Change the first argument of `@loop` to choose the SuperCollider sound. The Python function name can be anything.
 
 **Kicks**
 
@@ -597,71 +662,9 @@ Change the first argument of `@loop` to choose the SuperCollider sound. The Pyth
 | `riser_noise` | Noise riser sweeping up over 8 seconds |
 | `glitch_ticks` | Small glitch ticks |
 
-### Block overview
-
-| Loop name | Layer | Character |
-| :--- | :--- | :--- |
-| `kick_hard` | foundation | Hard four-on-the-floor kick (depth=1, dry) |
-| `bass_rumble` | foundation | Rumble under the kick (depth=1, dry) |
-| `bass_reese` | movement | Moving Reese bass (depth=4, mid-range) |
-| `hat_ride` | movement | Ride / open hat (depth=4) |
-| `clap_snap` | body | Sharp snap clap (depth=4, faster LFO) |
-| `clap_snare` | body | Snare-like accent (depth=4) |
-| `chord_rave` | harmonic | Rave stab (depth=6, bright) |
-| `neon_stab` | harmonic | Answer stab (depth=5) |
-| `lead_hoover` | lead | Hoover-style lead (depth=5, slight reverb) |
-| `hat_engine` | hats | Hi-hat grid (depth=6, fastest LFO) |
-| `shimmer_pad` | space | Shimmer pad (heavy comments, high reverb) |
-| `warehouse_air` | space | Warehouse ambience (comments only, max reverb) |
-| `glitch_ticks` | texture | Digital glitch texture (depth=4, fast LFO) |
-| `fx_impact` | texture | Drop impact hit (depth=5) |
-
-### Getting it running
-
-Start watch and edit the file while it plays. Watch evaluates all loops once at startup, so it should make sound before you save:
-
-```bash
-pycodedj watch examples/club_set.py
-```
-
-You can also evaluate individual loops:
-
-```bash
-pycodedj eval examples/club_set.py::kick_hard
-pycodedj eval examples/club_set.py::bass_reese
-pycodedj eval examples/club_set.py::chord_rave
-```
-
-### Performing with it
-
-**Change the volume:** Change `volume=` and save. The loop's amplitude updates immediately.
-
-```python
-@loop("lead_hoover", interval=4.0)
-def hoover(volume=0.4):   # push it forward
-    ...
-```
-
-**Change the space:** Add or remove comments in `warehouse_air` or `shimmer_pad` to shift the reverb depth.
-
-```python
-@loop("warehouse_air", interval=4.0)
-def room_tone(volume=0.06):
-    # concrete walls
-    # low ceiling
-    # crowd warmth
-    pass
-```
-
-Leave only one comment line and save. The space dries out immediately.
-
-**Change the voices:** Remove an inner function from `chord_rave` and the chord drops from four voices to three.
-
-Changing code structure *is* the performance.
-
 ---
 
-## 9. Performance ideas
+## 10. Performance ideas
 
 ### Idea A: Grow from simple to complex
 
@@ -770,7 +773,7 @@ def rush_hour(volume=0.2):
 
 ---
 
-## 10. Troubleshooting
+## 11. Troubleshooting
 
 ### No sound
 
@@ -897,7 +900,7 @@ The block with the error keeps its previous sound. Other loops are unaffected. F
 
 ---
 
-## 11. Full command and option reference
+## 12. Full command and option reference
 
 ### `pycodedj eval`
 
@@ -977,7 +980,7 @@ def function_name(volume=amplitude):
 
 ---
 
-## 12. Under the hood
+## 13. Under the hood
 
 ### Mapping values
 

@@ -24,10 +24,11 @@
 6. [コードと音の関係を知る](#6-コードと音の関係を知る)
 7. [複数のループを同時に動かす](#7-複数のループを同時に動かす)
 8. [クラブセット例 — club_set.py を動かす](#8-クラブセット例--club_setpy-を動かす)
-9. [演奏のアイデア](#9-演奏のアイデア)
-10. [うまくいかないとき](#10-うまくいかないとき)
-11. [コマンドと設定の全リスト](#11-コマンドと設定の全リスト)
-12. [仕組みをもっと知りたい人へ](#12-仕組みをもっと知りたい人へ)
+9. [音色リファレンス](#9-音色リファレンス)
+10. [演奏のアイデア](#10-演奏のアイデア)
+11. [うまくいかないとき](#11-うまくいかないとき)
+12. [コマンドと設定の全リスト](#12-コマンドと設定の全リスト)
+13. [仕組みをもっと知りたい人へ](#13-仕組みをもっと知りたい人へ)
 
 ---
 
@@ -532,9 +533,77 @@ pycodedj eval examples/sound_showcase.py::bell_rave
 
 `@loop("kick_hard", ...)` のようなループ名は、SuperCollider 側では音色名として解釈されます。たとえば `kick_hard` はキック系、`bass_reese` はベース系のシンセに割り当てられます。Python 側でグルーヴや構成を変えるだけなら、通常は `sc/synths.scd` を編集する必要はありません。まったく新しい音色エンジンを増やしたいときだけ、SuperCollider 側に SynthDef を追加します。
 
-### 使える音色名
+### club_set.py のループ構成
 
-`@loop` の第一引数を変えると、SuperCollider 側で使う音色を選べます。
+| ループ名 | レイヤー | キャラクター |
+| :--- | :--- | :--- |
+| `kick_hard` | foundation | 硬い四つ打ちキック（depth=1、ドライ） |
+| `bass_rumble` | foundation | キック下のランブル（depth=1、ドライ） |
+| `bass_reese` | movement | 揺れる Reese ベース（depth=4、中域） |
+| `hat_ride` | movement | ライド/オープンハット（depth=4） |
+| `clap_snap` | body | スナップクラップ（depth=4、速い LFO） |
+| `clap_snare` | body | スネア寄りのアクセント（depth=4） |
+| `chord_rave` | harmonic | レイブスタブ（depth=6、明るい） |
+| `neon_stab` | harmonic | アンサースタブ（depth=5） |
+| `lead_hoover` | lead | Hoover 風リード（depth=5、微リバーブ） |
+| `hat_engine` | hats | ハットグリッド（depth=6、最速 LFO） |
+| `shimmer_pad` | space | シマーパッド（コメント多め、高リバーブ） |
+| `warehouse_air` | space | 倉庫の空気感（コメントのみ、最大リバーブ） |
+| `glitch_ticks` | texture | グリッチテクスチャ（depth=4、速い LFO） |
+| `fx_impact` | texture | ドロップのインパクト（depth=5） |
+
+### 動かしてみる
+
+watch で起動して、エディタで各ブロックを編集しながら音を変えていきます。起動直後に全ループが一度評価されるので、保存しなくてもまず音が鳴ります。
+
+```bash
+pycodedj watch examples/club_set.py
+```
+
+個別にループを評価したい場合は eval を使います。
+
+```bash
+pycodedj eval examples/club_set.py::kick_hard
+pycodedj eval examples/club_set.py::bass_reese
+pycodedj eval examples/club_set.py::chord_rave
+```
+
+### 演奏してみる
+
+**音量を変える:** `volume=` の値を変えて保存するだけで、そのループの音量が即座に変わります。
+
+```python
+@loop("lead_hoover", interval=4.0)
+def hoover(volume=0.4):   # ← 前に出したいとき
+    ...
+```
+
+**空間を変える:** `warehouse_air` や `shimmer_pad` のコメントを増やしたり減らしたりすると、リバーブの深さが変わります。
+
+```python
+@loop("warehouse_air", interval=4.0)
+def room_tone(volume=0.06):
+    # concrete walls
+    # low ceiling pressing down
+    # crowd warmth
+    pass
+```
+
+コメントを 1 行だけ残して保存してみてください。空間が一気に乾いた音になります。
+
+**声部を変える:** `chord_rave` の内部関数を 1 つ減らすと、3 声から 2 声になって音が薄くなります。
+
+---
+
+## 9. 音色リファレンス
+
+`@loop` の第一引数（ループ名）を変えると、SuperCollider 側で使う音色を選べます。全 30 音色を 1 音ずつ確認したい場合は `examples/sound_showcase.py` を使います。
+
+```bash
+pycodedj eval examples/sound_showcase.py::bass_acid
+pycodedj eval examples/sound_showcase.py::riser_noise
+pycodedj eval examples/sound_showcase.py::bell_rave
+```
 
 **キック**
 
@@ -601,69 +670,9 @@ pycodedj eval examples/sound_showcase.py::bell_rave
 | `riser_noise` | ノイズライザー（8秒でスイープ上昇） |
 | `glitch_ticks` | 細かいグリッチ音 |
 
-### ブロック一覧
-
-| ループ名 | レイヤー | キャラクター |
-| :--- | :--- | :--- |
-| `kick_hard` | foundation | 硬い四つ打ちキック（depth=1、ドライ） |
-| `bass_rumble` | foundation | キック下のランブル（depth=1、ドライ） |
-| `bass_reese` | movement | 揺れる Reese ベース（depth=4、中域） |
-| `hat_ride` | movement | ライド/オープンハット（depth=4） |
-| `clap_snap` | body | スナップクラップ（depth=4、速い LFO） |
-| `clap_snare` | body | スネア寄りのアクセント（depth=4） |
-| `chord_rave` | harmonic | レイブスタブ（depth=6、明るい） |
-| `neon_stab` | harmonic | アンサースタブ（depth=5） |
-| `lead_hoover` | lead | Hoover 風リード（depth=5、微リバーブ） |
-| `hat_engine` | hats | ハットグリッド（depth=6、最速 LFO） |
-| `shimmer_pad` | space | シマーパッド（コメント多め、高リバーブ） |
-| `warehouse_air` | space | 倉庫の空気感（コメントのみ、最大リバーブ） |
-| `glitch_ticks` | texture | グリッチテクスチャ（depth=4、速い LFO） |
-| `fx_impact` | texture | ドロップのインパクト（depth=5） |
-
-### 動かしてみる
-
-watch で起動して、エディタで各ブロックを編集しながら音を変えていきます。起動直後に全ループが一度評価されるので、保存しなくてもまず音が鳴ります。
-
-```bash
-pycodedj watch examples/club_set.py
-```
-
-個別にループを評価したい場合は eval を使います。
-
-```bash
-pycodedj eval examples/club_set.py::kick_hard
-pycodedj eval examples/club_set.py::bass_reese
-pycodedj eval examples/club_set.py::chord_rave
-```
-
-### 演奏してみる
-
-**音量を変える:** `volume=` の値を変えて保存するだけで、そのループの音量が即座に変わります。
-
-```python
-@loop("lead_hoover", interval=4.0)
-def hoover(volume=0.4):   # ← 前に出したいとき
-    ...
-```
-
-**空間を変える:** `warehouse_air` や `shimmer_pad` のコメントを増やしたり減らしたりすると、リバーブの深さが変わります。
-
-```python
-@loop("warehouse_air", interval=4.0)
-def room_tone(volume=0.06):
-    # concrete walls
-    # low ceiling pressing down
-    # crowd warmth
-    pass
-```
-
-コメントを 1 行だけ残して保存してみてください。空間が一気に乾いた音になります。
-
-**声部を変える:** `chord_rave` の内部関数を 1 つ減らすと、3 声から 2 声になって音が薄くなります。
-
 ---
 
-## 9. 演奏のアイデア
+## 10. 演奏のアイデア
 
 ### アイデア A: シンプルから複雑へ育てる
 
@@ -768,7 +777,7 @@ def rush_hour(volume=0.2):
 
 ---
 
-## 10. うまくいかないとき
+## 11. うまくいかないとき
 
 ### 音が鳴らない
 
@@ -895,7 +904,7 @@ pip install 'pycodedj[watch]'
 
 ---
 
-## 11. コマンドと設定の全リスト
+## 12. コマンドと設定の全リスト
 
 ### `pycodedj eval`
 
@@ -973,7 +982,7 @@ def 関数名(volume=音量):
 
 ---
 
-## 12. 仕組みをもっと知りたい人へ
+## 13. 仕組みをもっと知りたい人へ
 
 ### マッピングの数値
 
