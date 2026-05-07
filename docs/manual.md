@@ -149,12 +149,12 @@ When the status bar at the bottom turns green showing `localhost`, the server is
 
 ### Step 2: Load the synths
 
-Open `sc/synths.scd` from the PyCodeDJ project folder using **File > Open**. Select everything with **Ctrl+A**, then evaluate with **Ctrl+Enter**.
+Open `sc/synths.scd` from the PyCodeDJ project folder using **File > Open**. Select everything with **Ctrl+A** (Cmd+A on Mac), then evaluate with **Ctrl+Enter** (Cmd+Enter on Mac).
 
 The Post window on the right should show:
 
 ```
-PyCodeDJ synths loaded. Ready.
+PyCodeDJ synths loaded. Ready. OSC port: 57120
 ```
 
 If this message does not appear, see [Troubleshooting](#10-troubleshooting).
@@ -618,18 +618,72 @@ def rush_hour():
 
 ### No sound
 
-First check that the SuperCollider server is running:
+First check that SuperCollider can make sound on its own. Open a new empty SuperCollider document and evaluate this one line:
+
+```supercollider
+{ SinOsc.ar(440, 0, 0.1) ! 2 }.play;
+```
+
+Evaluate with **Ctrl+Enter** (Cmd+Enter on Mac). Stop the sound with **Ctrl+.** (Cmd+. on Mac).
+
+If this does not make sound, the problem is not PyCodeDJ yet. Check the SuperCollider server, system volume, and audio output device.
+
+Next, check that the SuperCollider server is running:
 
 ```supercollider
 s.boot;
 ```
 
-Then re-run `sc/synths.scd` (Ctrl+A → Ctrl+Enter). The Post window should show `PyCodeDJ synths loaded. Ready.`
+Then re-run `sc/synths.scd` (Ctrl+A → Ctrl+Enter, or Cmd+A → Cmd+Enter on Mac). The Post window should show:
+
+```text
+PyCodeDJ synths loaded. Ready. OSC port: 57120
+```
+
+To confirm the OSC port, evaluate this in SuperCollider:
+
+```supercollider
+NetAddr.langPort.postln;
+```
+
+If it prints anything other than `57120`, pass that port from Python:
+
+```bash
+pycodedj eval examples/demo.py::bass --sc-port printed-port
+```
+
+To confirm that the synth definitions are loaded, evaluate this in SuperCollider:
+
+```supercollider
+~startLoop.value("bass", 1);
+```
+
+If this makes sound, the synth definitions are loaded. Stop the sound with **Ctrl+.** (Cmd+. on Mac).
+
+To confirm OSC receiving inside SuperCollider, evaluate:
+
+```supercollider
+NetAddr("127.0.0.1", NetAddr.langPort).sendMsg("/pycodedj/loop/bass/voice_count", 1);
+```
+
+If this makes sound, SuperCollider's OSC receiver is working.
 
 Still nothing? Check the connection:
 
 ```bash
-python examples/hello_sc.py
+pycodedj eval examples/demo.py::bass
+```
+
+If needed, trace incoming OSC messages in SuperCollider:
+
+```supercollider
+OSCFunc.trace(true);
+```
+
+Stop tracing with:
+
+```supercollider
+OSCFunc.trace(false);
 ```
 
 ### `[pycodedj] OSC error`

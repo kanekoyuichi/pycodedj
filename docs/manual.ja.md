@@ -151,12 +151,12 @@ s.boot;
 
 PyCodeDJ のプロジェクトフォルダにある `sc/synths.scd` を SuperCollider IDE で開きます。
 
-**File > Open** で `sc/synths.scd` を開いたら、**Ctrl+A** で全選択し、**Ctrl+Enter** で実行します。
+**File > Open** で `sc/synths.scd` を開いたら、**Ctrl+A**（Mac は Cmd+A）で全選択し、**Ctrl+Enter**（Mac は Cmd+Enter）で実行します。
 
 右側の Post window に次のメッセージが出れば準備完了です。
 
 ```
-PyCodeDJ synths loaded. Ready.
+PyCodeDJ synths loaded. Ready. OSC port: 57120
 ```
 
 このメッセージが出ない場合は [うまくいかないとき](#10-うまくいかないとき) を参照してください。
@@ -620,18 +620,72 @@ def rush_hour():
 
 ### 音が鳴らない
 
-まず SuperCollider のサーバーが起動しているか確認します。
+まず SuperCollider 単体で音が出るか確認します。SuperCollider IDE で新しい空のドキュメントを開き、次の 1 行を実行します。
+
+```supercollider
+{ SinOsc.ar(440, 0, 0.1) ! 2 }.play;
+```
+
+実行は **Ctrl+Enter**（Mac は Cmd+Enter）です。音を止めるには **Ctrl+.**（Mac は Cmd+.）を押します。
+
+ここで音が出ない場合は、PyCodeDJ ではなく SuperCollider のサーバー、Mac/PC の音量、出力先を確認してください。
+
+次に SuperCollider のサーバーが起動しているか確認します。
 
 ```supercollider
 s.boot;
 ```
 
-次に `sc/synths.scd` を再実行します（Ctrl+A → Ctrl+Enter）。Post window に `PyCodeDJ synths loaded. Ready.` が出るはずです。
+次に `sc/synths.scd` を再実行します（Ctrl+A → Ctrl+Enter、Mac は Cmd+A → Cmd+Enter）。Post window に次が出るはずです。
+
+```text
+PyCodeDJ synths loaded. Ready. OSC port: 57120
+```
+
+OSC port が `57120` か確認するには、SuperCollider で次を実行します。
+
+```supercollider
+NetAddr.langPort.postln;
+```
+
+`57120` 以外が表示された場合は、Python 側でその番号を指定します。
+
+```bash
+pycodedj eval examples/demo.py::bass --sc-port 表示された番号
+```
+
+SuperCollider 側のシンセが読み込まれているか直接確認するには、SuperCollider で次を実行します。
+
+```supercollider
+~startLoop.value("bass", 1);
+```
+
+これで音が出れば、シンセ定義は読み込まれています。音を止めるには **Ctrl+.**（Mac は Cmd+.）です。
+
+さらに OSC 受信を SuperCollider 内だけで確認するには、次を実行します。
+
+```supercollider
+NetAddr("127.0.0.1", NetAddr.langPort).sendMsg("/pycodedj/loop/bass/voice_count", 1);
+```
+
+これで音が出れば、SuperCollider 側の OSC 受信も動いています。
 
 それでも音が鳴らない場合は、接続確認をします。
 
 ```bash
-python examples/hello_sc.py
+pycodedj eval examples/demo.py::bass
+```
+
+必要なら SuperCollider 側で OSC の受信ログを出せます。
+
+```supercollider
+OSCFunc.trace(true);
+```
+
+ログを止めるには次を実行します。
+
+```supercollider
+OSCFunc.trace(false);
 ```
 
 ### `[pycodedj] OSC error` というエラーが出る
