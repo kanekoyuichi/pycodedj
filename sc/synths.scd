@@ -36,6 +36,20 @@ s.waitForBoot({
         Out.ar(0, Pan2.ar(sig, SinOsc.kr(0.13).range(-0.25, 0.25)));
     }).add;
 
+    SynthDef(\pycodedj_clap_snap, {
+        arg cutoff = 4200, lfoRate = 1.0, reverbMix = 0.18, amp = 0.18, gate = 1;
+        var trig, flam, env, tone, sig, gateEnv;
+        trig = Impulse.kr((lfoRate * 0.65).clip(0.8, 1.4));
+        flam = trig + DelayN.kr(trig, 0.04, 0.018) + DelayN.kr(trig, 0.06, 0.037);
+        env = Decay2.kr(flam, 0.001, 0.13);
+        tone = cutoff.clip(1800, 9000);
+        sig = BPF.ar(WhiteNoise.ar(0.55), tone, 0.55) * env;
+        sig = HPF.ar(sig, 900);
+        gateEnv = EnvGen.kr(Env.asr(0.01, 1, 0.1), gate, doneAction: 2);
+        sig = FreeVerb.ar(sig, reverbMix.clip(0.05, 0.5), 0.55, 0.25) * gateEnv * amp;
+        Out.ar(0, sig ! 2);
+    }).add;
+
     SynthDef(\pycodedj_neon_stab, {
         arg cutoff = 1200, lfoRate = 0.25, reverbMix = 0.25, amp = 0.14, gate = 1;
         var trig, root, freqs, env, sig, gateEnv;
@@ -182,6 +196,7 @@ s.waitForBoot({
         switch (name,
             "sub_bass", { \pycodedj_sub_bass },
             "hat_engine", { \pycodedj_hat_engine },
+            "clap_snap", { \pycodedj_clap_snap },
             "neon_stab", { \pycodedj_neon_stab },
             "acid_lead", { \pycodedj_acid_lead },
             "warehouse_air", { \pycodedj_warehouse_air },

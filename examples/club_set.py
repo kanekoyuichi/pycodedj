@@ -1,127 +1,64 @@
-# PyCodeDJ club-style demo.
+# PyCodeDJ dancefloor demo.
 #
-# Load sc/synths.scd in SuperCollider, then bring parts in and out:
-#   pycodedj eval examples/club_set.py::sub_bass
-#   pycodedj eval examples/club_set.py::hat_engine
-#   pycodedj eval examples/club_set.py::neon_stab
-#   pycodedj eval examples/club_set.py::acid_lead
-#   pycodedj eval examples/club_set.py::warehouse_air
-#   pycodedj eval examples/club_set.py::kick_pulse
-#   pycodedj eval examples/club_set.py::floor_kick
-#   pycodedj eval examples/club_set.py::glitch_ticks
-#   pycodedj eval examples/club_set.py::soft_pluck
-#   pycodedj eval examples/club_set.py::dub_chord
-#   pycodedj eval examples/club_set.py::shimmer_pad
+# Load sc/synths.scd in SuperCollider, then run:
+#   pycodedj watch examples/club_set.py
 #
-# Dancefloor preset: floor_kick + sub_bass + hat_engine are the main groove.
-# Chords, plucks, acid, and air sit lower in the mix as movement and lift.
+# This file is intentionally a compact club groove, not a synth catalogue.
+# The main weight is floor_kick + sub_bass + hat_engine + clap_snap.
 
 
 # @loop floor_kick interval=1.0
 def floor_kick():
-    four_on_floor = [1, 1, 1, 1]
+    # four-on-the-floor foundation
+    steps = [1, 1, 1, 1, 1, 1, 1, 1]
     for beat in range(8):
-        beat = beat % 4
-        if four_on_floor[beat]:
-            if beat == 0:
-                room = "boom"
+        if steps[beat]:
+            if beat in (0, 4):
+                body = "big"
             else:
-                room = "thump"
-            _ = room
+                body = "tight"
+            _ = body
 
 
 # @loop sub_bass interval=0.5
 def sub_bass():
-    groove = [1, 0, 0, 1, 0, 1, 0, 0, 1, 0, 0, 1]
+    # rolling low end between the kicks
+    groove = [1, 0, 0, 1, 0, 1, 0, 0, 1, 0, 1, 0]
     for step in range(12):
         if groove[step]:
             if step in (0, 5, 8):
-                for push in range(2):
-                    if push == 1:
-                        drive = "heavy"
+                for pressure in range(2):
+                    if pressure:
+                        weight = "heavy"
                     else:
-                        drive = "tight"
-                    _ = drive
+                        weight = "held"
+                    _ = weight
 
 
 # @loop hat_engine interval=0.25
 def hat_engine():
-    grid = range(16)
-    for tick in grid:
+    # offbeat lift and steady high-end motion
+    for tick in range(16):
         if tick % 2 == 0:
-            accent = "closed"
-            _ = accent
+            hat = "closed"
+            _ = hat
         if tick in (3, 7, 11, 15):
-            accent = "open"
-            _ = accent
+            hat = "open"
+            _ = hat
 
 
-# @loop neon_stab interval=1.0
-def neon_stab():
-    def chord_root():
-        return "minor"
-
-    def chord_fifth():
-        return "pressure"
-
-    return chord_root(), chord_fifth()
-
-
-# @loop acid_lead interval=0.25
-def acid_lead():
-    pattern = [0, 3, 7, 10, 12, 10, 7, 3]
-    for note in pattern:
-        if note > 9:
-            if note == 12:
-                bend = "up"
-            else:
-                bend = "down"
-            _ = bend
-
-
-# @loop warehouse_air interval=4.0
-# smoke above the kick
-# late reflections
-# concrete room tail
-# crowd heat
-# blue strobes
-def warehouse_air():
-    pass
-
-
-# @loop kick_pulse interval=0.5
-def kick_pulse():
-    hits = [1, 0, 0, 1, 0, 0, 1, 0]
+# @loop clap_snap interval=1.0
+def clap_snap():
+    # backbeat energy
     for beat in range(8):
-        if hits[beat]:
-            weight = "bounce"
-            _ = weight
+        if beat in (2, 6):
+            clap = "backbeat"
+            _ = clap
 
 
-# @loop glitch_ticks interval=0.25
-def glitch_ticks():
-    for grain in range(12):
-        if grain % 4 == 0:
-            cut = "sharp"
-            _ = cut
-        if grain in (5, 9):
-            cut = "scatter"
-            _ = cut
-
-
-# @loop soft_pluck interval=0.5
-def soft_pluck():
-    notes = ["root", "third", "fifth", "octave"]
-    for note in notes:
-        if note in ("fifth", "octave"):
-            color = "bright"
-        else:
-            color = "round"
-        _ = color
-
-
-# @loop dub_chord interval=1.0
+# @loop dub_chord interval=2.0
 def dub_chord():
+    # sparse chord hits, kept behind the drums
     def root():
         return "low"
 
@@ -131,10 +68,10 @@ def dub_chord():
     return root(), fifth()
 
 
-# @loop shimmer_pad interval=4.0
-# high ceiling
-# silver trail
-# slow light
-# suspended air
-def shimmer_pad():
+# @loop warehouse_air interval=4.0
+# dark room
+# low ceiling
+# smoke
+# crowd heat
+def warehouse_air():
     pass

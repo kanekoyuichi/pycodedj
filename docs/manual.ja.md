@@ -500,23 +500,18 @@ pycodedj eval myfile.py::bass
 
 ## 8. クラブセット例 — club_set.py を動かす
 
-`examples/club_set.py` は、クラブミュージック風のパートを 11 個組み合わせたデモファイルです。それぞれのブロックがコードの構造で異なる音色を持っています。
+`examples/club_set.py` は、クラブのグルーヴとして成立しやすい 6 パートに絞ったデモファイルです。音色カタログではなく、キック、サブベース、ハット、クラップ、コード、空気感を組み合わせたセットです。
 
 ### ブロック一覧
 
 | ループ名 | キャラクター | コードの特徴 |
 | :--- | :--- | :--- |
+| `floor_kick` | ドスドス響く四つ打ちキック | 低域の胴鳴りと短いアタック |
 | `sub_bass` | 重いサブベース | `if` のネストが深く、フィルターが開いている |
 | `hat_engine` | ハイハットのグリッド | `for` + `if` が多く、揺らぎが速い |
-| `neon_stab` | 3 声のコードスタブ | 関数 3 つでポリフォニー |
-| `acid_lead` | アシッドリード | 深いネストと多い制御フローで明るく速い |
-| `warehouse_air` | 倉庫の空気感 | コメントだらけでリバーブが深い |
-| `kick_pulse` | キック/低音パルス | downbeat を強調する短い低音 |
-| `floor_kick` | ドスドス響く四つ打ちキック | 低域の胴鳴りと短いアタック |
-| `glitch_ticks` | グリッチ粒子 | 細かいノイズ粒と速い揺らぎ |
-| `soft_pluck` | 柔らかいプラック | 短い音価のメロディ |
+| `clap_snap` | クラップ/スネア感 | バックビートのアクセント |
 | `dub_chord` | ダブコード | 残響のあるコードヒット |
-| `shimmer_pad` | シマーパッド | 長く伸びる明るいパッド |
+| `warehouse_air` | 倉庫の空気感 | コメントだらけでリバーブが深い |
 
 ### 動かしてみる
 
@@ -531,15 +526,10 @@ pycodedj watch examples/club_set.py
 ```bash
 pycodedj eval examples/club_set.py::sub_bass
 pycodedj eval examples/club_set.py::hat_engine
-pycodedj eval examples/club_set.py::neon_stab
-pycodedj eval examples/club_set.py::acid_lead
-pycodedj eval examples/club_set.py::warehouse_air
-pycodedj eval examples/club_set.py::kick_pulse
-pycodedj eval examples/club_set.py::floor_kick
-pycodedj eval examples/club_set.py::glitch_ticks
-pycodedj eval examples/club_set.py::soft_pluck
+pycodedj eval examples/club_set.py::clap_snap
 pycodedj eval examples/club_set.py::dub_chord
-pycodedj eval examples/club_set.py::shimmer_pad
+pycodedj eval examples/club_set.py::warehouse_air
+pycodedj eval examples/club_set.py::floor_kick
 ```
 
 ### 演奏してみる

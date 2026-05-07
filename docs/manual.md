@@ -498,23 +498,18 @@ pycodedj eval myfile.py::bass
 
 ## 8. Club set example — running club_set.py
 
-`examples/club_set.py` contains eleven club-music-style parts, each with a distinct sound shaped by its code structure.
+`examples/club_set.py` is a focused six-part dancefloor groove. It is not a synth catalogue: it combines kick, sub bass, hats, clap, chord hits, and room ambience.
 
 ### Block overview
 
 | Loop name | Character | Code features |
 | :--- | :--- | :--- |
+| `floor_kick` | Big four-on-the-floor kick | Low body and a short attack |
 | `sub_bass` | Heavy sub bass | Deep `if` nesting, filter wide open |
 | `hat_engine` | Hi-hat grid | Many `for` + `if`, fast LFO |
-| `neon_stab` | 3-voice chord stab | Three functions = three voices |
-| `acid_lead` | Acid lead | Deep nesting and lots of control flow = bright and fast |
-| `warehouse_air` | Warehouse ambience | Comment-heavy = deep reverb |
-| `kick_pulse` | Kick / low pulse | Short low-end hits around the downbeat |
-| `floor_kick` | Big four-on-the-floor kick | Low body and a short attack |
-| `glitch_ticks` | Glitch particles | Small noisy grains and fast movement |
-| `soft_pluck` | Soft pluck | Short melodic plucks |
+| `clap_snap` | Clap / snare accent | Backbeat energy |
 | `dub_chord` | Dub chord | Reverb-heavy chord hits |
-| `shimmer_pad` | Shimmer pad | Long bright pad texture |
+| `warehouse_air` | Warehouse ambience | Comment-heavy = deep reverb |
 
 ### Getting it running
 
@@ -529,15 +524,10 @@ You can also evaluate individual loops:
 ```bash
 pycodedj eval examples/club_set.py::sub_bass
 pycodedj eval examples/club_set.py::hat_engine
-pycodedj eval examples/club_set.py::neon_stab
-pycodedj eval examples/club_set.py::acid_lead
-pycodedj eval examples/club_set.py::warehouse_air
-pycodedj eval examples/club_set.py::kick_pulse
-pycodedj eval examples/club_set.py::floor_kick
-pycodedj eval examples/club_set.py::glitch_ticks
-pycodedj eval examples/club_set.py::soft_pluck
+pycodedj eval examples/club_set.py::clap_snap
 pycodedj eval examples/club_set.py::dub_chord
-pycodedj eval examples/club_set.py::shimmer_pad
+pycodedj eval examples/club_set.py::warehouse_air
+pycodedj eval examples/club_set.py::floor_kick
 ```
 
 ### Performing with it

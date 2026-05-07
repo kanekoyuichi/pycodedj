@@ -134,7 +134,7 @@ pycodedj watch demo.py
 | ファイル | 内容 |
 | :--- | :--- |
 | `examples/demo.py` | bass / melody / pad の 3 ループ入門デモ |
-| `examples/club_set.py` | sub_bass / hat_engine / neon_stab / acid_lead / warehouse_air / kick_pulse / floor_kick / glitch_ticks / soft_pluck / dub_chord / shimmer_pad の 11 音色クラブスタイルデモ |
+| `examples/club_set.py` | floor_kick / sub_bass / hat_engine / clap_snap / dub_chord / warehouse_air の 6 パートに絞ったクラブグルーヴ |
 
 ---
 
