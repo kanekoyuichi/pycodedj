@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.1.1] - 2026-05-07
+
+### Docs
+
+- Add cross-language links between English and Japanese README and manual using absolute GitHub URLs
+- Rename publish workflow file to `workflow.yml`
+
 ## [0.1.0] - 2026-05-07
 
 ### Features
