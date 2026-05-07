@@ -1,6 +1,6 @@
 # PyCodeDJ
 
-[日本語版 README はこちら](README.ja.md)
+[日本語版 README はこちら](https://github.com/kanekoyuichi/pycodedj/blob/main/README.ja.md)
 
 A live-coding environment that translates Python code structure into music in real time. Every save changes the performance.
 
