@@ -135,6 +135,23 @@ SuperCollider の公式サイト（supercollider.github.io）からインスト�
 
 SuperCollider は「音を出す担当」です。最初に一度だけ設定すれば、あとは自動的に動きます。
 
+### SuperCollider で何をするの？
+
+PyCodeDJ では、Python は音を直接鳴らしません。Python 側はコードを分析して、OSC という短いメッセージを SuperCollider に送ります。
+
+SuperCollider 側では、次の 3 つを行います。
+
+1. audio server を起動する
+2. `sc/synths.scd` を読み込んで、PyCodeDJ 用のシンセを登録する
+3. Python から届く OSC メッセージを受け取り、音を鳴らす
+
+SuperCollider IDE には主に 2 つの場所があります。
+
+- コードを書くドキュメント: `s.boot;` や `{ SinOsc... }.play;` などを入力して実行する場所
+- Post window: 実行結果、エラー、`PyCodeDJ synths loaded...` などのログが表示される場所
+
+このマニュアルで「SuperCollider で実行する」と書いてあるコードは、ターミナルではなく SuperCollider IDE のコードを書くドキュメントで実行します。
+
 ### ステップ 1: サーバーを起動する
 
 SuperCollider IDE を開き、メニューから **Server > Boot Server** を選びます。
@@ -146,6 +163,8 @@ s.boot;
 ```
 
 画面下部に `localhost` が緑色に変わったら起動成功です。
+
+この audio server が起動していないと、Python 側のコマンドが成功しても音は出ません。
 
 ### ステップ 2: シンセを読み込む
 
@@ -160,6 +179,8 @@ PyCodeDJ synths loaded. Ready. OSC port: 57120
 ```
 
 このメッセージが出ない場合は [うまくいかないとき](#10-うまくいかないとき) を参照してください。
+
+`sc/synths.scd` は、PyCodeDJ 用の音色と OSC 受信処理を SuperCollider に登録するファイルです。SuperCollider を再起動した後は、もう一度このファイルを実行してください。
 
 ### ステップ 3: 接続を確認する
 

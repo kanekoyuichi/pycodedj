@@ -135,6 +135,23 @@ After installation, launch the SuperCollider IDE. If the window opens, the insta
 
 SuperCollider is the audio engine. You set it up once and it stays ready.
 
+### What does SuperCollider do here?
+
+In PyCodeDJ, Python does not generate audio directly. Python analyses your code and sends short OSC messages to SuperCollider.
+
+On the SuperCollider side, you do three things:
+
+1. Boot the audio server
+2. Load `sc/synths.scd` to register PyCodeDJ's synths
+3. Receive OSC messages from Python and turn them into sound
+
+The SuperCollider IDE has two important areas:
+
+- Code documents: where you type and evaluate code such as `s.boot;` or `{ SinOsc... }.play;`
+- Post window: where SuperCollider prints logs, errors, and messages such as `PyCodeDJ synths loaded...`
+
+When this manual says to "evaluate this in SuperCollider", run it in a SuperCollider code document, not in your terminal.
+
 ### Step 1: Boot the server
 
 Open the SuperCollider IDE and choose **Server > Boot Server** from the menu.
@@ -147,6 +164,8 @@ s.boot;
 
 When the status bar at the bottom turns green showing `localhost`, the server is running.
 
+If this audio server is not running, Python commands may still succeed, but no sound will come out.
+
 ### Step 2: Load the synths
 
 Open `sc/synths.scd` from the PyCodeDJ project folder using **File > Open**. Select everything with **Ctrl+A** (Cmd+A on Mac), then evaluate with **Ctrl+Enter** (Cmd+Enter on Mac).
@@ -158,6 +177,8 @@ PyCodeDJ synths loaded. Ready. OSC port: 57120
 ```
 
 If this message does not appear, see [Troubleshooting](#10-troubleshooting).
+
+`sc/synths.scd` registers the PyCodeDJ synth definitions and OSC receiver in SuperCollider. Run this file again after restarting SuperCollider.
 
 ### Step 3: Confirm the connection
 
