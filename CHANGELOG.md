@@ -1,5 +1,29 @@
 # Changelog
 
+## [0.3.0] - 2026-05-08
+
+### Features
+
+- `pycodedj panic` — 全アクティブループを即時停止。SuperCollider 側でシンセを解放し `~loops` / `~loopParams` を初期化する
+- `pycodedj mute <name>` — ループを消音（停止しない）。再評価時もミュート状態を維持
+- `pycodedj unmute <name>` — ミュート解除、音量を復元
+- `pycodedj solo <name>` — 対象ループ以外を全ミュート（CLI は OSC 直送、完全な状態管理は watch セッション内の `Engine.solo()` 推奨）
+- `pycodedj unsolo` — ソロ解除、solo 前のミュート状態に戻す
+- `pycodedj status` — アクティブループの名前・ミュート状態・音量・カットオフを表示
+
+### Improvements
+
+- `ParseResult` dataclass 導入 — `parse_blocks()` が SyntaxError 時に `ParseResult(ok=False, error=...)` を返すようになり、watch モードでコード編集中に構文エラーがあっても演奏中のループが止まらなくなった
+- `Engine` 内部状態を `LoopState` dataclass で管理 — `muted` / `muted_before_solo` フラグを保持し、mute/solo/unsolo の状態を正確に追跡
+- `eval_block` が OSC 送信成功後に内部状態を更新するよう修正（送信失敗時の状態不整合を解消）
+- `Engine.solo()` に未知のループ名ガードを追加（存在しない名前を渡しても全ループがミュートされない）
+- CLI `unmute` が SuperCollider に永続化された `amp=0` を上書きしてから voice_count を送るよう修正
+
+### Docs
+
+- README.md / README.ja.md — panic / mute / unmute / status のクイックリファレンスを追加、ロードマップの Sprint 1 を完了に更新
+- `docs/manual.md` / `docs/manual.ja.md` / `docs/manual.html` — セクション 12 に新コマンド 6 つの全リファレンスを追加
+
 ## [0.2.1] - 2026-05-08
 
 ### Docs
