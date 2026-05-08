@@ -2,28 +2,28 @@
 
 [English manual](https://github.com/kanekoyuichi/pycodedj/blob/main/docs/manual.md)
 
-> Python コードを書くと、リアルタイムに音が変わる
+> Python のコードを書くと、音が変わる
 
 ---
 
-## このマニュアルを読む前に
+## このマニュアルについて
 
-プログラムを書いたことがある人なら、誰でも試せます。音楽の知識は不要です。SuperCollider も「はじめて聞いた」で大丈夫です。
+プログラムを書いたことがあれば、誰でも試せます。音楽の知識は不要です。SuperCollider は「名前も聞いたことがない」で大丈夫です。
 
-このマニュアルを順番に進めると、最終的に **自分が書いた Python コードから音が出る体験** ができます。所要時間の目安: セットアップ込みで 20〜30 分。
+このマニュアルを順番に読んでいくと、最終的に **自分が書いた Python コードから音が鳴る体験** ができます。セットアップも含めて 20〜30 分が目安です。
 
 ---
 
 ## 目次
 
 1. [PyCodeDJ って何？](#1-pycodedj-って何)
-2. [準備する](#2-準備する)
+2. [インストールする](#2-インストールする)
 3. [SuperCollider をセットアップする](#3-supercollider-をセットアップする)
 4. [はじめての音を出す](#4-はじめての音を出す)
-5. [保存するだけで音が変わる — watch モード](#5-保存するだけで音が変わる--watch-モード)
-6. [コードと音の関係を知る](#6-コードと音の関係を知る)
-7. [複数のループを同時に動かす](#7-複数のループを同時に動かす)
-8. [クラブセット例 — club_set.py を動かす](#8-クラブセット例--club_setpy-を動かす)
+5. [watch モード — 保存するだけで音が変わる](#5-watch-モード--保存するだけで音が変わる)
+6. [コードの構造が音を変える](#6-コードの構造が音を変える)
+7. [pattern() で音程とリズムを指定する](#7-pattern-で音程とリズムを指定する)
+8. [複数のループを同時に動かす](#8-複数のループを同時に動かす)
 9. [音色リファレンス](#9-音色リファレンス)
 10. [演奏のアイデア](#10-演奏のアイデア)
 11. [うまくいかないとき](#11-うまくいかないとき)
@@ -36,69 +36,72 @@
 
 ### ひとことで言うと
 
-**Python のコードを書くと、リアルタイムに音が変わる楽器です。**
+**「コードを書くこと」が「音楽を演奏すること」になるツールです。**
 
-`for` ループを増やすと音の揺らぎが速くなります。関数を 3 つ書くと 3 声のポリフォニーになります。コメントをたくさん書くと、リバーブが深くかかって空間が広がります。`volume=` で音量を直接指定できます。
+`for` ループを増やすと音の揺らぎが速くなります。  
+関数を 3 つ書くと 3 声のポリフォニーになります。  
+コメントをたくさん書くと、リバーブが深くかかって空間が広がります。  
+`pattern("x . x .")` と書けば、そのリズムで音が鳴ります。
 
 ```python
-from pycodedj import loop
+from pycodedj import loop, pattern
 
-@loop("main", interval=1.0)
-def my_sound(volume=0.4):
-    # コメントを増やすほど空間が広がる
-    # もう一行
-    # さらにもう一行
-    for i in range(4):   # for を増やすと揺らぎが速くなる
-        if i > 2:        # if を増やすとさらに速くなる
+# コードの「構造」が音を決める
+@loop("bass", interval=2.0)
+def bass_line(volume=0.4):
+    for i in range(8):
+        if i % 2 == 0:
             pass
+
+# pattern() でリズムと音程を明示的に指定する
+@loop("kick", synth="floor_kick", dur=0.25)
+def kick_drum():
+    pattern("x . x .")
+
+@loop("melody", synth="acid_lead", root="A3", scale="minor", dur=0.25)
+def melody_line():
+    pattern("0 . 3 . 5 . 7 .")
 ```
 
-このコードを評価すると、ターミナルに次のように表示されます。
-
-```
-[pycodedj] main  cutoff=560Hz  lfo=1.08Hz  reverb=0.43  voices=1  amp=0.40
-```
-
-SuperCollider がすぐにその音色に切り替わります。他のループは止まりません。
+このコードをファイルに保存するだけで、音が変わります。  
+追加説明もシンセの設定も必要ありません。ただ書いて、保存するだけです。
 
 ### 何に使えるの？
 
-- ライブコーディングパフォーマンス（コードを書きながら音楽を演奏する）
-- コードを書く「感触」を音で感じながら開発する
-- プログラミングの学習に音のフィードバックを加える
+- **ライブコーディングパフォーマンス** — コードを書きながら観客の前で音楽を演奏する
+- **コードを書く感触を音で感じる** — 構造が変わるたびに音も変わる即興制作
+- **プログラミング学習** — 書いたコードが即座に音でフィードバックされる
 
 ### 音はどこから出るの？
 
-PyCodeDJ 自体は音を出しません。**SuperCollider**（無料のソフトウェア音響シンセサイザー）が音を出します。PyCodeDJ は「Python コードを分析して、SuperCollider にパラメーターを伝える橋渡し役」です。
+PyCodeDJ 自体は音を出しません。**SuperCollider**（無料のソフトウェア音響シンセサイザー）が音を出します。PyCodeDJ は「Python コードを分析して SuperCollider にパラメーターを送る橋渡し役」です。
 
 ```
-あなたが書く Python コード
-        |
-        | pycodedj eval / watch を実行
-        v
-  PyCodeDJ がコードを分析
-  （どれだけネストしているか、
-    関数がいくつあるか、など）
-        |
-        | OSC という通信プロトコルで指示
-        v
-  SuperCollider が音を出す
-        |
-        v
-     スピーカー
+あなたが Python コードを書いて保存する
+         |
+         v
+   PyCodeDJ がコードを分析
+   （ネストの深さ、関数の数、
+     コメントの量、pattern() の内容…）
+         |
+         | OSC という通信で指示
+         v
+   SuperCollider が音を出す
+         |
+         v
+      スピーカー
 ```
 
-SuperCollider の操作は最小限で済みます。難しいことはしなくて大丈夫です。
+SuperCollider の操作は最初の一度だけです。難しいことは何もありません。
 
 ---
 
-## 2. 準備する
+## 2. インストールする
 
 ### 必要なもの
 
-- Python 3.10 以上（`python --version` で確認できます）
-- SuperCollider 3.12 以上（次のセクションでインストール方法を説明します）
-- ターミナル（コマンドを打てる環境）
+- **Python 3.10 以上** — `python --version` または `python3 --version` で確認できます
+- **SuperCollider 3.12 以上** — 次のセクションでインストール方法を説明します
 
 ### PyCodeDJ をインストールする
 
@@ -106,7 +109,7 @@ SuperCollider の操作は最小限で済みます。難しいことはしなく
 pip install 'pycodedj[watch]'
 ```
 
-`[watch]` を付けることで、ファイル保存を検知する `watch` コマンドも使えるようになります。これがあると演奏がずっとスムーズになるので、最初からインストールするのをおすすめします。
+`[watch]` を付けることで、ファイルの保存を検知して自動で再評価する `watch` コマンドが使えるようになります。これがあると演奏がずっとスムーズになるので、最初から付けてインストールするのをおすすめします。
 
 インストールできたか確認します。
 
@@ -120,115 +123,104 @@ pycodedj --help
 usage: pycodedj [-h] {eval,watch,panic,mute,unmute,solo,unsolo,status} ...
 ```
 
-### SuperCollider をインストールする
+### 開発版をインストールする
 
-SuperCollider の公式サイト（supercollider.github.io）からインストーラーをダウンロードします。
+ソースから使いたい場合は次のようにします。
 
-- macOS: `.dmg` ファイルをダウンロードしてインストール
-- Linux: パッケージマネージャーか公式サイトから
-- Windows: `.exe` インストーラーをダウンロード
-
-インストール後に SuperCollider IDE（アプリ）を起動してください。画面が開けばインストール成功です。
+```bash
+git clone https://github.com/kanekoyuichi/pycodedj
+cd pycodedj
+pip install -e ".[dev]"
+```
 
 ---
 
 ## 3. SuperCollider をセットアップする
 
-SuperCollider は「音を出す担当」です。最初に一度だけ設定すれば、あとは自動的に動きます。
+SuperCollider は「音を出す担当」です。最初に一度だけ設定すれば、あとは自動で動きます。
 
-### SuperCollider で何をするの？
+### SuperCollider をインストールする
 
-PyCodeDJ では、Python は音を直接鳴らしません。Python 側はコードを分析して、OSC という短いメッセージを SuperCollider に送ります。
+SuperCollider の公式サイト（[supercollider.github.io](https://supercollider.github.io)）からインストーラーをダウンロードします。
 
-SuperCollider 側では、次の 3 つを行います。
+- **macOS:** `.dmg` ファイルをダウンロードしてインストール
+- **Linux:** パッケージマネージャーか公式サイトから（Ubuntu なら `sudo apt install supercollider`）
+- **Windows:** `.exe` インストーラーをダウンロード
 
-1. audio server を起動する
-2. `sc/synths.scd` を読み込んで、PyCodeDJ 用のシンセを登録する
-3. Python から届く OSC メッセージを受け取り、音を鳴らす
+インストール後に **SuperCollider IDE**（アプリ）を起動してください。画面が開けばインストール成功です。
 
-SuperCollider IDE には主に 2 つの場所があります。
+### SuperCollider IDE の見方
 
-- コードを書くドキュメント: `s.boot;` や `{ SinOsc... }.play;` などを入力して実行する場所
-- Post window: 実行結果、エラー、`PyCodeDJ synths loaded...` などのログが表示される場所
+SuperCollider IDE には大きく 2 つの場所があります。
 
-このマニュアルで「SuperCollider で実行する」と書いてあるコードは、ターミナルではなく SuperCollider IDE のコードを書くドキュメントで実行します。
+- **コードを書く場所（上側）:** `s.boot;` のようなコードを入力して実行する
+- **Post window（右側や下側）:** 実行結果やログが流れる場所
+
+「SuperCollider で実行する」と書いてあるコードは、ターミナルではなく SuperCollider IDE のコードを書く場所で実行します。
 
 ### ステップ 1: サーバーを起動する
 
-SuperCollider IDE を開き、メニューから **Server > Boot Server** を選びます。
-
-または、コード入力欄に次を書いて **Ctrl+Enter**（Mac は Cmd+Enter）で実行します。
+SuperCollider IDE を開いて、コードを書く場所に次を入力し **Ctrl+Enter**（Mac は **Cmd+Enter**）で実行します。
 
 ```supercollider
 s.boot;
 ```
 
-画面下部に `localhost` が緑色に変わったら起動成功です。
+画面下部のインジケーターが緑色に変わったら起動成功です。
 
-この audio server が起動していないと、Python 側のコマンドが成功しても音は出ません。
+> **ヒント:** メニューから **Server > Boot Server** を選んでも同じことができます。
 
 ### ステップ 2: シンセを読み込む
 
-PyCodeDJ のプロジェクトフォルダにある `sc/synths.scd` を SuperCollider IDE で開きます。
+PyCodeDJ の音色と OSC 受信処理を SuperCollider に登録します。
 
-**File > Open** で `sc/synths.scd` を開いたら、**Ctrl+A**（Mac は Cmd+A）で全選択し、**Ctrl+Enter**（Mac は Cmd+Enter）で実行します。
+**File > Open** で PyCodeDJ プロジェクトフォルダの `sc/synths.scd` を開きます。  
+開いたら **Ctrl+A**（Mac は **Cmd+A**）で全選択し、**Ctrl+Enter**（Mac は **Cmd+Enter**）で実行します。
 
-右側の Post window に次のメッセージが出れば準備完了です。
+Post window に次が出れば準備完了です。
 
 ```
 PyCodeDJ synths loaded. Ready. OSC port: 57120
 ```
 
-このメッセージが出ない場合は [うまくいかないとき](#10-うまくいかないとき) を参照してください。
+このメッセージが出なかった場合は [うまくいかないとき](#11-うまくいかないとき) を参照してください。
 
-`sc/synths.scd` は、PyCodeDJ 用の音色と OSC 受信処理を SuperCollider に登録するファイルです。SuperCollider を再起動した後は、もう一度このファイルを実行してください。
+> **注意:** SuperCollider を再起動したら、もう一度 `sc/synths.scd` を実行してください。
 
-### ステップ 3: 出力先を変更した場合
+### ステップ 3: 接続を確認する
 
-SuperCollider は audio server を起動した時点の出力先を使います。Mac/PC 側でスピーカー、イヤホン、オーディオインターフェースなどの出力先を変更した場合は、SuperCollider の audio server を起動し直してください。
-
-まず SuperCollider IDE のコードを書くドキュメントで、使えるデバイス名を確認します。これはターミナルではなく SuperCollider で実行します。
-
-```supercollider
-ServerOptions.devices;
-```
-
-Post window にデバイス名の一覧が表示されます。使いたい出力先の名前を確認したら、同じく SuperCollider IDE のコードを書くドキュメントで次のように指定します。
-
-```supercollider
-s.quit;
-s.options.outDevice = "ここに出力デバイス名を書く";
-s.options.numInputBusChannels = 0;
-s.boot;
-```
-
-入力を使わない場合は `numInputBusChannels = 0` にしておくと、入力デバイスとのサンプルレート不一致を避けやすくなります。
-
-boot 後、SuperCollider 単体で音が出るか確認します。
-
-```supercollider
-{ SinOsc.ar(110, 0, 0.03) ! 2 }.play;
-```
-
-音が出たら、`sc/synths.scd` をもう一度実行します（Ctrl+A → Ctrl+Enter、Mac は Cmd+A → Cmd+Enter）。
-
-### ステップ 4: 接続を確認する
-
-ターミナルに戻り、次を実行します。
+SuperCollider の準備ができたら、ターミナルに戻って次を実行します。
 
 ```bash
 pycodedj eval examples/demo.py::bass
 ```
 
-ターミナルに `[pycodedj] bass ...` と表示され、SuperCollider から音が出れば接続成功です。
-
-SuperCollider はこのまま起動したままにしておいてください。
+ターミナルに `[pycodedj] bass ...` と表示されて SuperCollider から音が出れば、接続は完璧です。
 
 ---
 
 ## 4. はじめての音を出す
 
-### ステップ 1: デモファイルを確認する
+### ループファイルの基本形
+
+PyCodeDJ のコードファイルは次の形で書きます。
+
+```python
+from pycodedj import loop
+
+@loop("名前", interval=秒数)
+def 関数名(volume=音量):
+    # ここに書いたコードの「構造」が音を決める
+    ...
+```
+
+`@loop("名前", interval=秒数)` は**デコレータ**です。これを付けた関数がひとつの「ループ」になります。
+
+- `"名前"` — SuperCollider に送られる名前。英数字とアンダースコア（例: `bass`, `kick_hard`）
+- `interval=秒数` — ループの更新間隔（省略時は 1.0 秒）
+- `volume=音量` — 音量。0.0〜1.0 の数値（省略時は 0.3）
+
+### サンプルファイルで試してみる
 
 `examples/demo.py` を開いてみましょう。
 
@@ -255,17 +247,11 @@ def pad(volume=0.15):
     pass
 ```
 
-`@loop("bass", ...)` が付いた関数が「bass ループ」です。関数名（`bass`, `melody`, `pad`）は自由につけられます。OSC に送られる名前は `@loop(...)` の第一引数です。
-
-### ステップ 2: 音を出す
-
-ターミナルで次を実行します。
+`bass`, `melody`, `pad` の 3 つのループが定義されています。それぞれを評価してみましょう。
 
 ```bash
 pycodedj eval examples/demo.py::bass
 ```
-
-`eval` は evaluate（評価する）の略です。このコマンドは `examples/demo.py` の `bass` ループを今すぐ読み取り、コード構造を分析して SuperCollider に音のパラメーターを送ります。
 
 成功すると次のように表示されます。
 
@@ -273,21 +259,20 @@ pycodedj eval examples/demo.py::bass
 [pycodedj] bass  cutoff=418Hz  lfo=1.08Hz  reverb=0.00  voices=1  amp=0.40
 ```
 
-これがあなたの最初のライブコーディングです。続けて melody と pad も評価してみましょう。
+続けて `melody` と `pad` も評価します。
 
 ```bash
 pycodedj eval examples/demo.py::melody
 pycodedj eval examples/demo.py::pad
 ```
 
-3 つのループが同時に鳴っています。それぞれが独立して動いているのがわかるでしょうか。
+3 つのループが同時に鳴っています。それぞれが独立して動いています。
 
-### ステップ 3: コードを変えて音を変える
+### コードを変えて音を変える
 
-`examples/demo.py` をテキストエディタで開いて、bass ブロックを変えてみます。
+`examples/demo.py` をエディタで開いて、`bass` ブロックを変えてみましょう。
 
 **変更前:**
-
 ```python
 @loop("bass", interval=2.0)
 def bass(volume=0.4):
@@ -297,18 +282,17 @@ def bass(volume=0.4):
 ```
 
 **変更後（ネストを深くする）:**
-
 ```python
 @loop("bass", interval=2.0)
 def bass(volume=0.4):
     for i in range(8):
-        for j in range(4):      # 1 行追加
+        for j in range(4):      # 追加
             if i % 2 == 0:
-                if j > 2:       # 1 行追加
+                if j > 2:       # 追加
                     pass
 ```
 
-ファイルを保存したら、ターミナルで再度評価します。
+保存したら再度評価します。
 
 ```bash
 pycodedj eval examples/demo.py::bass
@@ -318,21 +302,25 @@ pycodedj eval examples/demo.py::bass
 [pycodedj] bass  cutoff=1200Hz  lfo=2.16Hz  reverb=0.00  voices=1  amp=0.40
 ```
 
-cutoff が上がって音が明るくなり、lfo も速くなりました。音量を変えたいときは `volume=` の値を変えます。
+cutoff が上がって音が明るくなり、lfo も速くなりました。ネストが深くなるほどフィルターが開きます。
+
+### 音量を変える
+
+`volume=` の値を変えるだけです。
 
 ```python
 @loop("bass", interval=2.0)
-def bass(volume=0.7):   # ← 大きくする
+def bass(volume=0.7):   # 大きくする
     ...
 ```
 
 ---
 
-## 5. 保存するだけで音が変わる — watch モード
+## 5. watch モード — 保存するだけで音が変わる
 
-毎回 `pycodedj eval` を打つのは面倒です。`watch` コマンドを使うと、起動時に一度すべてのループを評価し、その後は**ファイルを保存するだけで自動的に全ループが再評価されます**。
+毎回 `pycodedj eval` を打つのは手間です。`watch` コマンドを使うと、起動時に全ループをまとめて評価し、その後は**ファイルを保存するだけで自動的に全ループが再評価**されます。
 
-### 起動方法
+### 起動する
 
 ```bash
 pycodedj watch examples/demo.py
@@ -343,97 +331,100 @@ pycodedj watch examples/demo.py
 [pycodedj] reloaded demo.py (3 loop(s))
 ```
 
-起動直後に一度音が鳴ります。あとはエディタでコードを書いて保存するだけです。保存のたびに次のように出力されます。
+起動直後に一度すべてのループが評価されて音が鳴ります。あとはエディタでコードを書いて保存するだけです。
 
 ```
 [pycodedj] reloaded demo.py (3 loop(s))
 ```
 
-これがライブコーディングの本来のワークフローです。コードを書く → 保存する → 音が変わる、このサイクルを繰り返します。
+**コードを書く → 保存する → 音が変わる**、このサイクルがライブコーディングの本来の姿です。
 
-### 止め方
+### 止める
 
-ターミナルで **Ctrl+C** を押すと監視が止まります。SuperCollider の音はそのまま鳴り続けます。
+**Ctrl+C** を押すと監視が止まります。SuperCollider の音はそのまま鳴り続けます（止めたいときは `pycodedj panic`）。
 
-### デバウンスについて
+### 構文エラーが出たときは
 
-連続して保存したとき（vim のような一部のエディタは保存時にテンポラリファイルを経由する）でも、短時間に複数回評価されないよう自動的に間引きます。`--debounce` オプションでその待機時間を変更できます（デフォルト 0.3 秒）。
+コードに構文エラーがある状態で保存しても、**そのループだけ変化せず、他のループは鳴り続けます**。エラーはターミナルに表示されます。
 
-```bash
-pycodedj watch demo.py --debounce 0.5
 ```
+[pycodedj] syntax error (bass): invalid syntax (demo.py, line 7)
+```
+
+構文を直して保存すれば自動的に回復します。
 
 ---
 
-## 6. コードと音の関係を知る
+## 6. コードの構造が音を変える
 
-PyCodeDJ は Python コードの「構造」を 5 つの音楽パラメーターに変換します。
+PyCodeDJ は Python コードの「構造」を 5 つの音楽パラメーターに変換します。コードの中身（計算の結果や変数の値）ではなく、**形** を見ています。
 
 ### 対応表
 
 | コードのどこを見るか | 変わる音のパラメーター | 変化のイメージ |
 | :--- | :--- | :--- |
-| ブロック構造の深さ（`if` や `for` のネスト） | フィルターの明るさ（Cutoff） | 深くなるほど音が明るく開く |
-| 制御フローの数（`if` / `for` / `while` の合計） | 音の揺らぎの速さ（LFO レート） | 多いほど揺らぎが速くなる |
-| 関数の数（`def` の数） | 音の重なり（ポリフォニー声部数） | 多いほど音が重なる（最大 4） |
-| コメントの割合（コメント行 ÷ 全行） | 空間の広さ（リバーブの深さ） | 多いほど残響が増える |
-| `volume=` 引数のデフォルト値 | 音量（Amplitude） | 直接指定。0.0〜1.0 |
-| `eq=` / `low=` / `mid=` / `high=` 引数 | 簡易 3 バンド EQ | ループごとの音質補正 |
+| ブロックのネストの深さ（`if` や `for` の入れ子） | フィルターの明るさ（Cutoff 200〜4000 Hz） | 深くなるほど音が明るく開く |
+| 制御フローの数（`if` / `for` / `while` の合計） | 音の揺らぎの速さ（LFO レート 0.1〜5.0 Hz） | 多いほど揺らぎが速くなる |
+| 関数の数（`def` の数） | 音の重なり（ポリフォニー声部数 1〜4） | 多いほど音が重なる |
+| コメントの割合（コメント行 ÷ 全行数） | 空間の広さ（リバーブ 0.0〜0.8） | 多いほど残響が増える |
+| `volume=` 引数のデフォルト値 | 音量（0.0〜1.0） | そのまま反映される |
+| `eq=` / `low=` / `mid=` / `high=` 引数 | 3 バンド EQ | ループごとの音質補正 |
 
-### 実例で見る
+> **ポイント:** `x = 1 + 2 * (3 + 4)` のような式はカウントされません。`if` / `for` などのブロック構造だけを見ています。
+
+### 実例
 
 #### フィルターの明るさ（ネストの深さ）
 
 ```python
-@loop("test", interval=1.0)
+# ネスト深さ 0 → フィルター最小（こもった音）
+@loop("dark", interval=1.0)
 def f(volume=0.3):
-    # ネスト深さ 1 → フィルター最小（こもった音）
     pass
 ```
 
 ```python
-@loop("test", interval=1.0)
+# ネスト深さ 4 → フィルター全開（明るい音）
+@loop("bright", interval=1.0)
 def f(volume=0.3):
-    # ネスト深さ 4 → フィルター最大（明るい音）
     for i in range(4):
         for j in range(4):
             if i == j:
                 pass
 ```
 
-> `x = 1 + 2 * (3 + 4)` のような演算式はネストの深さにカウントされません。`if` や `for` などのブロック構造だけを数えます。
-
 #### 揺らぎの速さ（制御フローの数）
 
 ```python
-@loop("test", interval=1.0)
+# 制御フロー 0 個 → 揺らぎ最小（静かな音）
+@loop("still", interval=1.0)
 def f(volume=0.3):
-    # 制御フロー 0 個 → 揺らぎ最小（ゆったり）
     pass
 ```
 
 ```python
-@loop("test", interval=1.0)
+# 制御フロー 3 個 → 揺らぎ速い
+@loop("busy", interval=1.0)
 def f(volume=0.3):
-    for i in range(4):   # 1 つ目
-        if i > 2:        # 2 つ目
-            while False: # 3 つ目
+    for i in range(4):    # 1 つ目
+        if i > 2:          # 2 つ目
+            while False:   # 3 つ目
                 pass
 ```
 
 #### 音の重なり（関数の数）
 
 ```python
-@loop("test", interval=1.0)
-def solo(volume=0.3):
-    # 関数 1 個 → 1 声（ソロ）
+# def 1 個 → 1 声（ソロ）
+@loop("solo", interval=1.0)
+def f(volume=0.3):
     pass
 ```
 
 ```python
-@loop("test", interval=1.0)
+# def 4 個 → 4 声（最大ポリフォニー）
+@loop("choir", interval=1.0)
 def f(volume=0.3):
-    # 関数 4 個 → 4 声（最大ポリフォニー）
     def voice_a(): pass
     def voice_b(): pass
     def voice_c(): pass
@@ -443,38 +434,26 @@ def f(volume=0.3):
 #### 空間の広さ（コメント率）
 
 ```python
-@loop("test", interval=1.0)
+# コメントなし → ドライな音
+@loop("dry", interval=1.0)
 def f(volume=0.3):
-    # コメントなし → ドライな音
     x = 1
     return x
 ```
 
 ```python
-@loop("test", interval=1.0)
+# コメントが多い → 深い残響
+@loop("spacious", interval=1.0)
 def f(volume=0.3):
-    # コメントが多い → 深い残響
     # 余白
-    # 余白
-    # 余白
+    # もっと余白
+    # 静寂も音楽
     pass
-```
-
-#### 音量（volume 引数）
-
-```python
-@loop("kick", interval=1.0)
-def my_kick(volume=0.9):   # 大きい
-    ...
-
-@loop("shimmer", interval=4.0)
-def bg_shimmer(volume=0.05):  # 奥で小さく
-    ...
 ```
 
 #### 簡易 EQ
 
-`eq=` でジャンル寄りの EQ プリセットを選べます。必要なら `low=`, `mid=`, `high=` で一部だけ上書きできます。
+`eq=` でジャンル寄りの EQ プリセットを選べます。`low=`, `mid=`, `high=` で個別に調整も可能です。
 
 ```python
 @loop("bass_reese", interval=0.5)
@@ -486,9 +465,9 @@ def hats(volume=0.08, eq="edm", low=0.5, high=1.25):
     ...
 ```
 
-| `eq` | 傾向 |
+| `eq=` | 傾向 |
 | :--- | :--- |
-| `"flat"` | 補正なし |
+| `"flat"` | 補正なし（デフォルト） |
 | `"rock"` / `"pop"` | 低音と高音を少し上げ、中域を少し下げる |
 | `"edm"` / `"hiphop"` | 低音を強め、高音も少し上げる |
 | `"classic"` / `"jazz"` | フラット志向 |
@@ -496,222 +475,326 @@ def hats(volume=0.08, eq="edm", low=0.5, high=1.25):
 
 ---
 
-## 7. 複数のループを同時に動かす
+## 7. pattern() で音程とリズムを指定する
 
-PyCodeDJ の最大の特徴は、**複数のループが独立して動き続ける**ことです。
+前章の「コード構造が音を変える」とは別に、**明示的にリズムと音程を指定する**方法があります。それが `pattern()` です。
 
-### 基本の使い方
-
-`@loop("名前", ...)` デコレータを付けた関数を並べるだけで、複数のループを作れます。
+### pattern() の基本
 
 ```python
-from pycodedj import loop
+from pycodedj import loop, pattern
 
-@loop("bass", interval=2.0)
-def my_bass(volume=0.4):
-    for i in range(8):
-        pass
+@loop("kick", synth="floor_kick", dur=0.25)
+def kick_drum():
+    pattern("x . x .")
+```
 
-@loop("chord", interval=1.0)
-def my_chord(volume=0.2):
-    def chord_a(): pass
-    def chord_b(): pass
+`pattern()` に渡す文字列に、鳴らすタイミングを書きます。
 
-@loop("texture", interval=4.0)
-def bg(volume=0.06):
-    # 背景
-    # 空気
+| トークン | 意味 |
+| :--- | :--- |
+| `x` | ここで音を鳴らす（トリガー） |
+| `.` | 休符（無音） |
+| `0`, `1`, `2` … | 音を鳴らす + 音程（スケール度数） |
+
+スペースで区切ると 1 ステップになります。`"x . x ."` なら 4 ステップのパターンです。
+
+### @loop のパラメーター（pattern 用）
+
+`pattern()` を使うループでは、`@loop` デコレータに次の引数を追加します。
+
+| 引数 | 説明 | 例 |
+| :--- | :--- | :--- |
+| `synth=` | 使うシンセ名 | `synth="floor_kick"` |
+| `root=` | ルートノート | `root="A3"`, `root="C4"` |
+| `scale=` | スケール名 | `scale="minor"`, `scale="major"` |
+| `dur=` | 1 ステップの長さ（秒） | `dur=0.25`（16 分音符相当） |
+
+> **ポイント:** `volume=` / `eq=` / `interval=` は pattern ループでも引き続き使えます。
+
+### トリガーパターン — x と . だけで
+
+音程なしで「リズムだけ」を指定したいときは `x` と `.` だけ使います。
+
+```python
+from pycodedj import loop, pattern
+
+@loop("kick", synth="floor_kick", dur=0.25)
+def kick():
+    pattern("x . x .")      # 4 ステップ: 鳴る・休・鳴る・休
+
+@loop("hat", synth="hat_engine", dur=0.25)
+def hat():
+    pattern("x x x x x x x x")  # 8 ステップ: 全部鳴る（16 分グリッド）
+
+@loop("snare", synth="clap_snare", dur=0.25)
+def snare():
+    pattern(". . x . . . x .")   # 2・4 拍に鳴る
+```
+
+### 音程パターン — 数字でスケール度数を指定
+
+音程を指定したいときは整数（0 以上）を使います。数字はスケールの**度数**（0 から数えるインデックス）です。
+
+```python
+@loop("melody", synth="acid_lead", root="A3", scale="minor", dur=0.25)
+def melody():
+    pattern("0 . 3 . 5 . 7 .")
+```
+
+`scale="minor"` で `root="A3"` のとき、度数と音程の対応はこうなります。
+
+| 度数 | A ナチュラルマイナー |
+| :--- | :--- |
+| 0 | A3 |
+| 1 | B3 |
+| 2 | C4 |
+| 3 | D4 |
+| 4 | E4 |
+| 5 | F4 |
+| 6 | G4 |
+| 7 | A4（1 オクターブ上） |
+
+> **ヒント:** 度数が 7 以上になると自動的にオクターブが上がります。`7` は `0` の 1 オクターブ上、`14` は 2 オクターブ上です。
+
+### 利用可能なスケール
+
+SuperCollider の Scale ライブラリが使えます。主なものを挙げます。
+
+| `scale=` に渡す名前 | スケール |
+| :--- | :--- |
+| `"major"` | メジャー（長調） |
+| `"minor"` | ナチュラルマイナー（短調） |
+| `"chromatic"` | クロマチック（半音階） |
+| `"dorian"` | ドリアン |
+| `"phrygian"` | フリジアン |
+| `"lydian"` | リディアン |
+| `"mixolydian"` | ミクソリディアン |
+| `"pentatonicMajor"` | メジャーペンタトニック |
+| `"pentatonicMinor"` | マイナーペンタトニック |
+
+### x と数字を混ぜる
+
+トリガー（`x`）と度数を混ぜても使えます。`x` は「ルートノートで鳴らす」という意味になります。
+
+```python
+@loop("bass", synth="acid_lead", root="C3", scale="minor", dur=0.25)
+def bass():
+    pattern("0 . x . 3 . x .")
+    # 0→C3, 休, x→C3, 休, 3→Eb3, 休, x→C3, 休
+```
+
+### ルートノートの書き方
+
+`root=` にはノート名 + オクターブ番号を渡します。
+
+| 書き方 | 音 |
+| :--- | :--- |
+| `"C4"` | 中央 C（ミドル C） |
+| `"A3"` | A3 |
+| `"Bb2"` | B♭2 |
+| `"F#3"` | F♯3（`s` を使って `"Fs3"` とも書ける） |
+| `"C1"` | 低い C |
+
+### 実例: キックとベースとメロディー
+
+```python
+from pycodedj import loop, pattern
+
+@loop("kick", synth="floor_kick", dur=0.25)
+def kick():
+    pattern("x . . . x . . .")
+
+@loop("bass", synth="bass_acid", root="A1", scale="minor", dur=0.25)
+def bass():
+    pattern("0 . 0 . 3 . 5 .")
+
+@loop("melody", synth="acid_lead", root="A3", scale="minor", dur=0.5)
+def melody():
+    pattern("0 3 5 7")
+
+@loop("pad", interval=4.0)
+def pad(volume=0.06):
+    # 背景の空気感
+    # コード構造で鳴らす
     pass
 ```
 
-それぞれを別々に評価できます。
+### pattern() と構造マッピングの違い
 
-```bash
-pycodedj eval myfile.py::bass
-pycodedj eval myfile.py::chord
-pycodedj eval myfile.py::texture
-```
+| | コード構造マッピング（従来） | pattern() |
+| :--- | :--- | :--- |
+| リズム | SuperCollider 側で生成（コードの構造から） | 自分で指定 |
+| 音程 | SuperCollider 側で生成 | 自分で指定（または任せる） |
+| 使い方 | 構造の変化を楽しむ | リズム・音程を明示したいとき |
 
-または `watch` を使えばファイルを保存するだけで全ループが一斉に更新されます。
-
-### ループを止めるには
-
-ループを止めたいときは、その `@loop` デコレータごと関数を削除して保存します。watch モードなら保存時に自動で止まります。
-
-eval で止めたい場合は、関数名の `def` だけを残して本体を空にし、ファイルからブロックが消えたと判定されるよう `@loop` を削除します。
+どちらを使っても構いません。同じファイルの中で混在させることもできます。
 
 ---
 
-## 8. クラブセット例 — club_set.py を動かす
+## 8. 複数のループを同時に動かす
 
-`examples/club_set.py` は、四つ打ちを中心とした EDM クラブグルーヴのデモファイルです。8 ループで構成され、各ループのコード構造が意図的に異なるキャラクターを持つよう設計されています。
+PyCodeDJ の最大の特徴は、**複数のループが独立して動き続ける**ことです。1 つのループを変更しても、他のループは止まりません。
 
-全 30 音色を 1 音ずつ確認したい場合は `examples/sound_showcase.py` を使います。
-
-```bash
-pycodedj eval examples/sound_showcase.py::bass_acid
-pycodedj eval examples/sound_showcase.py::riser_noise
-pycodedj eval examples/sound_showcase.py::bell_rave
-```
-
-`@loop("kick_hard", ...)` のようなループ名は、SuperCollider 側では音色名として解釈されます。たとえば `kick_hard` はキック系、`bass_reese` はベース系のシンセに割り当てられます。Python 側でグルーヴや構成を変えるだけなら、通常は `sc/synths.scd` を編集する必要はありません。まったく新しい音色エンジンを増やしたいときだけ、SuperCollider 側に SynthDef を追加します。
-
-### club_set.py のループ構成
-
-| ループ名 | 役割 | コード構造の特徴 | cutoff / LFO |
-| :--- | :--- | :--- | :--- |
-| `kick_hard` | 四つ打ちキック | 1行代入のみ（最小） | 580Hz / 0.10Hz |
-| `sub_bass` | ディープサブ | 単純な for ループ | 960Hz / 0.59Hz |
-| `bass_acid` | アシッドライン | リスト展開 + 二重ループ + if | 2100Hz / 2.06Hz |
-| `hat_engine` | 16分ハットグリッド | 二重 for + 多段 if/elif（最複雑） | 2860Hz / 4.51Hz |
-| `clap_snare` | 2・4拍バックビート | 二重 for + if/elif + ネスト if | 2480Hz / 2.55Hz |
-| `chord_rave` | レイブコードスタブ | 三重 for + 多段 if/elif | 2860Hz / 3.53Hz |
-| `lead_hoover` | Hoover 風リード | コメント + 二重 for + 二段 if | 2100Hz / 2.06Hz、reverb 0.15 |
-| `shimmer_pad` | 空気感・奥行き | コメントのみ、コードなし | 580Hz / 0.10Hz、reverb 0.60 |
-
-### 動かしてみる
-
-watch で起動して、エディタで各ブロックを編集しながら音を変えていきます。起動直後に全ループが一度評価されるので、保存しなくてもまず音が鳴ります。
-
-```bash
-pycodedj watch examples/club_set.py
-```
-
-個別にループを評価したい場合は eval を使います。
-
-```bash
-pycodedj eval examples/club_set.py::kick_hard
-pycodedj eval examples/club_set.py::bass_reese
-pycodedj eval examples/club_set.py::chord_rave
-```
-
-### 演奏してみる
-
-**音量を変える:** `volume=` の値を変えて保存するだけで、そのループの音量が即座に変わります。
+### 基本の使い方
 
 ```python
-@loop("lead_hoover", interval=4.0)
-def hoover(volume=0.4):   # ← 前に出したいとき
-    ...
-```
+from pycodedj import loop, pattern
 
-**EQ を変える:** `eq=` でプリセットを選び、必要な帯域だけ `low=`, `mid=`, `high=` で調整できます。
+@loop("kick", synth="floor_kick", dur=0.25)
+def kick():
+    pattern("x . x .")
 
-```python
-@loop("bass_reese", interval=0.5)
-def bass(volume=0.45, eq="edm", low=1.5):
-    ...
-```
+@loop("bass", interval=2.0)
+def bass_line(volume=0.4):
+    for i in range(8):
+        if i % 2 == 0:
+            pass
 
-**空間を変える:** `warehouse_air` や `shimmer_pad` のコメントを増やしたり減らしたりすると、リバーブの深さが変わります。
-
-```python
-@loop("warehouse_air", interval=4.0)
-def room_tone(volume=0.06):
-    # concrete walls
-    # low ceiling pressing down
-    # crowd warmth
+@loop("pad", interval=4.0)
+def atmosphere(volume=0.08):
+    # 背景の空気
+    # 余白
     pass
 ```
 
-コメントを 1 行だけ残して保存してみてください。空間が一気に乾いた音になります。
+watch で起動すれば、保存するたびに変更したループだけが更新されます。
 
-**グルーヴを変える:** `bass_acid` の `elif` ブロックを削除してフラットにすると、アシッドのスクウェルチが消えて落ち着いたベースになります。`snare_roll` の `volume=` を上げると、ビルドアップがより強調されます。
+```bash
+pycodedj watch myfile.py
+```
+
+### 演奏中のコントロール
+
+**ミュートとアンミュート**
+
+```bash
+pycodedj mute bass        # bass を消音（停止はしない）
+pycodedj unmute bass      # bass の音量を元に戻す
+```
+
+**緊急停止**
+
+```bash
+pycodedj panic            # すべてのループを即時停止
+```
+
+**ループの状態を確認**
+
+```bash
+pycodedj status
+```
+
+```
+Loop         State    Amp    Cutoff
+kick         playing  0.30   —
+bass         playing  0.40   1340Hz
+pad          muted    0.08   200Hz
+```
+
+### ループを削除するには
+
+ファイルからそのブロック（`@loop` デコレータごと関数）を削除して保存します。watch モードなら保存時に自動的に停止します。
 
 ---
 
 ## 9. 音色リファレンス
 
-`@loop` の第一引数（ループ名）を変えると、SuperCollider 側で使う音色を選べます。全 30 音色を 1 音ずつ確認したい場合は `examples/sound_showcase.py` を使います。
+`@loop` の第一引数（ループ名）で、SuperCollider 側で使う音色が決まります。
+
+全 30 音色を 1 音ずつ確認したい場合は `examples/sound_showcase.py` を使います。
 
 ```bash
+pycodedj eval examples/sound_showcase.py::floor_kick
 pycodedj eval examples/sound_showcase.py::bass_acid
-pycodedj eval examples/sound_showcase.py::riser_noise
-pycodedj eval examples/sound_showcase.py::bell_rave
+pycodedj eval examples/sound_showcase.py::acid_lead
 ```
 
-**キック**
+`synth=` パラメーター（pattern 使用時）でも同じ名前を指定できます。
 
-| ループ名 | 音 |
+### キック
+
+| 名前 | 音の特徴 |
 | :--- | :--- |
 | `kick_hard` | 硬めでアタックの強いキック |
 | `floor_kick` | 太い四つ打ちキック |
 | `kick_pulse` | 軽めのパルスキック |
 
-**ベース**
+### ベース
 
-| ループ名 | 音 |
+| 名前 | 音の特徴 |
 | :--- | :--- |
-| `bass_rumble` | キック由来の低いランブル |
+| `bass_rumble` | 深い低音ランブル |
 | `bass_reese` | 揺れる Reese 系ベース |
 | `sub_bass` | サブベース |
-| `bass_acid` | 303スタイルのアシッドベース（スクウェルチ付き） |
+| `bass_acid` | 303 スタイルのアシッドベース |
 
-**パーカッション**
+### パーカッション
 
-| ループ名 | 音 |
+| 名前 | 音の特徴 |
 | :--- | :--- |
 | `hat_engine` | クローズ/オープンのハットグリッド |
 | `hat_ride` | 長めのライド/オープンハット |
 | `clap_snap` | 鋭いクラップ |
 | `clap_snare` | スネア寄りのクラップ |
-| `tom_drum` | フロアタム（ピッチスイープあり） |
-| `snare_roll` | スネアロール（lfoRate で速度制御） |
+| `tom_drum` | フロアタム（ピッチスイープ付き） |
+| `snare_roll` | スネアロール |
 | `noise_crash` | クラッシュシンバル（長いテール） |
 
-**コード・スタブ**
+### コード・スタブ
 
-| ループ名 | 音 |
+| 名前 | 音の特徴 |
 | :--- | :--- |
 | `chord_rave` | 明るいレイブスタブ |
 | `neon_stab` | ネオン系スタブコード |
 | `dub_chord` | ダブコード |
 | `stab_saw` | デチューンソーコードスタブ |
 | `organ_chord` | ハモンドオルガン風コード |
-| `bell_rave` | インハーモニクスFMレイブベル |
+| `bell_rave` | FM ベル（レイブ系） |
 
-**リード**
+### リード・メロディー
 
-| ループ名 | 音 |
+| 名前 | 音の特徴 |
 | :--- | :--- |
 | `acid_lead` | アシッド系リード |
 | `lead_hoover` | Hoover 風リード |
 | `soft_pluck` | やわらかいプラック |
-| `synth_arp` | アルペジオシンセ（高速ノートシーケンス） |
+| `synth_arp` | アルペジオシンセ |
+| `note` | 汎用ノートシンセ（音程パターン向け） |
 
-**アトモスフィア**
+### アトモスフィア
 
-| ループ名 | 音 |
+| 名前 | 音の特徴 |
 | :--- | :--- |
 | `shimmer_pad` | 深いシマーパッド |
 | `warehouse_air` | 倉庫っぽい空気感 |
 | `vox_ahh` | フォルマントボーカルパッド |
 
-**FX**
+### FX
 
-| ループ名 | 音 |
+| 名前 | 音の特徴 |
 | :--- | :--- |
 | `fx_impact` | 低いインパクト |
-| `riser_noise` | ノイズライザー（8秒でスイープ上昇） |
+| `riser_noise` | ノイズライザー（8 秒でスイープ上昇） |
 | `glitch_ticks` | 細かいグリッチ音 |
 
 ---
 
 ## 10. 演奏のアイデア
 
-### アイデア A: シンプルから複雑へ育てる
+### アイデア A: シンプルから育てていく
 
-最初は空のコードから始めて、少しずつ要素を加えていきます。watch を起動した状態で保存するたびに音が変わっていく様子を楽しめます。
+watch を起動した状態で、空のコードから少しずつ要素を足していきます。保存するたびに音が変わる様子を体験できます。
 
 ```python
-# 段階 1: ほぼ無音（フィルター最小、ポリフォニー 1）
+# 段階 1: 最小（フィルター最小、ポリフォニー 1）
 @loop("main", interval=1.0)
 def f(volume=0.3):
     pass
 ```
 
 ```python
-# 段階 2: 揺らぎを加える
+# 段階 2: 揺らぎを追加
 @loop("main", interval=1.0)
 def f(volume=0.3):
     for i in range(4):
@@ -719,7 +802,7 @@ def f(volume=0.3):
 ```
 
 ```python
-# 段階 3: さらに深く
+# 段階 3: ネストを深くしてフィルターを開く
 @loop("main", interval=1.0)
 def f(volume=0.3):
     for i in range(4):
@@ -737,15 +820,30 @@ def f(volume=0.5):
             for j in range(2):
                 if i > j:
                     pass
-
     def voice_b():
         for k in range(8):
             pass
 ```
 
-### アイデア B: コントラストをつける
+### アイデア B: pattern() でライブシーケンス
 
-2 つのループを使って、にぎやかなパートと静かなパートを対比させます。
+pattern() を使って、保存するたびにリズムや音程を変えていきます。
+
+```python
+from pycodedj import loop, pattern
+
+@loop("kick", synth="floor_kick", dur=0.25)
+def kick():
+    pattern("x . x .")   # ← ここを変えて保存するたびにリズムが変わる
+
+@loop("bass", synth="bass_acid", root="A1", scale="minor", dur=0.25)
+def bass():
+    pattern("0 . 0 . 3 .")   # ← 度数を変えて和声を変える
+```
+
+### アイデア C: コントラストをつける
+
+にぎやかなパートと静かなパートを対比させます。
 
 ```python
 @loop("bass", interval=2.0)
@@ -755,13 +853,10 @@ def the_bass(volume=0.5):
             for j in range(4):
                 if i == j:
                     pass
-
     def layer_b():
         for k in range(8):
             pass
-```
 
-```python
 @loop("pad", interval=4.0)
 def space(volume=0.08):
     # 静寂
@@ -770,9 +865,9 @@ def space(volume=0.08):
     pass
 ```
 
-### アイデア C: コメントだけで演奏する
+### アイデア D: コメントだけで演奏する
 
-関数は 1 つだけ残して、コメントの量だけで演奏します。コメントが増えるほど残響が深くなり、音の空間が変化します。
+関数は 1 つだけ残して、コメントの量だけで演奏します。コメントが増えるほど残響が深くなります。
 
 ```python
 @loop("ambient", interval=4.0)
@@ -781,18 +876,18 @@ def f(volume=0.15):
     pass
 ```
 
-### アイデア D: 関数名をストーリーとして書く
+### アイデア E: 関数名でストーリーを書く
 
-音は関数の中身の構造で決まります。関数名はどんな名前でも構いません。演奏しながらコードがストーリーになるような書き方もできます。
+音は関数の中身の構造で決まります。関数名は何でも構いません。
 
 ```python
-@loop("narrative", interval=2.0)
+@loop("scene", interval=2.0)
 def the_city_wakes_up(volume=0.3):
     for hour in range(6):
         if hour > 4:
             pass
 
-@loop("texture", interval=1.0)
+@loop("rush", interval=1.0)
 def rush_hour(volume=0.2):
     for commuter in range(8):
         for train in range(3):
@@ -806,69 +901,55 @@ def rush_hour(volume=0.2):
 
 ### 音が鳴らない
 
-まず SuperCollider 単体で音が出るか確認します。SuperCollider IDE で新しい空のドキュメントを開き、次の 1 行を実行します。
+まず SuperCollider 単体で音が出るか確認します。SuperCollider IDE のコードを書く場所で次を実行します。
 
 ```supercollider
 { SinOsc.ar(440, 0, 0.1) ! 2 }.play;
 ```
 
-実行は **Ctrl+Enter**（Mac は Cmd+Enter）です。音を止めるには **Ctrl+.**（Mac は Cmd+.）を押します。
+**Ctrl+Enter**（Mac は **Cmd+Enter**）で実行、**Ctrl+.**（Mac は **Cmd+.**）で停止です。
 
-ここで音が出ない場合は、PyCodeDJ ではなく SuperCollider のサーバー、Mac/PC の音量、出力先を確認してください。
+ここで音が出なければ PyCodeDJ の問題ではありません。SuperCollider サーバーの状態、OS の音量設定、出力デバイスを確認してください。
 
-次に SuperCollider のサーバーが起動しているか確認します。
+音が出た場合は次を確認します。
+
+**1. サーバーが起動しているか**
 
 ```supercollider
 s.boot;
 ```
 
-次に `sc/synths.scd` を再実行します（Ctrl+A → Ctrl+Enter、Mac は Cmd+A → Cmd+Enter）。Post window に次が出るはずです。
+**2. `sc/synths.scd` が読み込まれているか**
 
-```text
+`sc/synths.scd` を全選択して実行（Ctrl+A → Ctrl+Enter）し、Post window に次が出るか確認します。
+
+```
 PyCodeDJ synths loaded. Ready. OSC port: 57120
 ```
 
-OSC port が `57120` か確認するには、SuperCollider で次を実行します。
+**3. ポート番号が合っているか**
+
+SuperCollider で次を実行して確認します。
 
 ```supercollider
 NetAddr.langPort.postln;
 ```
 
-`57120` 以外が表示された場合は、Python 側でその番号を指定します。
+`57120` 以外が表示されたら、Python 側でポートを指定します。
 
 ```bash
 pycodedj eval examples/demo.py::bass --sc-port 表示された番号
 ```
 
-SuperCollider 側のシンセが読み込まれているか直接確認するには、SuperCollider で次を実行します。
+**4. OSC の受信確認**
 
-```supercollider
-~startLoop.value("bass", 1);
-```
-
-これで音が出れば、シンセ定義は読み込まれています。音を止めるには **Ctrl+.**（Mac は Cmd+.）です。
-
-さらに OSC 受信を SuperCollider 内だけで確認するには、次を実行します。
-
-```supercollider
-NetAddr("127.0.0.1", NetAddr.langPort).sendMsg("/pycodedj/loop/bass/voice_count", 1);
-```
-
-これで音が出れば、SuperCollider 側の OSC 受信も動いています。
-
-それでも音が鳴らない場合は、接続確認をします。
-
-```bash
-pycodedj eval examples/demo.py::bass
-```
-
-必要なら SuperCollider 側で OSC の受信ログを出せます。
+SuperCollider で OSC トレースを有効にします。
 
 ```supercollider
 OSCFunc.trace(true);
 ```
 
-ログを止めるには次を実行します。
+この状態で `pycodedj eval` を実行し、SuperCollider の Post window に OSC メッセージが流れるか確認します。確認が終わったらトレースを止めます。
 
 ```supercollider
 OSCFunc.trace(false);
@@ -878,21 +959,17 @@ OSCFunc.trace(false);
 
 SuperCollider が起動していないか、ポート番号が違います。
 
-1. SuperCollider IDE が開いていて、サーバーが起動しているか確認する
+1. SuperCollider IDE が開いていてサーバーが起動しているか確認する
 2. `sc/synths.scd` を実行して `Ready.` メッセージを確認する
-3. ポート番号がデフォルト（57120）から変わっていれば `--sc-port` で指定する
+3. ポート番号が違う場合は `--sc-port` で指定する
 
 ```bash
 pycodedj eval demo.py::bass --sc-port 57200
 ```
 
-### eval を実行したが何も出ない（フィードバックが出ない）
-
-eval に成功すると `[pycodedj] ループ名  cutoff=...Hz ...` の行が出るはずです。何も出ない場合は stderr を確認してください。構文エラーが出ているかもしれません。
-
 ### `loop 'xxx' not found` というエラーが出る
 
-ループ名の綴りが `@loop(...)` の第一引数と一致していません。`::` の後ろの名前を確認してください。
+`::` の後ろのループ名が `@loop(...)` の第一引数と一致していません。
 
 ```bash
 # ファイルの中に @loop("bass", ...) と書いてあれば
@@ -902,16 +979,14 @@ pycodedj eval demo.py::Bass   # NG（大文字小文字が違う）
 
 ### `file not found` というエラーが出る
 
-ファイルのパスが正しくありません。カレントディレクトリを確認するか、フルパスで指定します。
+ファイルのパスが正しくありません。現在のディレクトリを確認するか、フルパスで指定します。
 
 ```bash
-pwd
-ls
-
-pycodedj eval /home/user/projects/myfile.py::bass
+pwd    # 現在のディレクトリを確認
+ls     # ファイル一覧を確認
 ```
 
-### `pycodedj watch` が watchdog をインストールしろと言う
+### `pycodedj watch` が watchdog のインストールを求める
 
 ```bash
 pip install 'pycodedj[watch]'
@@ -919,13 +994,22 @@ pip install 'pycodedj[watch]'
 
 最初のインストールで `[watch]` を付け忘れた場合はこれで追加できます。
 
-### 構文エラーのあるコードを評価したとき
+### 出力先を変えたら音が出なくなった
 
-```
-[pycodedj] syntax error (bass): invalid syntax ...
+SuperCollider は audio server を起動した時点の出力先を使います。出力先を変更したら次の手順を踏みます。
+
+```supercollider
+// 利用可能なデバイスを確認
+ServerOptions.devices;
+
+// 出力先を指定して再起動
+s.quit;
+s.options.outDevice = "ここに出力デバイス名";
+s.options.numInputBusChannels = 0;
+s.boot;
 ```
 
-構文エラーがあったブロックは変化せず、直前の音を維持します。他のループは止まりません。コードの構文を修正してから再度評価してください。
+boot 後、`sc/synths.scd` をもう一度実行してください。
 
 ---
 
@@ -934,7 +1018,6 @@ pip install 'pycodedj[watch]'
 ### `pycodedj eval`
 
 指定したループを一度だけ評価して SuperCollider にパラメーターを送ります。
-`eval` は evaluate（評価する）の略で、「このループを今すぐ音に反映する」という意味です。
 
 ```
 pycodedj eval FILE::LOOP [--sc-host HOST] [--sc-port PORT]
@@ -946,17 +1029,13 @@ pycodedj eval FILE::LOOP [--sc-host HOST] [--sc-port PORT]
 | `--sc-host` | SuperCollider のホスト | `127.0.0.1` |
 | `--sc-port` | SuperCollider の受信ポート番号 | `57120` |
 
-`FILE::LOOP` は、`FILE` の中にある `@loop("LOOP", ...)` のブロックを指定します。たとえば `examples/demo.py::bass` は、`@loop("bass", ...)` デコレータが付いた関数を評価します。
-
 成功すると stdout にフィードバックが出ます。
 
 ```
 [pycodedj] bass  cutoff=418Hz  lfo=1.08Hz  reverb=0.00  voices=1  amp=0.40
 ```
 
-評価に失敗した場合（構文エラー / OSC 送信失敗）は stderr にエラーが出て終了コード 1 で終了します。
-
-**使用例:**
+失敗した場合は stderr にエラーが出て終了コード 1 で終了します。
 
 ```bash
 pycodedj eval examples/demo.py::bass
@@ -974,30 +1053,23 @@ pycodedj watch FILE [--sc-host HOST] [--sc-port PORT] [--debounce SECS]
 
 | 引数・オプション | 説明 | デフォルト |
 | :--- | :--- | :--- |
-| `FILE` | 監視するファイルのパス | — |
+| `FILE` | 監視するファイル | — |
 | `--sc-host` | SuperCollider のホスト | `127.0.0.1` |
 | `--sc-port` | SuperCollider の受信ポート番号 | `57120` |
 | `--debounce` | 連続保存をまとめる待機時間（秒） | `0.3` |
 
-**使用例:**
-
 ```bash
 pycodedj watch examples/demo.py
 pycodedj watch club_set.py --debounce 0.5
-pycodedj watch myfile.py --sc-host 192.168.1.10
 ```
 
 ### `pycodedj panic`
 
-全アクティブループに即時停止信号を送ります。
+全アクティブループに即時停止信号を送ります。演奏中に問題が起きたとき、すべての音をすぐ止めたい場合に使います。
 
 ```
 pycodedj panic [--sc-host HOST] [--sc-port PORT]
 ```
-
-演奏中に問題が起きたとき、すべての音をすぐ止めたい場合に使います。SuperCollider 側で実行中のシンセをすべて解放し、ループ状態を初期化します。
-
-**使用例:**
 
 ```bash
 pycodedj panic
@@ -1005,25 +1077,15 @@ pycodedj panic
 
 ### `pycodedj mute`
 
-ループを消音します（停止はしません）。ループは引き続き管理され、unmute で音量が復元します。
+ループを消音します（停止はしません）。unmute で音量が復元します。
 
 ```
 pycodedj mute NAME [--sc-host HOST] [--sc-port PORT]
 ```
 
-| 引数・オプション | 説明 | デフォルト |
-| :--- | :--- | :--- |
-| `NAME` | ループ名 | — |
-| `--sc-host` | SuperCollider のホスト | `127.0.0.1` |
-| `--sc-port` | SuperCollider の受信ポート番号 | `57120` |
-
-**使用例:**
-
 ```bash
 pycodedj mute bass
 ```
-
-> **注意:** CLI は OSC を直接 SuperCollider に送信します。ループを再評価してもミュート状態を維持したい場合は、watch セッション内で `Engine.mute()` を呼び出してください。
 
 ### `pycodedj unmute`
 
@@ -1033,29 +1095,17 @@ pycodedj mute bass
 pycodedj unmute NAME [--sc-host HOST] [--sc-port PORT]
 ```
 
-**使用例:**
-
 ```bash
 pycodedj unmute bass
 ```
 
-### `pycodedj solo`
-
-> **CLI からはサポートされていません。** Solo は watch プロセスの状態へのアクセスが必要です。watch セッション内で `Engine.solo()` を直接呼び出してください。
-
-### `pycodedj unsolo`
-
-> **CLI からはサポートされていません。** watch セッション内で `Engine.unsolo()` を直接呼び出してください。
-
 ### `pycodedj status`
 
-アクティブなループの名前・ミュート状態・音量・フィルターカットオフを表示します。
+アクティブなループの状態を表示します。
 
 ```
 pycodedj status [--sc-host HOST] [--sc-port PORT]
 ```
-
-出力形式:
 
 ```
 Loop         State    Amp    Cutoff
@@ -1063,33 +1113,36 @@ bass         playing  0.40   1340Hz
 pad          muted    0.15   200Hz
 ```
 
-> **注意:** `status` は `pycodedj watch` とは別プロセスで動作するため、watch プロセスの状態を読み取ることができません。CLI から単独で実行すると「no active loops」と表示されます。
+> **注意:** `status` は watch プロセスとは別プロセスで動作するため、watch セッション外で実行すると「no active loops」と表示されます。
 
-**使用例:**
-
-```bash
-pycodedj status
-```
-
-### ループの書き方
+### ループの書き方（まとめ）
 
 ```python
-from pycodedj import loop
+from pycodedj import loop, pattern
 
-@loop("ループ名", interval=秒)
+# コード構造マッピング
+@loop("名前", interval=秒数)
 def 関数名(volume=音量, eq="プリセット"):
-    # 関数の中身が音楽パラメーターに変換される
+    # 中身の構造が音楽パラメーターになる
     ...
+
+# pattern() を使う
+@loop("名前", synth="音色名", root="ノート", scale="スケール", dur=秒数)
+def 関数名(volume=音量):
+    pattern("x . x . 0 . 3 .")
 ```
 
-| 要素 | 説明 |
-| :--- | :--- |
-| `"ループ名"` | SuperCollider に送られる名前。英数字とアンダースコア。例: `bass`, `kick_hard` |
-| `interval=秒` | ループの更新間隔（秒）。省略時は 1.0 |
-| `volume=音量` | 音量。0.0〜1.0 の浮動小数点数。省略時は 0.3 |
-| `eq="プリセット"` | 簡易 EQ。省略時は `"flat"` |
-| `low=倍率`, `mid=倍率`, `high=倍率` | EQ の手動調整。0.0〜2.0。プリセットの一部だけ上書きできる |
-| 関数名 | 自由につけられる。ループ名とは独立している |
+| 引数 | 説明 | デフォルト |
+| :--- | :--- | :--- |
+| `"名前"` | ループ名（英数字とアンダースコア） | — |
+| `interval=` | 更新間隔（秒） | `1.0` |
+| `volume=` | 音量（0.0〜1.0） | `0.3` |
+| `eq=` | EQ プリセット | `"flat"` |
+| `low=`, `mid=`, `high=` | EQ 個別調整（0.0〜2.0） | プリセット値 |
+| `synth=` | pattern 用のシンセ名 | — |
+| `root=` | pattern 用のルートノート | `"C4"` |
+| `scale=` | pattern 用のスケール名 | `"chromatic"` |
+| `dur=` | pattern の 1 ステップの長さ（秒） | `0.25` |
 
 ---
 
@@ -1104,22 +1157,20 @@ def 関数名(volume=音量, eq="プリセット"):
 | リバーブ | コメント率 0.0–1.0 | 0.0–0.8 | リニア |
 | 声部数 | 関数数（クランプ） | 1–4 | クランプ |
 | 音量 | `volume=` 引数 | そのまま | パススルー |
-| EQ | `eq=` プリセット + `low/mid/high` | 0.0–2.0 | プリセット、手動値はクランプ |
 
 ### OSC アドレス
 
-SuperCollider と通信するアドレスの形式です。Hydra などのビジュアルツールを繋ぐときに参照してください。
+SuperCollider と通信するアドレスです。Hydra などのビジュアルツールを繋ぐときに参照してください。
 
 | アドレス | 型 | 値 |
 | :--- | :--- | :--- |
 | `/pycodedj/loop/<name>/params` | int, float, float, float, float | `voice_count`, `cutoff`, `lfo_rate`, `reverb`, `amp` の順 |
-| `/pycodedj/loop/<name>/voice_count` | int | 1–4（互換用） |
-| `/pycodedj/loop/<name>/cutoff` | float | 200–4000（互換用） |
-| `/pycodedj/loop/<name>/lfo_rate` | float | 0.1–5.0（互換用） |
-| `/pycodedj/loop/<name>/reverb` | float | 0.0–0.8（互換用） |
-| `/pycodedj/loop/<name>/amp` | float | 0.0–1.0（互換用） |
+| `/pycodedj/loop/<name>/pattern` | int, str, float, str, int… | `root_midi`, `scale`, `dur`, `synth`, `step…` |
+| `/pycodedj/loop/<name>/pattern_stop` | — | パターン停止 |
+| `/pycodedj/loop/<name>/synth` | str | シンセ名（空文字列でリセット） |
+| `/pycodedj/loop/<name>/amp` | float | 音量（互換用） |
 
-### Python から直接使う
+### Python API から直接使う
 
 CLI を使わずにプログラムから操作することもできます。
 
@@ -1149,6 +1200,7 @@ pycodedj/
 ├── block_parser.py   # @loop デコレータを AST で解析してブロックを分割する
 ├── analyzer.py       # コードの特徴量（深さ・数・比率）を抽出する
 ├── mapper.py         # 特徴量を音楽パラメーターに変換する
+├── pattern.py        # pattern() 文字列を解析する
 ├── engine.py         # ブロック評価のパイプライン全体を管理する
 ├── osc_bridge.py     # SuperCollider へ OSC で送信する
 ├── watcher.py        # ファイル監視（watchdog ベース）

@@ -1,5 +1,27 @@
 # Changelog
 
+## [0.4.0] - 2026-05-08
+
+### Features
+
+- `pattern()` ヘルパー — `x`（トリガー）・`.`（休符）・整数（スケール度数）で構成したパターン文字列を SuperCollider に送信し `Pdef + Pbind` で再生する
+- `@loop` デコレータに `synth=`, `root=`, `scale=`, `dur=` 引数を追加。`pattern()` ループでシンセ・ルートノート・スケール・ステップ長を指定できる
+- `pycodedj_note` SynthDef を追加。音程パターン（度数を含む場合）は自動的にこのシンセで再生される
+- `send_pattern` / `send_pattern_stop` / `send_synth` を `OscBridge` に追加
+- SC 側: `~patterns` 辞書でアクティブな `Pdef` を追跡。`~startLoop` でパターン中のループに対して従来のシンセループが二重起動されないよう保護
+
+### Improvements
+
+- `block_parser._extract_pattern_call` を `ast.walk`（全ノード走査）から DFS preorder + ネストスコープ除外に変更。ネストされたヘルパー関数内の `pattern()` 呼び出しを誤検出しなくなった
+- パターン引数の検証を OSC 送信より前に行い、検証失敗時に状態が更新されないよう修正（アトミック更新）
+- パターンループは `voice_count=0` を送信し従来のシンセループを抑制。ミュート状態でも Pdef を停止しないよう `~applyLoopParams` を修正
+- 度数トークンがある場合は `synth=` 指定の有無にかかわらず `pycodedj_note` を使用（既存シンセは `freq` を消費しないため）
+
+### Docs
+
+- `docs/manual.ja.md` / `docs/manual.md` / `docs/manual.html` — マニュアル全面改訂。`pattern()` の使い方（第 7 章）を新設し、初心者向けに丁寧に再構成
+- `README.ja.md` / `README.md` — Sprint 2 機能（`pattern()`, `@loop` 拡張）の説明を追加、ロードマップの Sprint 2 を完了に更新
+
 ## [0.3.0] - 2026-05-08
 
 ### Features

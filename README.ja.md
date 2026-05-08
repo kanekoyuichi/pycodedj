@@ -2,7 +2,7 @@
 
 [English README](https://github.com/kanekoyuichi/pycodedj/blob/main/README.md) · [マニュアル (JA)](https://github.com/kanekoyuichi/pycodedj/blob/main/docs/manual.ja.md) · [Full Manual (EN)](https://github.com/kanekoyuichi/pycodedj/blob/main/docs/manual.md)
 
-Pythonコードの構造をリアルタイムに音楽へ変換するライブコーディング環境。ファイルを保存するたびに演奏が変わる。
+Python のコードを書くと、リアルタイムに音が変わるライブコーディング環境。ファイルを保存するたびに演奏が変わる。
 
 ---
 
@@ -10,12 +10,12 @@ Pythonコードの構造をリアルタイムに音楽へ変換するライブ�
 
 PyCodeDJ は「コードを書くこと」と「音を鳴らすこと」を直結させます。
 
-関数を増やせばポリフォニーが広がり、ネストを深くすればフィルターが開き、コメントを書き込めば空間が広がる。コードの構造そのものが楽器です。
+`for` ループを増やすと音の揺らぎが速くなり、ネストを深くするとフィルターが開き、コメントを書き込むと空間が広がります。`pattern("x . x .")` と書けばそのリズムで音が鳴り、`pattern("0 . 3 . 5 .")` と書けば指定した音程で演奏されます。
 
-既存の Python ↔ SuperCollider ブリッジ（sc3nb・supriya）との違いは2点です。
+既存の Python ↔ SuperCollider ブリッジ（sc3nb・supriya）との違いは 2 点です。
 
-- **ホットリロード演奏** — ループを止めずにファイルを差し替える。保存が即座に音の変化になる。
-- **コード構造の可聴化** — AST解析で抽出した構造的特徴量（深さ・分岐数・関数数など）を音楽パラメーターへ自動変換する。
+- **ホットリロード演奏** — ループを止めずにファイルを差し替える。保存が即座に音の変化になる
+- **2 つの演奏スタイル** — コードの構造から自動生成するモードと、`pattern()` で音程とリズムを明示指定するモードを自由に混在させられる
 
 ---
 
@@ -29,26 +29,24 @@ PyCodeDJ は「コードを書くこと」と「音を鳴らすこと」を直�
 
 | 層 | 役割 | 技術 |
 | :--- | :--- | :--- |
-| 制御層 | コード解析・スケジューリング・OSC送出 | Python 3.10+, python-osc, watchdog |
+| 制御層 | コード解析・スケジューリング・OSC 送出 | Python 3.10+, python-osc, watchdog |
 | 音響層 | リアルタイム音響合成 | SuperCollider (scsynth) |
 | 視覚層 | 音楽データに同期した映像生成 | Hydra または Pyxel |
 
-BPMクロックは SuperCollider 側の `TempoClock` が保持します。Python は「次のループで使う設定の更新」をOSCで送るだけに徹し、タイミング精度は SuperCollider に委ねます。
+BPM クロックは SuperCollider 側の `TempoClock` が保持します。Python は「次のループで使う設定の更新」を OSC で送るだけで、タイミング精度は SuperCollider に委ねます。
 
 ---
 
 ## コード構造 → 音楽パラメーターのマッピング
 
-| コード特徴量 | 音楽パラメーター | 音楽的根拠 |
-| :--- | :--- | :--- |
-| ネストの深さ（最大） | フィルター Cutoff (200–4000 Hz) | 深い構造＝複雑さ＝音色の明るさ |
-| 制御フロー数（if/for/while） | LFO レート (0.1–5.0 Hz) | 分岐の多さ＝揺らぎの速さ |
-| 関数定義数 | ポリフォニー声部数 (1–4) | 関数＝独立した声部 |
-| コメント率 | リバーブ Depth (0.0–0.8) | 余白の多さ＝空間の広さ |
-| `volume=` 引数 | Amplitude (0.0–1.0) | 演奏者が直接音量を制御する |
-| `eq=` / `low=` / `mid=` / `high=` 引数 | 簡易 3 バンド EQ | ループごとの音質補正 |
-
-テンポ（BPM）と基音（Pitch）は演奏者が明示的に制御します。保存のたびに楽曲全体の土台が変わることを防ぐためです。
+| コード特徴量 | 音楽パラメーター |
+| :--- | :--- |
+| ネストの深さ（最大） | フィルター Cutoff (200–4000 Hz) |
+| 制御フロー数（if/for/while） | LFO レート (0.1–5.0 Hz) |
+| 関数定義数 | ポリフォニー声部数 (1–4) |
+| コメント率 | リバーブ Depth (0.0–0.8) |
+| `volume=` 引数 | Amplitude (0.0–1.0) |
+| `eq=` / `low=` / `mid=` / `high=` 引数 | 簡易 3 バンド EQ |
 
 ---
 
@@ -63,12 +61,12 @@ BPMクロックは SuperCollider 側の `TempoClock` が保持します。Python
 pip install 'pycodedj[watch]'
 ```
 
-`[watch]` を付けると `pycodedj watch` コマンドも使えるようになります。
+`[watch]` を付けると `pycodedj watch` コマンドも使えます。
 
 開発用:
 
 ```bash
-git clone https://github.com/yourname/pycodedj
+git clone https://github.com/kanekoyuichi/pycodedj
 cd pycodedj
 pip install -e ".[dev]"
 ```
@@ -77,84 +75,92 @@ pip install -e ".[dev]"
 
 ## クイックスタート
 
-**1. SuperCollider を起動し、シンセを読み込む**
+**1. SuperCollider を起動してシンセを読み込む**
 
-SuperCollider IDE で `sc/synths.scd` を開いて実行します。
+SuperCollider IDE で `sc/synths.scd` を開き、Ctrl+A（Mac は Cmd+A）→ Ctrl+Enter（Mac は Cmd+Enter）で実行します。Post window に次が出れば準備完了です。
+
+```
+PyCodeDJ synths loaded. Ready. OSC port: 57120
+```
 
 **2. ライブコーディングファイルを用意する**
 
 ```python
-from pycodedj import loop
+from pycodedj import loop, pattern
 
+# コードの「構造」が音楽パラメーターになるモード
 @loop("bass", interval=2.0)
 def bass(volume=0.4):
     for i in range(8):
         if i % 2 == 0:
             pass
 
-@loop("melody", interval=0.5)
-def melody(volume=0.3):
-    x = 1
-    y = 2
-    return x + y
+# pattern() でリズムと音程を明示指定するモード
+@loop("kick", synth="floor_kick", dur=0.25)
+def kick():
+    pattern("x . x .")
 
+@loop("melody", synth="acid_lead", root="A3", scale="minor", dur=0.25)
+def melody():
+    pattern("0 . 3 . 5 .")
+
+# コメントで空間を作るモード
 @loop("pad", interval=4.0)
-def pad(volume=0.15):
-    # 空間を作る
-    # もう少し余白
+def pad(volume=0.1):
+    # 背景の空気
+    # 余白
     pass
 ```
 
-**3. ブロックを評価する**
-
-```bash
-pycodedj eval demo.py::bass
-```
-
-成功すると次のフィードバックが表示されます。
-
-```
-[pycodedj] bass  cutoff=418Hz  lfo=1.08Hz  reverb=0.00  voices=1  amp=0.40
-```
-
-他のループはそのまま鳴り続けます。
-
-**4. watch モードでライブコーディング**
-
-毎回 eval を打つ代わりに、ファイル保存で全ループを自動再評価できます。
+**3. watch モードで起動する**
 
 ```bash
 pycodedj watch demo.py
 ```
 
-あとはエディタでコードを書いて保存するだけです。
+あとはエディタでコードを書いて保存するだけです。保存のたびに全ループが再評価されます。
 
-**5. 緊急停止**
+**4. 緊急停止**
 
 ```bash
 pycodedj panic
 ```
 
-全アクティブループに停止信号を即時送信します。演奏中に問題が起きたときに使います。
-
-**6. ミュート / ソロ**
+**5. ミュート / アンミュート**
 
 ```bash
-pycodedj mute bass        # ループを消音（停止はしない）
-pycodedj unmute bass      # 音量を元に戻す
-pycodedj solo pad         # pad 以外を全ミュート
-pycodedj unsolo           # ソロ解除、ミュート状態を元に戻す
+pycodedj mute bass
+pycodedj unmute bass
 ```
 
-注意: `mute` / `unmute` / `solo` / `unsolo` は OSC を直接 SuperCollider に送信します。完全な状態管理が必要な場合は watch セッション内で `Engine.mute()` / `Engine.solo()` を呼び出してください。
+---
 
-**7. ループのステータス確認**
+## pattern() の使い方
 
-```bash
-pycodedj status
+`pattern()` を使うと、リズムと音程を明示的に指定できます。
+
+```python
+from pycodedj import loop, pattern
+
+# トリガーパターン（x=鳴らす、.=休符）
+@loop("kick", synth="floor_kick", dur=0.25)
+def kick():
+    pattern("x . x .")
+
+# 音程パターン（数字=スケール度数）
+@loop("bass", synth="bass_acid", root="A1", scale="minor", dur=0.25)
+def bass():
+    pattern("0 . 3 . 5 .")
 ```
 
-アクティブなループの名前・ミュート状態・音量・フィルターカットオフを表示します。
+`@loop` に渡す引数:
+
+| 引数 | 説明 |
+| :--- | :--- |
+| `synth=` | 使うシンセ名 |
+| `root=` | ルートノート（例: `"A3"`, `"C4"`） |
+| `scale=` | スケール（例: `"minor"`, `"major"`, `"pentatonicMinor"`） |
+| `dur=` | 1 ステップの長さ（秒）。`0.25` で 16 分音符相当 |
 
 ---
 
@@ -163,76 +169,25 @@ pycodedj status
 | ファイル | 内容 |
 | :--- | :--- |
 | `examples/demo.py` | bass / melody / pad の 3 ループ入門デモ |
-| `examples/club_set.py` | EDM クラブグルーヴ（8 ループ、キック → アシッドベース → レイブスタブ → Hoover → シマー） |
-| `examples/sound_showcase.py` | 全 30 音色を収録 — 1 音ずつ eval して確認できる |
-
----
-
-## ライブコーディング例
-
-### ネストを深くするとフィルターが開く
-
-```python
-from pycodedj import loop
-
-@loop("bass", interval=2.0)
-def bass(volume=0.4):
-    for i in range(4):       # 制御フロー +1
-        for j in range(4):   # ネスト深さ +1、制御フロー +1
-            if i == j:       # ネスト深さ +1、制御フロー +1
-                pass
-```
-
-### 関数を増やすとポリフォニーが広がる
-
-```python
-from pycodedj import loop
-
-@loop("chord", interval=1.0)
-def chord(volume=0.2):
-    def voice_a(): pass
-    def voice_b(): pass
-    def voice_c(): pass
-    def voice_d(): pass
-```
-
-### コメントを増やすと空間（リバーブ）が広がる
-
-```python
-from pycodedj import loop
-
-@loop("pad", interval=4.0)
-def pad(volume=0.15):
-    # ここに余白を置く
-    # もう少し置く
-    # 静寂も音楽
-    pass
-```
+| `examples/club_set.py` | EDM クラブグルーヴ（キック・ベース・ハット・コード・パッドを含む 8 ループ） |
+| `examples/sound_showcase.py` | 全 30 音色 — 1 音ずつ eval して確認できる |
 
 ---
 
 ## OSC アドレス仕様
 
-SuperCollider との通信に使うアドレスです。
-
-| アドレス | 型 | 値域 | 対応パラメーター |
-| :--- | :--- | :--- | :--- |
-| `/pycodedj/loop/<name>/params` | int, float, float, float, float | パラメーター順を参照 | `voice_count`, `cutoff`, `lfo_rate`, `reverb`, `amp` |
-| `/pycodedj/loop/<name>/cutoff` | float | 200–4000 Hz | フィルター Cutoff（互換用） |
-| `/pycodedj/loop/<name>/lfo_rate` | float | 0.1–5.0 Hz | LFO レート（互換用） |
-| `/pycodedj/loop/<name>/reverb` | float | 0.0–0.8 | リバーブ Depth（互換用） |
-| `/pycodedj/loop/<name>/voice_count` | int | 1–4 | ポリフォニー声部数（互換用） |
-| `/pycodedj/loop/<name>/amp` | float | 0.0–1.0 | Amplitude（互換用） |
-
-`<name>` はブロック名（`bass`、`melody` など）です。ループごとに独立したアドレスを持つため、複数ループが同じパラメーターを上書きしません。
-
-Hydra 等の外部ビジュアライザーへは同じパラメーターを別ポートに送信します。
+| アドレス | 型 | 対応パラメーター |
+| :--- | :--- | :--- |
+| `/pycodedj/loop/<name>/params` | int, float, float, float, float | `voice_count`, `cutoff`, `lfo_rate`, `reverb`, `amp` |
+| `/pycodedj/loop/<name>/pattern` | int, str, float, str, int… | パターンデータ |
+| `/pycodedj/loop/<name>/pattern_stop` | — | パターン停止 |
+| `/pycodedj/loop/<name>/amp` | float | 音量（互換用） |
 
 ---
 
 ## 動作環境
 
-- **推奨OS:** macOS（Core Audio の低遅延性を活用）または Linux（Raspberry Pi 5 等）
+- **推奨 OS:** macOS（Core Audio の低遅延性を活用）または Linux（Raspberry Pi 5 等）
 - **Python:** 3.10 以上
 - **SuperCollider:** 3.12 以上
 
@@ -242,10 +197,10 @@ Hydra 等の外部ビジュアライザーへは同じパラメーターを別�
 
 - [x] Python → SuperCollider OSC プロトタイプ
 - [x] ホットリロード・ライブループ実装（`pycodedj watch`）
-- [x] Sprint 1: ライブ安定性（`panic`, SyntaxError維持, `mute`/`solo`, `status`）
-- [ ] Sprint 2: 音楽DSL（`pattern()`, `sample()`, `@loop` パラメータ拡張, mapping モード）
-- [ ] Sprint 3: 音色・演奏性（SynthDef整理, `bpm`, `list-synths`）
-- [ ] Sprint 4: README・マニュアル刷新、Hydra ビジュアライザー統合
+- [x] Sprint 1: ライブ安定性（`panic`, SyntaxError 維持, `mute`/`solo`, `status`）
+- [x] Sprint 2: 音楽 DSL（`pattern()`, `@loop` パラメータ拡張: `synth`, `root`, `scale`, `dur`）
+- [ ] Sprint 3: 音色・演奏性（SynthDef 整理, `bpm`, `list-synths`, `sample()`）
+- [ ] Sprint 4: Hydra ビジュアライザー統合
 
 ---
 

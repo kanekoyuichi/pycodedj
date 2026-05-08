@@ -317,13 +317,13 @@
     <p class="sidebar-title">目次</p>
     <ul class="sidebar-toc">
       <li><a href="#s1">1. PyCodeDJ って何？</a></li>
-      <li><a href="#s2">2. 準備する</a></li>
+      <li><a href="#s2">2. インストールする</a></li>
       <li><a href="#s3">3. SuperCollider をセットアップする</a></li>
       <li><a href="#s4">4. はじめての音を出す</a></li>
-      <li><a href="#s5">5. 保存するだけで音が変わる</a></li>
-      <li><a href="#s6">6. コードと音の関係を知る</a></li>
-      <li><a href="#s7">7. 複数のループを同時に動かす</a></li>
-      <li><a href="#s8">8. クラブセット例</a></li>
+      <li><a href="#s5">5. watch モード</a></li>
+      <li><a href="#s6">6. コードの構造が音を変える</a></li>
+      <li><a href="#s7">7. pattern() で音程とリズムを指定する</a></li>
+      <li><a href="#s8">8. 複数のループを同時に動かす</a></li>
       <li><a href="#s9">9. 音色リファレンス</a></li>
       <li><a href="#s10">10. 演奏のアイデア</a></li>
       <li><a href="#s11">11. うまくいかないとき</a></li>
@@ -341,12 +341,12 @@
         <a href="https://github.com/kanekoyuichi/pycodedj/blob/main/docs/manual.md" target="_blank">English manual</a>
       </p>
 
-      <blockquote><p>Python コードを書くと、リアルタイムに音が変わる</p></blockquote>
+      <blockquote><p>Python のコードを書くと、音が変わる</p></blockquote>
 
       <hr>
 
-      <p>プログラムを書いたことがある人なら、誰でも試せます。音楽の知識は不要です。SuperCollider も「はじめて聞いた」で大丈夫です。</p>
-      <p>このマニュアルを順番に進めると、最終的に <strong>自分が書いた Python コードから音が出る体験</strong> ができます。所要時間の目安: セットアップ込みで 20〜30 分。</p>
+      <p>プログラムを書いたことがあれば、誰でも試せます。音楽の知識は不要です。SuperCollider は「名前も聞いたことがない」で大丈夫です。</p>
+      <p>このマニュアルを順番に読んでいくと、最終的に <strong>自分が書いた Python コードから音が鳴る体験</strong> ができます。セットアップも含めて 20〜30 分が目安です。</p>
 
       <hr>
 
@@ -356,25 +356,28 @@
 
         <h3>ひとことで言うと</h3>
 
-        <p><strong>Python のコードを書くと、リアルタイムに音が変わる楽器です。</strong></p>
-        <p><code>for</code> ループを増やすと音の揺らぎが速くなります。関数を 3 つ書くと 3 声のポリフォニーになります。コメントをたくさん書くと、リバーブが深くかかって空間が広がります。<code>volume=</code> で音量を直接指定できます。</p>
+        <p><strong>「コードを書くこと」が「音楽を演奏すること」になるツールです。</strong></p>
+        <p><code>for</code> ループを増やすと音の揺らぎが速くなります。関数を 3 つ書くと 3 声のポリフォニーになります。コメントをたくさん書くと、リバーブが深くかかって空間が広がります。<code>pattern("x . x .")</code> と書けばそのリズムで音が鳴ります。</p>
 
-        <pre data-lang="python"><code id="code-s1-1">from pycodedj import loop
+        <pre data-lang="python"><code id="code-s1-1">from pycodedj import loop, pattern
 
-@loop("main", interval=1.0)
-def my_sound(volume=0.4):
-    # コメントを増やすほど空間が広がる
-    # もう一行
-    # さらにもう一行
-    for i in range(4):   # for を増やすと揺らぎが速くなる
-        if i > 2:        # if を増やすとさらに速くなる
-            pass</code></pre>
+# コードの「構造」が音を決める
+@loop("bass", interval=2.0)
+def bass_line(volume=0.4):
+    for i in range(8):
+        if i % 2 == 0:
+            pass
 
-        <p>このコードを評価すると、ターミナルに次のように表示されます。</p>
+# pattern() でリズムと音程を明示的に指定する
+@loop("kick", synth="floor_kick", dur=0.25)
+def kick_drum():
+    pattern("x . x .")
 
-        <pre data-lang="text"><code>[pycodedj] main  cutoff=560Hz  lfo=1.08Hz  reverb=0.43  voices=1  amp=0.40</code></pre>
+@loop("melody", synth="acid_lead", root="A3", scale="minor", dur=0.25)
+def melody_line():
+    pattern("0 . 3 . 5 . 7 .")</code></pre>
 
-        <p>SuperCollider がすぐにその音色に切り替わります。他のループは止まりません。</p>
+        <p>このコードをファイルに保存するだけで、音が変わります。追加説明もシンセの設定も必要ありません。</p>
 
         <h3>何に使えるの？</h3>
         <ul>
@@ -408,7 +411,7 @@ def my_sound(volume=0.4):
 
       <!-- Section 2 -->
       <section id="s2">
-        <h2>2. 準備する</h2>
+        <h2>2. インストールする</h2>
 
         <h3>必要なもの</h3>
         <ul>
@@ -626,7 +629,7 @@ def bass(volume=0.7):   # ← 大きくする
 
       <!-- Section 6 -->
       <section id="s6">
-        <h2>6. コードと音の関係を知る</h2>
+        <h2>6. コードの構造が音を変える</h2>
 
         <p>PyCodeDJ は Python コードの「構造」を 5 つの音楽パラメーターに変換します。</p>
 
@@ -778,158 +781,184 @@ def hats(volume=0.08, eq="edm", low=0.5, high=1.25):
 
       <!-- Section 7 -->
       <section id="s7">
-        <h2>7. 複数のループを同時に動かす</h2>
+        <h2>7. pattern() で音程とリズムを指定する</h2>
 
-        <p>PyCodeDJ の最大の特徴は、<strong>複数のループが独立して動き続ける</strong>ことです。</p>
+        <p>前章の「コード構造が音を変える」とは別に、<strong>明示的にリズムと音程を指定する</strong>方法があります。それが <code>pattern()</code> です。</p>
 
-        <h3>基本の使い方</h3>
-        <p><code>@loop("名前", ...)</code> デコレータを付けた関数を並べるだけで、複数のループを作れます。</p>
+        <h3>基本</h3>
 
-        <pre data-lang="python"><code id="code-s7-1">from pycodedj import loop
+        <pre data-lang="python"><code id="code-s7-1">from pycodedj import loop, pattern
 
-@loop("bass", interval=2.0)
-def my_bass(volume=0.4):
-    for i in range(8):
-        pass
+@loop("kick", synth="floor_kick", dur=0.25)
+def kick_drum():
+    pattern("x . x .")</code></pre>
 
-@loop("chord", interval=1.0)
-def my_chord(volume=0.2):
-    def chord_a(): pass
-    def chord_b(): pass
+        <p><code>pattern()</code> に渡す文字列に、鳴らすタイミングを書きます。スペースで区切ると 1 ステップです。</p>
 
-@loop("texture", interval=4.0)
-def bg(volume=0.06):
-    # 背景
-    # 空気
+        <table>
+          <thead><tr><th>トークン</th><th>意味</th></tr></thead>
+          <tbody>
+            <tr><td><code>x</code></td><td>ここで音を鳴らす（トリガー）</td></tr>
+            <tr><td><code>.</code></td><td>休符（無音）</td></tr>
+            <tr><td><code>0</code>, <code>1</code>, <code>2</code> …</td><td>音を鳴らす + 音程（スケール度数）</td></tr>
+          </tbody>
+        </table>
+
+        <h3>@loop のパラメーター（pattern 用）</h3>
+
+        <table>
+          <thead><tr><th>引数</th><th>説明</th><th>例</th></tr></thead>
+          <tbody>
+            <tr><td><code>synth=</code></td><td>使うシンセ名</td><td><code>synth="floor_kick"</code></td></tr>
+            <tr><td><code>root=</code></td><td>ルートノート</td><td><code>root="A3"</code>, <code>root="C4"</code></td></tr>
+            <tr><td><code>scale=</code></td><td>スケール名</td><td><code>scale="minor"</code>, <code>scale="major"</code></td></tr>
+            <tr><td><code>dur=</code></td><td>1 ステップの長さ（秒）</td><td><code>dur=0.25</code>（16 分音符相当）</td></tr>
+          </tbody>
+        </table>
+
+        <h3>トリガーパターン — x と . だけで</h3>
+
+        <p>音程なしで「リズムだけ」を指定したいときは <code>x</code> と <code>.</code> だけ使います。</p>
+
+        <pre data-lang="python"><code id="code-s7-2">@loop("kick", synth="floor_kick", dur=0.25)
+def kick():
+    pattern("x . x .")      # 4 ステップ
+
+@loop("hat", synth="hat_engine", dur=0.25)
+def hat():
+    pattern("x x x x x x x x")  # 8 ステップ（16 分グリッド）
+
+@loop("snare", synth="clap_snare", dur=0.25)
+def snare():
+    pattern(". . x . . . x .")   # 2・4 拍に鳴る</code></pre>
+
+        <h3>音程パターン — 度数（整数）で指定する</h3>
+
+        <p>音程を指定したいときは整数（0 以上）を使います。数字はスケールの<strong>度数</strong>（0 から数えるインデックス）です。</p>
+
+        <pre data-lang="python"><code id="code-s7-3">@loop("melody", synth="acid_lead", root="A3", scale="minor", dur=0.25)
+def melody():
+    pattern("0 . 3 . 5 . 7 .")</code></pre>
+
+        <p><code>scale="minor"</code> で <code>root="A3"</code> のとき、度数と音程の対応はこうなります。</p>
+
+        <table>
+          <thead><tr><th>度数</th><th>A ナチュラルマイナー</th></tr></thead>
+          <tbody>
+            <tr><td><code>0</code></td><td>A3</td></tr>
+            <tr><td><code>1</code></td><td>B3</td></tr>
+            <tr><td><code>2</code></td><td>C4</td></tr>
+            <tr><td><code>3</code></td><td>D4</td></tr>
+            <tr><td><code>4</code></td><td>E4</td></tr>
+            <tr><td><code>5</code></td><td>F4</td></tr>
+            <tr><td><code>6</code></td><td>G4</td></tr>
+            <tr><td><code>7</code></td><td>A4（1 オクターブ上）</td></tr>
+          </tbody>
+        </table>
+
+        <blockquote><p>度数が 7 以上になると自動的にオクターブが上がります。<code>7</code> は <code>0</code> の 1 オクターブ上、<code>14</code> は 2 オクターブ上です。</p></blockquote>
+
+        <h3>利用可能なスケール（主なもの）</h3>
+
+        <table>
+          <thead><tr><th><code>scale=</code></th><th>スケール</th></tr></thead>
+          <tbody>
+            <tr><td><code>"major"</code></td><td>メジャー（長調）</td></tr>
+            <tr><td><code>"minor"</code></td><td>ナチュラルマイナー（短調）</td></tr>
+            <tr><td><code>"chromatic"</code></td><td>クロマチック（半音階）</td></tr>
+            <tr><td><code>"dorian"</code></td><td>ドリアン</td></tr>
+            <tr><td><code>"pentatonicMajor"</code></td><td>メジャーペンタトニック</td></tr>
+            <tr><td><code>"pentatonicMinor"</code></td><td>マイナーペンタトニック</td></tr>
+          </tbody>
+        </table>
+
+        <h3>実例: キック・ベース・メロディー</h3>
+
+        <pre data-lang="python"><code id="code-s7-4">from pycodedj import loop, pattern
+
+@loop("kick", synth="floor_kick", dur=0.25)
+def kick():
+    pattern("x . . . x . . .")
+
+@loop("bass", synth="bass_acid", root="A1", scale="minor", dur=0.25)
+def bass():
+    pattern("0 . 0 . 3 . 5 .")
+
+@loop("melody", synth="acid_lead", root="A3", scale="minor", dur=0.5)
+def melody():
+    pattern("0 3 5 7")
+
+@loop("pad", interval=4.0)
+def pad(volume=0.06):
+    # 背景の空気感
+    # コード構造で鳴らす
     pass</code></pre>
 
-        <p>それぞれを別々に評価できます。</p>
+        <h3>pattern() と構造マッピングの違い</h3>
 
-        <pre data-lang="bash"><code id="code-s7-2">pycodedj eval myfile.py::bass
-pycodedj eval myfile.py::chord
-pycodedj eval myfile.py::texture</code></pre>
+        <table>
+          <thead><tr><th></th><th>コード構造マッピング（従来）</th><th>pattern()</th></tr></thead>
+          <tbody>
+            <tr><td>リズム</td><td>コードの構造から自動生成</td><td>自分で指定</td></tr>
+            <tr><td>音程</td><td>コードの構造から自動生成</td><td>自分で指定（または任せる）</td></tr>
+            <tr><td>使いどき</td><td>構造の変化を楽しみたい</td><td>リズム・音程を明示したい</td></tr>
+          </tbody>
+        </table>
 
-        <p>または <code>watch</code> を使えばファイルを保存するだけで全ループが一斉に更新されます。</p>
-
-        <h3>ループを止めるには</h3>
-        <p>ループを止めたいときは、その <code>@loop</code> デコレータごと関数を削除して保存します。watch モードなら保存時に自動で止まります。</p>
-        <p>eval で止めたい場合は、関数名の <code>def</code> だけを残して本体を空にし、ファイルからブロックが消えたと判定されるよう <code>@loop</code> を削除します。</p>
+        <p>どちらも同じファイルの中で自由に混在させられます。</p>
       </section>
 
       <hr>
 
       <!-- Section 8 -->
       <section id="s8">
-        <h2>8. クラブセット例 — club_set.py を動かす</h2>
+        <h2>8. 複数のループを同時に動かす</h2>
 
-        <p><code>examples/club_set.py</code> は、四つ打ちを中心とした EDM クラブグルーヴのデモファイルです。8 ループで構成され、各ループのコード構造が意図的に異なるキャラクターを持つよう設計されています。</p>
-        <p>全 30 音色を 1 音ずつ確認したい場合は <code>examples/sound_showcase.py</code> を使います。</p>
+        <p>PyCodeDJ の最大の特徴は、<strong>複数のループが独立して動き続ける</strong>ことです。1 つのループを変更しても、他のループは止まりません。</p>
 
-        <pre data-lang="bash"><code id="code-s8-1">pycodedj eval examples/sound_showcase.py::bass_acid
-pycodedj eval examples/sound_showcase.py::riser_noise
-pycodedj eval examples/sound_showcase.py::bell_rave</code></pre>
+        <h3>基本の使い方</h3>
 
-        <p><code>@loop("kick_hard", ...)</code> のようなループ名は、SuperCollider 側では音色名として解釈されます。たとえば <code>kick_hard</code> はキック系、<code>bass_reese</code> はベース系のシンセに割り当てられます。Python 側でグルーヴや構成を変えるだけなら、通常は <code>sc/synths.scd</code> を編集する必要はありません。まったく新しい音色エンジンを増やしたいときだけ、SuperCollider 側に SynthDef を追加します。</p>
+        <pre data-lang="python"><code id="code-s8-1">from pycodedj import loop, pattern
 
-        <h3>club_set.py のループ構成</h3>
-        <table>
-          <thead>
-            <tr>
-              <th>ループ名</th>
-              <th>役割</th>
-              <th>コード構造の特徴</th>
-              <th>cutoff / LFO</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td><code>kick_hard</code></td>
-              <td>四つ打ちキック</td>
-              <td>1行代入のみ（最小）</td>
-              <td>580Hz / 0.10Hz</td>
-            </tr>
-            <tr>
-              <td><code>sub_bass</code></td>
-              <td>ディープサブ</td>
-              <td>単純な for ループ</td>
-              <td>960Hz / 0.59Hz</td>
-            </tr>
-            <tr>
-              <td><code>bass_acid</code></td>
-              <td>アシッドライン</td>
-              <td>リスト展開 + 二重ループ + if</td>
-              <td>2100Hz / 2.06Hz</td>
-            </tr>
-            <tr>
-              <td><code>hat_engine</code></td>
-              <td>16分ハットグリッド</td>
-              <td>二重 for + 多段 if/elif（最複雑）</td>
-              <td>2860Hz / 4.51Hz</td>
-            </tr>
-            <tr>
-              <td><code>clap_snare</code></td>
-              <td>2・4拍バックビート</td>
-              <td>二重 for + if/elif + ネスト if</td>
-              <td>2480Hz / 2.55Hz</td>
-            </tr>
-            <tr>
-              <td><code>chord_rave</code></td>
-              <td>レイブコードスタブ</td>
-              <td>三重 for + 多段 if/elif</td>
-              <td>2860Hz / 3.53Hz</td>
-            </tr>
-            <tr>
-              <td><code>lead_hoover</code></td>
-              <td>Hoover 風リード</td>
-              <td>コメント + 二重 for + 二段 if</td>
-              <td>2100Hz / 2.06Hz、reverb 0.15</td>
-            </tr>
-            <tr>
-              <td><code>shimmer_pad</code></td>
-              <td>空気感・奥行き</td>
-              <td>コメントのみ、コードなし</td>
-              <td>580Hz / 0.10Hz、reverb 0.60</td>
-            </tr>
-          </tbody>
-        </table>
+@loop("kick", synth="floor_kick", dur=0.25)
+def kick():
+    pattern("x . x .")
 
-        <h3>動かしてみる</h3>
-        <p>watch で起動して、エディタで各ブロックを編集しながら音を変えていきます。起動直後に全ループが一度評価されるので、保存しなくてもまず音が鳴ります。</p>
+@loop("bass", interval=2.0)
+def bass_line(volume=0.4):
+    for i in range(8):
+        if i % 2 == 0:
+            pass
 
-        <pre data-lang="bash"><code id="code-s8-2">pycodedj watch examples/club_set.py</code></pre>
-
-        <p>個別にループを評価したい場合は eval を使います。</p>
-
-        <pre data-lang="bash"><code id="code-s8-3">pycodedj eval examples/club_set.py::kick_hard
-pycodedj eval examples/club_set.py::bass_reese
-pycodedj eval examples/club_set.py::chord_rave</code></pre>
-
-        <h3>演奏してみる</h3>
-
-        <p><strong>音量を変える:</strong> <code>volume=</code> の値を変えて保存するだけで、そのループの音量が即座に変わります。</p>
-
-        <pre data-lang="python"><code id="code-s8-4">@loop("lead_hoover", interval=4.0)
-def hoover(volume=0.4):   # ← 前に出したいとき
-    ...</code></pre>
-
-        <p><strong>EQ を変える:</strong> <code>eq=</code> でプリセットを選び、必要な帯域だけ <code>low=</code>, <code>mid=</code>, <code>high=</code> で調整できます。</p>
-
-        <pre data-lang="python"><code id="code-s8-5">@loop("bass_reese", interval=0.5)
-def bass(volume=0.45, eq="edm", low=1.5):
-    ...</code></pre>
-
-        <p><strong>空間を変える:</strong> <code>warehouse_air</code> や <code>shimmer_pad</code> のコメントを増やしたり減らしたりすると、リバーブの深さが変わります。</p>
-
-        <pre data-lang="python"><code id="code-s8-6">@loop("warehouse_air", interval=4.0)
-def room_tone(volume=0.06):
-    # concrete walls
-    # low ceiling pressing down
-    # crowd warmth
+@loop("pad", interval=4.0)
+def atmosphere(volume=0.08):
+    # 背景の空気
+    # 余白
     pass</code></pre>
 
-        <p>コメントを 1 行だけ残して保存してみてください。空間が一気に乾いた音になります。</p>
+        <p>watch で起動すれば、保存するたびに変更したループだけが更新されます。</p>
 
-        <p><strong>グルーヴを変える:</strong> <code>bass_acid</code> の <code>elif</code> ブロックを削除してフラットにすると、アシッドのスクウェルチが消えて落ち着いたベースになります。<code>snare_roll</code> の <code>volume=</code> を上げると、ビルドアップがより強調されます。</p>
+        <pre data-lang="bash"><code id="code-s8-2">pycodedj watch myfile.py</code></pre>
+
+        <h3>演奏中のコントロール</h3>
+
+        <pre data-lang="bash"><code id="code-s8-3">pycodedj mute bass        # bass を消音（停止はしない）
+pycodedj unmute bass      # bass の音量を元に戻す
+pycodedj panic            # すべてのループを即時停止
+pycodedj status           # ループの状態を確認</code></pre>
+
+        <h3>ループを削除するには</h3>
+        <p>ファイルからそのブロック（<code>@loop</code> デコレータごと関数）を削除して保存します。watch モードなら保存時に自動的に停止します。</p>
+
+        <h3>サンプルファイル</h3>
+        <table>
+          <thead><tr><th>ファイル</th><th>内容</th></tr></thead>
+          <tbody>
+            <tr><td><code>examples/demo.py</code></td><td>bass / melody / pad の 3 ループ入門デモ</td></tr>
+            <tr><td><code>examples/club_set.py</code></td><td>EDM クラブグルーヴ（キック・ベース・ハット・コード・パッドを含む 8 ループ）</td></tr>
+            <tr><td><code>examples/sound_showcase.py</code></td><td>全 30 音色 — 1 音ずつ eval して確認できる</td></tr>
+          </tbody>
+        </table>
       </section>
 
       <hr>
@@ -1000,7 +1029,7 @@ pycodedj eval examples/sound_showcase.py::bell_rave</code></pre>
           </tbody>
         </table>
 
-        <h3>リード</h3>
+        <h3>リード・メロディー</h3>
         <table>
           <thead>
             <tr><th>ループ名</th><th>音</th></tr>
@@ -1009,7 +1038,8 @@ pycodedj eval examples/sound_showcase.py::bell_rave</code></pre>
             <tr><td><code>acid_lead</code></td><td>アシッド系リード</td></tr>
             <tr><td><code>lead_hoover</code></td><td>Hoover 風リード</td></tr>
             <tr><td><code>soft_pluck</code></td><td>やわらかいプラック</td></tr>
-            <tr><td><code>synth_arp</code></td><td>アルペジオシンセ（高速ノートシーケンス）</td></tr>
+            <tr><td><code>synth_arp</code></td><td>アルペジオシンセ</td></tr>
+            <tr><td><code>note</code></td><td>汎用ノートシンセ（音程パターン向け）</td></tr>
           </tbody>
         </table>
 
@@ -1079,7 +1109,20 @@ def f(volume=0.5):
         for k in range(8):
             pass</code></pre>
 
-        <h3>アイデア B: コントラストをつける</h3>
+        <h3>アイデア B: pattern() でライブシーケンス</h3>
+        <p>pattern() を使って、保存するたびにリズムや音程を変えていきます。</p>
+
+        <pre data-lang="python"><code id="code-s10-b1">from pycodedj import loop, pattern
+
+@loop("kick", synth="floor_kick", dur=0.25)
+def kick():
+    pattern("x . x .")     # ← ここを変えて保存するたびにリズムが変わる
+
+@loop("bass", synth="bass_acid", root="A1", scale="minor", dur=0.25)
+def bass():
+    pattern("0 . 0 . 3 .") # ← 度数を変えて和声を変える</code></pre>
+
+        <h3>アイデア C: コントラストをつける</h3>
         <p>2 つのループを使って、にぎやかなパートと静かなパートを対比させます。</p>
 
         <pre data-lang="python"><code id="code-s10-5">@loop("bass", interval=2.0)
@@ -1101,7 +1144,7 @@ def space(volume=0.08):
     # ただの余白
     pass</code></pre>
 
-        <h3>アイデア C: コメントだけで演奏する</h3>
+        <h3>アイデア D: コメントだけで演奏する</h3>
         <p>関数は 1 つだけ残して、コメントの量だけで演奏します。コメントが増えるほど残響が深くなり、音の空間が変化します。</p>
 
         <pre data-lang="python"><code id="code-s10-7">@loop("ambient", interval=4.0)
@@ -1109,7 +1152,7 @@ def f(volume=0.15):
     # ここからコメントを増やしたり減らしたりするだけ
     pass</code></pre>
 
-        <h3>アイデア D: 関数名をストーリーとして書く</h3>
+        <h3>アイデア E: 関数名をストーリーとして書く</h3>
         <p>音は関数の中身の構造で決まります。関数名はどんな名前でも構いません。演奏しながらコードがストーリーになるような書き方もできます。</p>
 
         <pre data-lang="python"><code id="code-s10-8">@loop("narrative", interval=2.0)
@@ -1538,6 +1581,7 @@ if params is not None:
 ├── block_parser.py   # @loop デコレータを AST で解析してブロックを分割する
 ├── analyzer.py       # コードの特徴量（深さ・数・比率）を抽出する
 ├── mapper.py         # 特徴量を音楽パラメーターに変換する
+├── pattern.py        # pattern() 文字列を解析する
 ├── engine.py         # ブロック評価のパイプライン全体を管理する
 ├── osc_bridge.py     # SuperCollider へ OSC で送信する
 ├── watcher.py        # ファイル監視（watchdog ベース）
