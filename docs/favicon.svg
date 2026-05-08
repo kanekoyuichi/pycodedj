@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="PyCodeDJ">
+  <defs>
+    <linearGradient id="bg" x1="10" y1="8" x2="54" y2="58" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#16161f"/>
+      <stop offset="1" stop-color="#08080e"/>
+    </linearGradient>
+    <linearGradient id="wave" x1="14" y1="32" x2="50" y2="32" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#a6e3a1"/>
+      <stop offset="0.52" stop-color="#89b4fa"/>
+      <stop offset="1" stop-color="#cba6f7"/>
+    </linearGradient>
+  </defs>
+  <rect width="64" height="64" rx="14" fill="url(#bg)"/>
+  <rect x="8" y="8" width="48" height="48" rx="10" fill="none" stroke="#1e1e2e" stroke-width="2"/>
+  <path d="M15 32c4-12 8-12 12 0s8 12 12 0 8-12 12 0" fill="none" stroke="url(#wave)" stroke-width="5" stroke-linecap="round"/>
+  <circle cx="48" cy="18" r="4" fill="#f38ba8"/>
+</svg>
