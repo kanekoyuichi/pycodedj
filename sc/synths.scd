@@ -669,6 +669,21 @@ s.waitForBoot({
     // OSCFunc with nil path receives every incoming OSC message and we filter by prefix.
     // var は SC では実行文より前に宣言しなければならないため、
     // すべての var をクロージャ先頭にまとめる。
+    // ── Panic handler ────────────────────────────────────────────────────────
+    // /pycodedj/panic: すべての Synth を即停止し ~loops / ~loopParams を初期化する。
+    // OSCFunc は再登録時に上書きされるため、スクリプト再実行時でも安全。
+    if (~pycodedjPanic.notNil) { ~pycodedjPanic.free };
+    ~pycodedjPanic = OSCFunc({ |msg, time, addr|
+        ~loops.keysValuesDo({ |name, synths|
+            if (synths.notNil) {
+                synths.do({ |synth| synth.set(\gate, 0) });
+            };
+        });
+        ~loops = Dictionary.new;
+        ~loopParams = Dictionary.new;
+        "PyCodeDJ panic: all loops stopped.".postln;
+    }, '/pycodedj/panic');
+
     if (~pycodedjOSC.notNil) {
         thisProcess.removeOSCRecvFunc(~pycodedjOSC);
     };

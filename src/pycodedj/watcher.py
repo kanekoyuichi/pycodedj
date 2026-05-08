@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import os
+import sys
 import threading
 from pathlib import Path
 from typing import Callable
@@ -45,8 +46,11 @@ class _LoopFileHandler:
             source = Path(self._path).read_text(encoding="utf-8")
         except OSError:
             return
-        blocks = parse_blocks(source)
-        current_names = {b.name for b in blocks}
+        result = parse_blocks(source)
+        if not result.ok:
+            sys.stderr.write(f"[pycodedj] syntax error in {self._path}: {result.error}\n")
+            return  # _active_names を維持してループを継続する
+        current_names = {b.name for b in result.blocks}
 
         for name in self._active_names - current_names:
             try:
@@ -55,10 +59,10 @@ class _LoopFileHandler:
                 pass
         self._active_names = current_names
 
-        for block in blocks:
+        for block in result.blocks:
             self._engine.eval_block(block)
         if self._on_eval is not None:
-            self._on_eval(self._path, len(blocks))
+            self._on_eval(self._path, len(result.blocks))
 
 
 def watch(

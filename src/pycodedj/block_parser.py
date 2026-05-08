@@ -56,11 +56,18 @@ def _optional_float(value: object) -> float | None:
     return None
 
 
-def parse_blocks(source: str) -> list[LoopBlock]:
+@dataclass
+class ParseResult:
+    ok: bool
+    blocks: list[LoopBlock]
+    error: SyntaxError | None = None
+
+
+def parse_blocks(source: str) -> ParseResult:
     try:
         tree = ast.parse(source)
-    except SyntaxError:
-        return []
+    except SyntaxError as e:
+        return ParseResult(ok=False, blocks=[], error=e)
 
     lines = source.splitlines(keepends=True)
     blocks: list[LoopBlock] = []
@@ -87,4 +94,4 @@ def parse_blocks(source: str) -> list[LoopBlock]:
             high=_optional_float(arg_defaults.get("high")),
         ))
 
-    return blocks
+    return ParseResult(ok=True, blocks=blocks)
