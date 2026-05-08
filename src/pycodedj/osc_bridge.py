@@ -69,6 +69,12 @@ class OscBridge:
     def send_pattern_stop(self, name: str) -> None:
         self.audio.send(f"/pycodedj/loop/{name}/pattern_stop")
 
+    def send_loop_stop(self, name: str) -> None:
+        self.audio.send(f"/pycodedj/loop/{name}/voice_count", 0)
+        self.audio.send(f"/pycodedj/loop/{name}/pattern_stop")
+        if self.visual is not None:
+            self.visual.send(f"/pycodedj/loop/{name}/voice_count", 0)
+
     def send_params(self, name: str, params: "MusicParams") -> None:
         base = f"/pycodedj/loop/{name}"
         # Keep audio updates atomic so SuperCollider does not set params on stale nodes.

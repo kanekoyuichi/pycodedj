@@ -202,3 +202,28 @@ def test_send_pattern_stop(mock_endpoint: OscEndpoint) -> None:
 
     calls = [c.args[0] for c in _send_mock(mock_endpoint).call_args_list]
     assert calls == ["/pycodedj/loop/kick/pattern_stop"]
+
+
+def test_send_loop_stop_sends_voice_count_zero_and_pattern_stop(
+    mock_endpoint: OscEndpoint,
+) -> None:
+    bridge = OscBridge(audio=mock_endpoint)
+    bridge.send_loop_stop("kick")
+
+    calls = [c.args[0] for c in _send_mock(mock_endpoint).call_args_list]
+    assert calls == [
+        "/pycodedj/loop/kick/voice_count",
+        "/pycodedj/loop/kick/pattern_stop",
+    ]
+    assert _send_mock(mock_endpoint).call_args_list[0].args[1] == [0]
+
+
+def test_send_loop_stop_notifies_visual_voice_count(
+    mock_endpoint: OscEndpoint, mock_visual: OscEndpoint
+) -> None:
+    bridge = OscBridge(audio=mock_endpoint, visual=mock_visual)
+    bridge.send_loop_stop("kick")
+
+    calls = [c.args[0] for c in _send_mock(mock_visual).call_args_list]
+    assert calls == ["/pycodedj/loop/kick/voice_count"]
+    assert _send_mock(mock_visual).call_args_list[0].args[1] == [0]

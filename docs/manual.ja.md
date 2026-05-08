@@ -120,7 +120,7 @@ pycodedj --help
 次のように表示されれば成功です。
 
 ```
-usage: pycodedj [-h] {eval,watch,panic,mute,unmute,solo,unsolo,status} ...
+usage: pycodedj [-h] [--version] {eval,watch,panic,stop,mute,unmute,solo,unsolo,status} ...
 ```
 
 ### 開発版をインストールする
@@ -717,9 +717,10 @@ pycodedj watch examples/club_set.py
 
 ### 演奏中のコントロール
 
-**ミュートとアンミュート**
+**停止 / ミュート / アンミュート**
 
 ```bash
+pycodedj stop bass        # bass を停止する
 pycodedj mute bass        # bass を消音（停止はしない）
 pycodedj unmute bass      # bass の音量を元に戻す
 ```
@@ -1139,6 +1140,18 @@ pycodedj panic [--sc-host HOST] [--sc-port PORT]
 
 ```bash
 pycodedj panic
+```
+
+### `pycodedj stop`
+
+指定した 1 つのループを停止します。`mute` と違い、音量を 0 にするだけではなく、通常ループのシンセと `pattern()` ループの Pdef の両方を止めます。
+
+```
+pycodedj stop NAME [--sc-host HOST] [--sc-port PORT]
+```
+
+```bash
+pycodedj stop kick_hard
 ```
 
 ### `pycodedj mute`

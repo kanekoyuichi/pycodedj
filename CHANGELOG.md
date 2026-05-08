@@ -1,5 +1,17 @@
 # Changelog
 
+## [0.6.0] - 2026-05-08
+
+### Features
+
+- `pycodedj stop NAME` を追加。指定したループだけを停止し、通常ループの `voice_count=0` と `pattern()` ループの `pattern_stop` を同時に送信する
+
+### Docs
+
+- README とマニュアルに `pycodedj stop` の使い方を追加
+- `docs/manual.html` を英語版HTMLに変更し、日本語版HTMLを `docs/manual.ja.html` として分離
+- `pyproject.toml` に PyPI 用の `description` を追加
+
 ## [0.5.1] - 2026-05-08
 
 ### Improvements

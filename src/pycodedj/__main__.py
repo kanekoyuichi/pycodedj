@@ -37,6 +37,11 @@ def _build_parser() -> argparse.ArgumentParser:
     panic_p.add_argument("--sc-host", default="127.0.0.1", help="SuperCollider host")
     panic_p.add_argument("--sc-port", default=57120, type=int, help="SuperCollider port")
 
+    stop_p = sub.add_parser("stop", help="Stop one loop immediately")
+    stop_p.add_argument("name", help="Loop name")
+    stop_p.add_argument("--sc-host", default="127.0.0.1", help="SuperCollider host")
+    stop_p.add_argument("--sc-port", default=57120, type=int, help="SuperCollider port")
+
     # NOTE: mute/unmute/solo/unsolo は watch プロセスとは別プロセスで実行されるため
     # Engine._states を共有できない。CLI では OSC を直接送信する簡易実装とする。
     mute_p = sub.add_parser("mute", help="Mute a loop (sends amp=0 via OSC)")
@@ -166,6 +171,19 @@ def _cmd_panic(args: argparse.Namespace) -> int:
     return 0
 
 
+def _cmd_stop(args: argparse.Namespace) -> int:
+    bridge = _make_bridge(args)
+    if bridge is None:
+        return 1
+    try:
+        bridge.send_loop_stop(args.name)
+    except OscError as e:
+        sys.stderr.write(f"[pycodedj] OSC error: {e}\n")
+        return 1
+    print(f"[pycodedj] stopped {args.name}")
+    return 0
+
+
 def _cmd_mute(args: argparse.Namespace) -> int:
     bridge = _make_bridge(args)
     if bridge is None:
@@ -239,6 +257,8 @@ def main() -> None:
         sys.exit(_cmd_watch(args))
     elif args.command == "panic":
         sys.exit(_cmd_panic(args))
+    elif args.command == "stop":
+        sys.exit(_cmd_stop(args))
     elif args.command == "mute":
         sys.exit(_cmd_mute(args))
     elif args.command == "unmute":

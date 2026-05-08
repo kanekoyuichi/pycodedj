@@ -116,7 +116,7 @@ pycodedj --help
 You should see:
 
 ```
-usage: pycodedj [-h] {eval,watch,panic,mute,unmute,solo,unsolo,status} ...
+usage: pycodedj [-h] [--version] {eval,watch,panic,stop,mute,unmute,solo,unsolo,status} ...
 ```
 
 ### Development install
@@ -694,9 +694,10 @@ These are the main loop names. Use `mute` / `unmute` to bring layers in and out 
 
 ### Live controls
 
-**Mute and unmute**
+**Stop, mute, and unmute**
 
 ```bash
+pycodedj stop bass        # stop bass
 pycodedj mute bass        # silence without stopping
 pycodedj unmute bass      # restore volume
 ```
@@ -1108,6 +1109,18 @@ pycodedj panic [--sc-host HOST] [--sc-port PORT]
 
 ```bash
 pycodedj panic
+```
+
+### `pycodedj stop`
+
+Stop one loop by name. Unlike `mute`, this stops both the legacy synth loop and the `pattern()` Pdef for that loop.
+
+```
+pycodedj stop NAME [--sc-host HOST] [--sc-port PORT]
+```
+
+```bash
+pycodedj stop kick_hard
 ```
 
 ### `pycodedj mute`

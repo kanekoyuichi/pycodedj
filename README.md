@@ -126,7 +126,13 @@ From here, just write code and save. Every save re-evaluates all loops.
 pycodedj panic
 ```
 
-**5. Mute / unmute**
+**5. Stop one loop**
+
+```bash
+pycodedj stop bass
+```
+
+**6. Mute / unmute**
 
 ```bash
 pycodedj mute bass

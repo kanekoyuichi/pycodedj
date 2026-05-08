@@ -126,7 +126,13 @@ pycodedj watch demo.py
 pycodedj panic
 ```
 
-**5. ミュート / アンミュート**
+**5. 1 つのループを停止**
+
+```bash
+pycodedj stop bass
+```
+
+**6. ミュート / アンミュート**
 
 ```bash
 pycodedj mute bass
