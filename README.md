@@ -129,6 +129,33 @@ pycodedj watch demo.py
 
 From here, just write code and save.
 
+**5. Emergency stop**
+
+```bash
+pycodedj panic
+```
+
+Sends a stop signal to all active loops immediately. Use this if something goes wrong during a performance.
+
+**6. Mute / solo**
+
+```bash
+pycodedj mute bass        # silence a loop without stopping it
+pycodedj unmute bass      # restore its sound
+pycodedj solo pad         # mute all loops except pad
+pycodedj unsolo           # release solo, restore previous mute state
+```
+
+Note: `mute`, `unmute`, `solo`, and `unsolo` send OSC directly to SuperCollider. For full state management, call `Engine.mute()` / `Engine.solo()` from within a watch session.
+
+**7. Loop status**
+
+```bash
+pycodedj status
+```
+
+Prints the name, mute state, amplitude, and filter cutoff of each active loop.
+
 ---
 
 ## Example Files
@@ -215,7 +242,7 @@ External visualisers such as Hydra can receive the same parameters on a separate
 
 - [x] Python → SuperCollider OSC prototype
 - [x] Hot-reload live loop implementation (`pycodedj watch`)
-- [ ] Sprint 1: Live stability (`panic`, SyntaxError recovery, `mute`/`solo`, `status`)
+- [x] Sprint 1: Live stability (`panic`, SyntaxError recovery, `mute`/`solo`, `status`)
 - [ ] Sprint 2: Music DSL (`pattern()`, `sample()`, `@loop` parameter expansion, mapping modes)
 - [ ] Sprint 3: Sound design and playability (SynthDef cleanup, `bpm`, `list-synths`)
 - [ ] Sprint 4: README and manual refresh, Hydra visualiser integration

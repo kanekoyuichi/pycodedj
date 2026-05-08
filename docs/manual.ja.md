@@ -117,7 +117,7 @@ pycodedj --help
 次のように表示されれば成功です。
 
 ```
-usage: pycodedj [-h] {eval,watch} ...
+usage: pycodedj [-h] {eval,watch,panic,mute,unmute,solo,unsolo,status} ...
 ```
 
 ### SuperCollider をインストールする
@@ -985,6 +985,90 @@ pycodedj watch FILE [--sc-host HOST] [--sc-port PORT] [--debounce SECS]
 pycodedj watch examples/demo.py
 pycodedj watch club_set.py --debounce 0.5
 pycodedj watch myfile.py --sc-host 192.168.1.10
+```
+
+### `pycodedj panic`
+
+全アクティブループに即時停止信号を送ります。
+
+```
+pycodedj panic [--sc-host HOST] [--sc-port PORT]
+```
+
+演奏中に問題が起きたとき、すべての音をすぐ止めたい場合に使います。SuperCollider 側で実行中のシンセをすべて解放し、ループ状態を初期化します。
+
+**使用例:**
+
+```bash
+pycodedj panic
+```
+
+### `pycodedj mute`
+
+ループを消音します（停止はしません）。ループは引き続き管理され、unmute で音量が復元します。
+
+```
+pycodedj mute NAME [--sc-host HOST] [--sc-port PORT]
+```
+
+| 引数・オプション | 説明 | デフォルト |
+| :--- | :--- | :--- |
+| `NAME` | ループ名 | — |
+| `--sc-host` | SuperCollider のホスト | `127.0.0.1` |
+| `--sc-port` | SuperCollider の受信ポート番号 | `57120` |
+
+**使用例:**
+
+```bash
+pycodedj mute bass
+```
+
+> **注意:** CLI は OSC を直接 SuperCollider に送信します。ループを再評価してもミュート状態を維持したい場合は、watch セッション内で `Engine.mute()` を呼び出してください。
+
+### `pycodedj unmute`
+
+ミュートしたループの音量を元に戻します。
+
+```
+pycodedj unmute NAME [--sc-host HOST] [--sc-port PORT]
+```
+
+**使用例:**
+
+```bash
+pycodedj unmute bass
+```
+
+### `pycodedj solo`
+
+> **CLI からはサポートされていません。** Solo は watch プロセスの状態へのアクセスが必要です。watch セッション内で `Engine.solo()` を直接呼び出してください。
+
+### `pycodedj unsolo`
+
+> **CLI からはサポートされていません。** watch セッション内で `Engine.unsolo()` を直接呼び出してください。
+
+### `pycodedj status`
+
+アクティブなループの名前・ミュート状態・音量・フィルターカットオフを表示します。
+
+```
+pycodedj status [--sc-host HOST] [--sc-port PORT]
+```
+
+出力形式:
+
+```
+Loop         State    Amp    Cutoff
+bass         playing  0.40   1340Hz
+pad          muted    0.15   200Hz
+```
+
+> **注意:** `status` は `pycodedj watch` とは別プロセスで動作するため、watch プロセスの状態を読み取ることができません。CLI から単独で実行すると「no active loops」と表示されます。
+
+**使用例:**
+
+```bash
+pycodedj status
 ```
 
 ### ループの書き方

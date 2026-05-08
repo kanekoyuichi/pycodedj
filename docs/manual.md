@@ -117,7 +117,7 @@ pycodedj --help
 If you see this, you're good:
 
 ```
-usage: pycodedj [-h] {eval,watch} ...
+usage: pycodedj [-h] {eval,watch,panic,mute,unmute,solo,unsolo,status} ...
 ```
 
 ### Installing SuperCollider
@@ -983,6 +983,90 @@ pycodedj watch FILE [--sc-host HOST] [--sc-port PORT] [--debounce SECS]
 pycodedj watch examples/demo.py
 pycodedj watch club_set.py --debounce 0.5
 pycodedj watch myfile.py --sc-host 192.168.1.10
+```
+
+### `pycodedj panic`
+
+Sends an immediate stop signal to all active loops.
+
+```
+pycodedj panic [--sc-host HOST] [--sc-port PORT]
+```
+
+Use this when something goes wrong during a performance and you need everything to stop now. SuperCollider frees all running synths and clears its loop state.
+
+**Example:**
+
+```bash
+pycodedj panic
+```
+
+### `pycodedj mute`
+
+Silences a loop without stopping it. The loop continues to be tracked; unmuting restores its sound.
+
+```
+pycodedj mute NAME [--sc-host HOST] [--sc-port PORT]
+```
+
+| Argument / option | Description | Default |
+| :--- | :--- | :--- |
+| `NAME` | Loop name | — |
+| `--sc-host` | SuperCollider host | `127.0.0.1` |
+| `--sc-port` | SuperCollider receive port | `57120` |
+
+**Example:**
+
+```bash
+pycodedj mute bass
+```
+
+> **Note:** The CLI sends OSC directly to SuperCollider. For full state tracking (so that re-evaluating a loop while muted keeps it silent), call `Engine.mute()` within a watch session instead.
+
+### `pycodedj unmute`
+
+Restores sound for a muted loop.
+
+```
+pycodedj unmute NAME [--sc-host HOST] [--sc-port PORT]
+```
+
+**Example:**
+
+```bash
+pycodedj unmute bass
+```
+
+### `pycodedj solo`
+
+> **Not supported from the CLI.** Solo requires access to the watch process state. Call `Engine.solo()` directly within a watch session.
+
+### `pycodedj unsolo`
+
+> **Not supported from the CLI.** Call `Engine.unsolo()` directly within a watch session.
+
+### `pycodedj status`
+
+Prints the name, mute state, amplitude, and filter cutoff for each active loop.
+
+```
+pycodedj status [--sc-host HOST] [--sc-port PORT]
+```
+
+Output format:
+
+```
+Loop         State    Amp    Cutoff
+bass         playing  0.40   1340Hz
+pad          muted    0.15   200Hz
+```
+
+> **Note:** `status` runs in a separate process from `pycodedj watch` and cannot read the watch process state. It will show "no active loops" when invoked from the CLI.
+
+**Example:**
+
+```bash
+pycodedj status
 ```
 
 ### Loop syntax

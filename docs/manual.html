@@ -428,7 +428,7 @@ def my_sound(volume=0.4):
 
         <p>次のように表示されれば成功です。</p>
 
-        <pre data-lang="text"><code>usage: pycodedj [-h] {eval,watch} ...</code></pre>
+        <pre data-lang="text"><code>usage: pycodedj [-h] {eval,watch,panic,mute,unmute,solo,unsolo,status} ...</code></pre>
 
         <h3>SuperCollider をインストールする</h3>
         <p>SuperCollider の公式サイト（supercollider.github.io）からインストーラーをダウンロードします。</p>
@@ -1311,6 +1311,64 @@ pycodedj eval demo.py::pad --sc-port 57200</code></pre>
         <pre data-lang="bash"><code id="code-s12-2">pycodedj watch examples/demo.py
 pycodedj watch club_set.py --debounce 0.5
 pycodedj watch myfile.py --sc-host 192.168.1.10</code></pre>
+
+        <h3><code>pycodedj panic</code></h3>
+        <p>全アクティブループに即時停止信号を送ります。演奏中に問題が起きたとき、すべての音をすぐ止めたい場合に使います。SuperCollider 側で実行中のシンセをすべて解放し、ループ状態を初期化します。</p>
+
+        <pre data-lang="text"><code>pycodedj panic [--sc-host HOST] [--sc-port PORT]</code></pre>
+
+        <p><strong>使用例:</strong></p>
+        <pre data-lang="bash"><code id="code-s12-3">pycodedj panic</code></pre>
+
+        <h3><code>pycodedj mute</code></h3>
+        <p>ループを消音します（停止はしません）。ループは引き続き管理され、<code>unmute</code> で音量が復元します。</p>
+
+        <pre data-lang="text"><code>pycodedj mute NAME [--sc-host HOST] [--sc-port PORT]</code></pre>
+
+        <table>
+          <thead>
+            <tr><th>引数・オプション</th><th>説明</th><th>デフォルト</th></tr>
+          </thead>
+          <tbody>
+            <tr><td><code>NAME</code></td><td>ループ名</td><td>—</td></tr>
+            <tr><td><code>--sc-host</code></td><td>SuperCollider のホスト</td><td><code>127.0.0.1</code></td></tr>
+            <tr><td><code>--sc-port</code></td><td>SuperCollider の受信ポート番号</td><td><code>57120</code></td></tr>
+          </tbody>
+        </table>
+
+        <p><strong>使用例:</strong></p>
+        <pre data-lang="bash"><code id="code-s12-4">pycodedj mute bass</code></pre>
+
+        <p><strong>注意:</strong> CLI は OSC を直接 SuperCollider に送信します。ループを再評価してもミュート状態を維持したい場合は、watch セッション内で <code>Engine.mute()</code> を呼び出してください。</p>
+
+        <h3><code>pycodedj unmute</code></h3>
+        <p>ミュートしたループの音量を元に戻します。</p>
+
+        <pre data-lang="text"><code>pycodedj unmute NAME [--sc-host HOST] [--sc-port PORT]</code></pre>
+
+        <p><strong>使用例:</strong></p>
+        <pre data-lang="bash"><code id="code-s12-5">pycodedj unmute bass</code></pre>
+
+        <h3><code>pycodedj solo</code></h3>
+        <p><strong>CLI からはサポートされていません。</strong> Solo は watch プロセスの状態へのアクセスが必要です。watch セッション内で <code>Engine.solo()</code> を直接呼び出してください。</p>
+
+        <h3><code>pycodedj unsolo</code></h3>
+        <p><strong>CLI からはサポートされていません。</strong> watch セッション内で <code>Engine.unsolo()</code> を直接呼び出してください。</p>
+
+        <h3><code>pycodedj status</code></h3>
+        <p>アクティブなループの名前・ミュート状態・音量・フィルターカットオフを表示します。</p>
+
+        <pre data-lang="text"><code>pycodedj status [--sc-host HOST] [--sc-port PORT]</code></pre>
+
+        <p>出力形式:</p>
+        <pre data-lang="text"><code>Loop         State    Amp    Cutoff
+bass         playing  0.40   1340Hz
+pad          muted    0.15   200Hz</code></pre>
+
+        <p><strong>注意:</strong> <code>status</code> は <code>pycodedj watch</code> とは別プロセスで動作するため、watch プロセスの状態を読み取れません。CLI から単独で実行すると「no active loops」と表示されます。</p>
+
+        <p><strong>使用例:</strong></p>
+        <pre data-lang="bash"><code id="code-s12-6">pycodedj status</code></pre>
 
         <h3>ループの書き方</h3>
 

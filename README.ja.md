@@ -129,6 +129,33 @@ pycodedj watch demo.py
 
 あとはエディタでコードを書いて保存するだけです。
 
+**5. 緊急停止**
+
+```bash
+pycodedj panic
+```
+
+全アクティブループに停止信号を即時送信します。演奏中に問題が起きたときに使います。
+
+**6. ミュート / ソロ**
+
+```bash
+pycodedj mute bass        # ループを消音（停止はしない）
+pycodedj unmute bass      # 音量を元に戻す
+pycodedj solo pad         # pad 以外を全ミュート
+pycodedj unsolo           # ソロ解除、ミュート状態を元に戻す
+```
+
+注意: `mute` / `unmute` / `solo` / `unsolo` は OSC を直接 SuperCollider に送信します。完全な状態管理が必要な場合は watch セッション内で `Engine.mute()` / `Engine.solo()` を呼び出してください。
+
+**7. ループのステータス確認**
+
+```bash
+pycodedj status
+```
+
+アクティブなループの名前・ミュート状態・音量・フィルターカットオフを表示します。
+
 ---
 
 ## サンプルファイル
@@ -215,7 +242,7 @@ Hydra 等の外部ビジュアライザーへは同じパラメーターを別�
 
 - [x] Python → SuperCollider OSC プロトタイプ
 - [x] ホットリロード・ライブループ実装（`pycodedj watch`）
-- [ ] Sprint 1: ライブ安定性（`panic`, SyntaxError維持, `mute`/`solo`, `status`）
+- [x] Sprint 1: ライブ安定性（`panic`, SyntaxError維持, `mute`/`solo`, `status`）
 - [ ] Sprint 2: 音楽DSL（`pattern()`, `sample()`, `@loop` パラメータ拡張, mapping モード）
 - [ ] Sprint 3: 音色・演奏性（SynthDef整理, `bpm`, `list-synths`）
 - [ ] Sprint 4: README・マニュアル刷新、Hydra ビジュアライザー統合
