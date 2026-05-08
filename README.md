@@ -213,11 +213,12 @@ External visualisers such as Hydra can receive the same parameters on a separate
 
 ## Roadmap
 
-- [x] Spec design and mapping design
-- [ ] Phase 0: Listening validation of mapping hypotheses
-- [x] Phase 1: Python → SuperCollider OSC prototype
-- [x] Phase 2: Hot-reload live loop implementation (`pycodedj watch`)
-- [ ] Phase 3: Hydra visualiser integration
+- [x] Python → SuperCollider OSC prototype
+- [x] Hot-reload live loop implementation (`pycodedj watch`)
+- [ ] Sprint 1: Live stability (`panic`, SyntaxError recovery, `mute`/`solo`, `status`)
+- [ ] Sprint 2: Music DSL (`pattern()`, `sample()`, `@loop` parameter expansion, mapping modes)
+- [ ] Sprint 3: Sound design and playability (SynthDef cleanup, `bpm`, `list-synths`)
+- [ ] Sprint 4: README and manual refresh, Hydra visualiser integration
 
 ---
 

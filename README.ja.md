@@ -213,11 +213,12 @@ Hydra 等の外部ビジュアライザーへは同じパラメーターを別�
 
 ## ロードマップ
 
-- [x] 仕様設計・マッピング設計
-- [ ] フェーズ0: マッピング仮説の聴取検証
-- [x] フェーズ1: Python → SuperCollider OSC プロトタイプ
-- [x] フェーズ2: ホットリロード・ライブループ実装（`pycodedj watch`）
-- [ ] フェーズ3: Hydra ビジュアライザー統合
+- [x] Python → SuperCollider OSC プロトタイプ
+- [x] ホットリロード・ライブループ実装（`pycodedj watch`）
+- [ ] Sprint 1: ライブ安定性（`panic`, SyntaxError維持, `mute`/`solo`, `status`）
+- [ ] Sprint 2: 音楽DSL（`pattern()`, `sample()`, `@loop` パラメータ拡張, mapping モード）
+- [ ] Sprint 3: 音色・演奏性（SynthDef整理, `bpm`, `list-synths`）
+- [ ] Sprint 4: README・マニュアル刷新、Hydra ビジュアライザー統合
 
 ---
 
