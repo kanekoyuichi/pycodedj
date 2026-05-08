@@ -92,3 +92,30 @@ def test_osc_error_on_attribute_error() -> None:
     ):
         with pytest.raises(OscError):
             OscEndpoint(host="127.0.0.1", port=57120)
+
+
+# --- send_panic ---
+
+def test_send_panic_sends_to_audio(mock_endpoint: OscEndpoint) -> None:
+    bridge = OscBridge(audio=mock_endpoint)
+    bridge.send_panic()
+
+    calls = [c.args[0] for c in _send_mock(mock_endpoint).call_args_list]
+    assert "/pycodedj/panic" in calls
+
+
+def test_send_panic_sends_to_visual_when_set(
+    mock_endpoint: OscEndpoint, mock_visual: OscEndpoint
+) -> None:
+    bridge = OscBridge(audio=mock_endpoint, visual=mock_visual)
+    bridge.send_panic()
+
+    visual_calls = [c.args[0] for c in _send_mock(mock_visual).call_args_list]
+    assert "/pycodedj/panic" in visual_calls
+
+
+def test_send_panic_skips_visual_when_none(mock_endpoint: OscEndpoint) -> None:
+    bridge = OscBridge(audio=mock_endpoint, visual=None)
+    bridge.send_panic()
+
+    assert _send_mock(mock_endpoint).call_count == 1

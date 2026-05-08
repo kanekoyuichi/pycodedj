@@ -191,6 +191,23 @@ def test_adapter_on_moved_ignores_wrong_dest(tmp_path: Path) -> None:
     engine.eval_block.assert_not_called()
 
 
+def test_syntax_error_does_not_stop_loops(tmp_path: Path) -> None:
+    target = tmp_path / "demo.py"
+    target.write_text(_BASS_BLOCK)
+    handler, engine = _make_handler(path=str(target), debounce=0.0)
+
+    # 1回目: 正常評価で _active_names を確立
+    handler.eval_now()
+
+    # SyntaxError なファイルに書き換えて再評価
+    target.write_text("def broken(:")
+    handler.dispatch(str(target))
+    time.sleep(0.05)
+
+    # SyntaxError 時は stop_loop を呼ばない
+    engine.stop_loop.assert_not_called()
+
+
 def test_watch_raises_on_missing_watchdog() -> None:
     import builtins
     real_import = builtins.__import__

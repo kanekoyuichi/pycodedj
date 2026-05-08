@@ -31,6 +31,35 @@ def _build_parser() -> argparse.ArgumentParser:
         metavar="SECS", help="Debounce interval in seconds (default: 0.3)",
     )
 
+    panic_p = sub.add_parser("panic", help="Stop all loops immediately")
+    panic_p.add_argument("--sc-host", default="127.0.0.1", help="SuperCollider host")
+    panic_p.add_argument("--sc-port", default=57120, type=int, help="SuperCollider port")
+
+    # NOTE: mute/unmute/solo/unsolo は watch プロセスとは別プロセスで実行されるため
+    # Engine._states を共有できない。CLI では OSC を直接送信する簡易実装とする。
+    mute_p = sub.add_parser("mute", help="Mute a loop (sends amp=0 via OSC)")
+    mute_p.add_argument("name", help="Loop name")
+    mute_p.add_argument("--sc-host", default="127.0.0.1", help="SuperCollider host")
+    mute_p.add_argument("--sc-port", default=57120, type=int, help="SuperCollider port")
+
+    unmute_p = sub.add_parser("unmute", help="Unmute a loop (sends amp restore via OSC)")
+    unmute_p.add_argument("name", help="Loop name")
+    unmute_p.add_argument("--sc-host", default="127.0.0.1", help="SuperCollider host")
+    unmute_p.add_argument("--sc-port", default=57120, type=int, help="SuperCollider port")
+
+    solo_p = sub.add_parser("solo", help="Solo a loop (mutes all others via OSC)")
+    solo_p.add_argument("name", help="Loop name to solo")
+    solo_p.add_argument("--sc-host", default="127.0.0.1", help="SuperCollider host")
+    solo_p.add_argument("--sc-port", default=57120, type=int, help="SuperCollider port")
+
+    unsolo_p = sub.add_parser("unsolo", help="Release solo")
+    unsolo_p.add_argument("--sc-host", default="127.0.0.1", help="SuperCollider host")
+    unsolo_p.add_argument("--sc-port", default=57120, type=int, help="SuperCollider port")
+
+    status_p = sub.add_parser("status", help="Show active loop status")
+    status_p.add_argument("--sc-host", default="127.0.0.1", help="SuperCollider host")
+    status_p.add_argument("--sc-port", default=57120, type=int, help="SuperCollider port")
+
     return parser
 
 
@@ -48,6 +77,14 @@ def _print_params(loop_name: str, params: object) -> None:
     )
 
 
+def _make_bridge(args: argparse.Namespace) -> OscBridge | None:
+    try:
+        return OscBridge(audio=OscEndpoint(host=args.sc_host, port=args.sc_port))
+    except OscError as e:
+        sys.stderr.write(f"[pycodedj] OSC error: {e}\n")
+        return None
+
+
 def _cmd_eval(args: argparse.Namespace) -> int:
     if "::" not in args.target:
         sys.stderr.write(f"[pycodedj] invalid target format (expected FILE::LOOP): {args.target}\n")
@@ -61,8 +98,11 @@ def _cmd_eval(args: argparse.Namespace) -> int:
         return 1
 
     source = path.read_text(encoding="utf-8")
-    blocks = parse_blocks(source)
-    block_map = {b.name: b for b in blocks}
+    result = parse_blocks(source)
+    if not result.ok:
+        sys.stderr.write(f"[pycodedj] syntax error in {file_path}: {result.error}\n")
+        return 1
+    block_map = {b.name: b for b in result.blocks}
 
     if loop_name not in block_map:
         available = ", ".join(block_map.keys()) or "(none)"
@@ -72,8 +112,11 @@ def _cmd_eval(args: argparse.Namespace) -> int:
         )
         return 1
 
+    bridge = _make_bridge(args)
+    if bridge is None:
+        return 1
+
     try:
-        bridge = OscBridge(audio=OscEndpoint(host=args.sc_host, port=args.sc_port))
         engine = Engine(bridge=bridge)
         params = engine.eval_block(block_map[loop_name])
     except OscError as e:
@@ -98,10 +141,8 @@ def _cmd_watch(args: argparse.Namespace) -> int:
         sys.stderr.write(f"[pycodedj] {e}\n")
         return 1
 
-    try:
-        bridge = OscBridge(audio=OscEndpoint(host=args.sc_host, port=args.sc_port))
-    except OscError as e:
-        sys.stderr.write(f"[pycodedj] OSC error: {e}\n")
+    bridge = _make_bridge(args)
+    if bridge is None:
         return 1
 
     engine = Engine(bridge=bridge)
@@ -114,6 +155,78 @@ def _cmd_watch(args: argparse.Namespace) -> int:
     return 0
 
 
+def _cmd_panic(args: argparse.Namespace) -> int:
+    bridge = _make_bridge(args)
+    if bridge is None:
+        return 1
+    Engine(bridge=bridge).panic()
+    print("[pycodedj] panic: all loops stopped")
+    return 0
+
+
+def _cmd_mute(args: argparse.Namespace) -> int:
+    bridge = _make_bridge(args)
+    if bridge is None:
+        return 1
+    try:
+        bridge.audio.send(f"/pycodedj/loop/{args.name}/amp", 0.0)
+    except OscError as e:
+        sys.stderr.write(f"[pycodedj] OSC error: {e}\n")
+        return 1
+    print(f"[pycodedj] muted {args.name}")
+    return 0
+
+
+def _cmd_unmute(args: argparse.Namespace) -> int:
+    bridge = _make_bridge(args)
+    if bridge is None:
+        return 1
+    try:
+        # CLI mute は SC ~loopParams に amp=0 を永続化するため、unmute では
+        # 先に amp をデフォルト値に戻し、その後 voice_count=1 で再起動する。
+        from .mapper import _AMP_DEFAULT
+        bridge.audio.send(f"/pycodedj/loop/{args.name}/amp", _AMP_DEFAULT)
+        bridge.audio.send(f"/pycodedj/loop/{args.name}/voice_count", 1)
+    except OscError as e:
+        sys.stderr.write(f"[pycodedj] OSC error: {e}\n")
+        return 1
+    print(f"[pycodedj] unmuted {args.name}")
+    return 0
+
+
+def _cmd_solo(args: argparse.Namespace) -> int:
+    sys.stderr.write(
+        "[pycodedj] solo is not supported from CLI (requires watch process state). "
+        "Use Engine.solo() directly in watch mode.\n"
+    )
+    return 1
+
+
+def _cmd_unsolo(args: argparse.Namespace) -> int:
+    sys.stderr.write(
+        "[pycodedj] unsolo is not supported from CLI (requires watch process state). "
+        "Use Engine.unsolo() directly in watch mode.\n"
+    )
+    return 1
+
+
+def _cmd_status(args: argparse.Namespace) -> int:
+    # NOTE: watch プロセスとは別プロセスのため Engine._states は常に空になる。
+    # status は将来の IPC 対応後に実用的になる。現状は Engine API の確認用。
+    bridge = _make_bridge(args)
+    if bridge is None:
+        return 1
+    entries = Engine(bridge=bridge).status()
+    if not entries:
+        print("[pycodedj] no active loops")
+        return 0
+    print(f"{'Loop':<12} {'State':<8} {'Amp':<6} {'Cutoff'}")
+    for e in entries:
+        state_str = "muted" if e.muted else "playing"
+        print(f"{e.name:<12} {state_str:<8} {e.amp:<6.2f} {e.cutoff:.0f}Hz")
+    return 0
+
+
 def main() -> None:
     parser = _build_parser()
     args = parser.parse_args()
@@ -122,6 +235,18 @@ def main() -> None:
         sys.exit(_cmd_eval(args))
     elif args.command == "watch":
         sys.exit(_cmd_watch(args))
+    elif args.command == "panic":
+        sys.exit(_cmd_panic(args))
+    elif args.command == "mute":
+        sys.exit(_cmd_mute(args))
+    elif args.command == "unmute":
+        sys.exit(_cmd_unmute(args))
+    elif args.command == "solo":
+        sys.exit(_cmd_solo(args))
+    elif args.command == "unsolo":
+        sys.exit(_cmd_unsolo(args))
+    elif args.command == "status":
+        sys.exit(_cmd_status(args))
     else:
         parser.print_help()
         sys.exit(1)

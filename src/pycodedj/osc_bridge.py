@@ -37,6 +37,11 @@ class OscBridge:
     audio: OscEndpoint
     visual: OscEndpoint | None = None
 
+    def send_panic(self) -> None:
+        self.audio.send("/pycodedj/panic")
+        if self.visual is not None:
+            self.visual.send("/pycodedj/panic")
+
     def send_params(self, name: str, params: "MusicParams") -> None:
         base = f"/pycodedj/loop/{name}"
         # Keep audio updates atomic so SuperCollider does not set params on stale nodes.
