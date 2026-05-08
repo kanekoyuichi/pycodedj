@@ -10,12 +10,12 @@ A live-coding environment that translates Python code structure into music in re
 
 PyCodeDJ connects "writing code" directly to "making sound."
 
-Add more functions and the polyphony widens. Deepen nesting and the filter opens up. Fill in comments and the space grows. The structure of your code is the instrument.
+Add more `for` loops and the modulation speeds up. Deepen nesting and the filter opens up. Fill in comments and the space grows. Write `pattern("x . x .")` and that rhythm plays. Write `pattern("0 . 3 . 5 .")` and those pitches ring out.
 
 Two things set it apart from existing Python ↔ SuperCollider bridges (sc3nb, supriya):
 
-- **Hot-reload performance** — swap out a loop without stopping it. Saving a file becomes an immediate sound change.
-- **Audible code structure** — structural features extracted via AST analysis (depth, branch count, function count, etc.) are automatically mapped to musical parameters.
+- **Hot-reload performance** — swap out a loop without stopping it. Saving a file is an immediate sound change.
+- **Two performance styles** — auto-generation from code structure, and explicit `pattern()` notation for rhythm and pitch. Mix them freely in the same file.
 
 ---
 
@@ -39,16 +39,14 @@ BPM clock is held by SuperCollider's `TempoClock`. Python only sends parameter u
 
 ## Code Structure → Music Parameter Mapping
 
-| Code feature | Music parameter | Musical rationale |
-| :--- | :--- | :--- |
-| Max nesting depth | Filter Cutoff (200–4000 Hz) | Deep structure = complexity = brightness |
-| Control-flow count (if/for/while) | LFO rate (0.1–5.0 Hz) | More branches = faster modulation |
-| Function definition count | Polyphony voice count (1–4) | Functions = independent voices |
-| Comment ratio | Reverb depth (0.0–0.8) | More whitespace = more space |
-| `volume=` argument | Amplitude (0.0–1.0) | Direct performer control over loudness |
-| `eq=` / `low=` / `mid=` / `high=` arguments | Simple 3-band EQ | Per-loop tone shaping |
-
-Tempo (BPM) and root pitch are controlled explicitly by the performer, to prevent the foundation of the piece from shifting on every save.
+| Code feature | Music parameter |
+| :--- | :--- |
+| Max nesting depth | Filter Cutoff (200–4000 Hz) |
+| Control-flow count (if/for/while) | LFO rate (0.1–5.0 Hz) |
+| Function definition count | Polyphony voice count (1–4) |
+| Comment ratio | Reverb depth (0.0–0.8) |
+| `volume=` argument | Amplitude (0.0–1.0) |
+| `eq=` / `low=` / `mid=` / `high=` arguments | Simple 3-band EQ |
 
 ---
 
@@ -68,7 +66,7 @@ The `[watch]` extra enables the `pycodedj watch` command.
 Development install:
 
 ```bash
-git clone https://github.com/yourname/pycodedj
+git clone https://github.com/kanekoyuichi/pycodedj
 cd pycodedj
 pip install -e ".[dev]"
 ```
@@ -79,82 +77,90 @@ pip install -e ".[dev]"
 
 **1. Boot SuperCollider and load the synths**
 
-Open `sc/synths.scd` in the SuperCollider IDE and evaluate it.
+Open `sc/synths.scd` in the SuperCollider IDE. Press Ctrl+A (Cmd+A on Mac) to select all, then Ctrl+Enter (Cmd+Enter on Mac) to run. When the Post window shows this, you're ready:
+
+```
+PyCodeDJ synths loaded. Ready. OSC port: 57120
+```
 
 **2. Write a live-coding file**
 
 ```python
-from pycodedj import loop
+from pycodedj import loop, pattern
 
+# Code-structure mode: the shape of your code maps to sound
 @loop("bass", interval=2.0)
 def bass(volume=0.4):
     for i in range(8):
         if i % 2 == 0:
             pass
 
-@loop("melody", interval=0.5)
-def melody(volume=0.3):
-    x = 1
-    y = 2
-    return x + y
+# pattern() mode: specify rhythm and pitch explicitly
+@loop("kick", synth="floor_kick", dur=0.25)
+def kick():
+    pattern("x . x .")
 
+@loop("melody", synth="acid_lead", root="A3", scale="minor", dur=0.25)
+def melody():
+    pattern("0 . 3 . 5 .")
+
+# Comments create space (reverb)
 @loop("pad", interval=4.0)
-def pad(volume=0.15):
-    # make space
-    # a little more
+def pad(volume=0.1):
+    # ambient space
+    # silence is music
     pass
 ```
 
-**3. Evaluate a block**
-
-```bash
-pycodedj eval demo.py::bass
-```
-
-On success, feedback is printed immediately:
-
-```
-[pycodedj] bass  cutoff=418Hz  lfo=1.08Hz  reverb=0.00  voices=1  amp=0.40
-```
-
-Other loops keep playing without interruption.
-
-**4. Live-code with watch mode**
-
-Instead of running eval manually, use watch to re-evaluate all loops on every save:
+**3. Start watch mode**
 
 ```bash
 pycodedj watch demo.py
 ```
 
-From here, just write code and save.
+From here, just write code and save. Every save re-evaluates all loops.
 
-**5. Emergency stop**
+**4. Emergency stop**
 
 ```bash
 pycodedj panic
 ```
 
-Sends a stop signal to all active loops immediately. Use this if something goes wrong during a performance.
-
-**6. Mute / solo**
+**5. Mute / unmute**
 
 ```bash
-pycodedj mute bass        # silence a loop without stopping it
-pycodedj unmute bass      # restore its sound
-pycodedj solo pad         # mute all loops except pad
-pycodedj unsolo           # release solo, restore previous mute state
+pycodedj mute bass
+pycodedj unmute bass
 ```
 
-Note: `mute`, `unmute`, `solo`, and `unsolo` send OSC directly to SuperCollider. For full state management, call `Engine.mute()` / `Engine.solo()` from within a watch session.
+---
 
-**7. Loop status**
+## Using pattern()
 
-```bash
-pycodedj status
+`pattern()` lets you specify rhythm and pitch explicitly.
+
+```python
+from pycodedj import loop, pattern
+
+# Trigger pattern (x = hit, . = rest)
+@loop("kick", synth="floor_kick", dur=0.25)
+def kick():
+    pattern("x . x .")
+
+# Pitch pattern (integer = scale degree)
+@loop("bass", synth="bass_acid", root="A1", scale="minor", dur=0.25)
+def bass():
+    pattern("0 . 3 . 5 .")
 ```
 
-Prints the name, mute state, amplitude, and filter cutoff of each active loop.
+`@loop` arguments for pattern mode:
+
+| Argument | Description |
+| :--- | :--- |
+| `synth=` | Synth name to use |
+| `root=` | Root note (e.g. `"A3"`, `"C4"`) |
+| `scale=` | Scale name (e.g. `"minor"`, `"major"`, `"pentatonicMinor"`) |
+| `dur=` | Step length in seconds. `0.25` = sixteenth note at 60 BPM |
 
 ---
 
@@ -162,71 +168,20 @@ Prints the name, mute state, amplitude, and filter cutoff of each active loop.
 
 | File | Contents |
 | :--- | :--- |
-| `examples/demo.py` | Intro demo with bass / melody / pad |
-| `examples/club_set.py` | EDM groove (8 loops, kick → acid bass → rave stabs → hoover → shimmer) |
-| `examples/sound_showcase.py` | All 30 synths — evaluate one at a time to audition each sound |
-
----
-
-## Live-Coding Examples
-
-### Deeper nesting opens the filter
-
-```python
-from pycodedj import loop
-
-@loop("bass", interval=2.0)
-def bass(volume=0.4):
-    for i in range(4):       # control flow +1
-        for j in range(4):   # depth +1, control flow +1
-            if i == j:       # depth +1, control flow +1
-                pass
-```
-
-### More functions = more polyphony
-
-```python
-from pycodedj import loop
-
-@loop("chord", interval=1.0)
-def chord(volume=0.2):
-    def voice_a(): pass
-    def voice_b(): pass
-    def voice_c(): pass
-    def voice_d(): pass
-```
-
-### More comments = more space (reverb)
-
-```python
-from pycodedj import loop
-
-@loop("pad", interval=4.0)
-def pad(volume=0.15):
-    # leave space here
-    # a little more
-    # silence is music
-    pass
-```
+| `examples/demo.py` | Intro demo: bass / melody / pad |
+| `examples/club_set.py` | EDM groove: 8 loops (kick, bass, hat, chords, pad) |
+| `examples/sound_showcase.py` | All 30 synths — evaluate one at a time to audition |
 
 ---
 
 ## OSC Address Reference
 
-Addresses used to communicate with SuperCollider.
-
-| Address | Type | Range | Parameter |
-| :--- | :--- | :--- | :--- |
-| `/pycodedj/loop/<name>/params` | int, float, float, float, float | see parameter order | `voice_count`, `cutoff`, `lfo_rate`, `reverb`, `amp` |
-| `/pycodedj/loop/<name>/cutoff` | float | 200–4000 Hz | Filter Cutoff (compatibility) |
-| `/pycodedj/loop/<name>/lfo_rate` | float | 0.1–5.0 Hz | LFO rate (compatibility) |
-| `/pycodedj/loop/<name>/reverb` | float | 0.0–0.8 | Reverb depth (compatibility) |
-| `/pycodedj/loop/<name>/voice_count` | int | 1–4 | Polyphony voice count (compatibility) |
-| `/pycodedj/loop/<name>/amp` | float | 0.0–1.0 | Amplitude (compatibility) |
-
-`<name>` is the loop name (e.g. `bass`, `melody`). Each loop has its own address namespace, so multiple loops never overwrite each other's parameters.
-
-External visualisers such as Hydra can receive the same parameters on a separate port.
+| Address | Type | Parameter |
+| :--- | :--- | :--- |
+| `/pycodedj/loop/<name>/params` | int, float, float, float, float | `voice_count`, `cutoff`, `lfo_rate`, `reverb`, `amp` |
+| `/pycodedj/loop/<name>/pattern` | int, str, float, str, int… | Pattern data |
+| `/pycodedj/loop/<name>/pattern_stop` | — | Stop pattern |
+| `/pycodedj/loop/<name>/amp` | float | Amplitude (compatibility) |
 
 ---
 
@@ -243,9 +198,9 @@ External visualisers such as Hydra can receive the same parameters on a separate
 - [x] Python → SuperCollider OSC prototype
 - [x] Hot-reload live loop implementation (`pycodedj watch`)
 - [x] Sprint 1: Live stability (`panic`, SyntaxError recovery, `mute`/`solo`, `status`)
-- [ ] Sprint 2: Music DSL (`pattern()`, `sample()`, `@loop` parameter expansion, mapping modes)
-- [ ] Sprint 3: Sound design and playability (SynthDef cleanup, `bpm`, `list-synths`)
-- [ ] Sprint 4: README and manual refresh, Hydra visualiser integration
+- [x] Sprint 2: Music DSL (`pattern()`, `@loop` parameter expansion: `synth`, `root`, `scale`, `dur`)
+- [ ] Sprint 3: Sound design and playability (SynthDef cleanup, `bpm`, `list-synths`, `sample()`)
+- [ ] Sprint 4: Hydra visualiser integration
 
 ---
 
