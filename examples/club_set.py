@@ -1,150 +1,107 @@
-# PyCodeDJ club groove — EDM edition
+# PyCodeDJ club set — sub-heavy warehouse floor
 #
-# 8 loops, each with a distinct code structure and sonic role.
 # Load sc/synths.scd in SuperCollider, then run:
 #   pycodedj watch examples/club_set.py
 #
-# Code structure → sound (by design):
-#
-#   kick_hard    depth=1, cf=0  →  580 Hz,  0.10 Hz LFO  (dark, static)
-#   sub_bass     depth=2, cf=1  →  960 Hz,  0.59 Hz LFO  (dark sub pulse)
-#   bass_acid    depth=5, cf=4  → 2100 Hz,  2.06 Hz LFO  (acid squelch)
-#   hat_engine   depth=7, cf=9  → 2860 Hz,  4.51 Hz LFO  (brightest, fastest)
-#   clap_snare   depth=6, cf=5  → 2480 Hz,  2.55 Hz LFO  (bright backbeat)
-#   chord_rave   depth=7, cf=7  → 2860 Hz,  3.53 Hz LFO  (rave stabs)
-#   lead_hoover  depth=5, cf=4  → 2100 Hz,  2.06 Hz LFO  reverb=0.15
-#   shimmer_pad  depth=1, cf=0  →  580 Hz,  0.10 Hz LFO  reverb=0.60
+# Club-focused design:
+# - steady four-on-the-floor kick for dancers
+# - clap on 2 and 4
+# - offbeat hats plus 16th-note motion
+# - bass notes locked to the kick with syncopated replies
+# - sustained sub and rumble layers for floor pressure
+# - sparse stabs and fills so the bass has room
 
-from pycodedj import loop
+from pycodedj import loop, pattern
 
 
-# --- Foundation: dead simple, bone-dry ---
+# --- Drum engine: stable pulse first, variations second ---
 
-@loop("kick_hard", interval=1.0)
-def four_on_floor(volume=0.9, eq="edm", low=1.25):
-    hit = "down"
-    _ = hit
-
-
-# --- Sub: minimal pulse, barely more than the kick ---
-
-@loop("sub_bass", interval=1.0)
-def sub_layer(volume=0.4, eq="edm", low=1.45, high=0.7):
-    for beat in range(4):
-        sub = "low"
-        _ = sub
+@loop("kick", synth="floor_kick", dur=0.117)
+def kick(volume=1.0, eq="edm", low=1.7, mid=0.78, high=0.82):
+    pattern(
+        "x . . . x . . . x . . . x . . . "
+        "x . . . x . . x x . . . x . . x"
+    )
 
 
-# --- Groove: syncopated acid sequence with accents ---
-
-@loop("bass_acid", interval=0.5)
-def acid_line(volume=0.22, eq="edm", low=1.2, mid=1.05):
-    pattern = [
-        ("hit", True), ("skip", False), ("slide", True),
-        ("hit", True), ("skip", False), ("accent", True),
-        ("skip", False), ("slide", True),
-    ]
-    for step, (note, active) in enumerate(pattern):
-        if active:
-            for layer in range(2):
-                if layer == 0:
-                    out = note
-                else:
-                    out = f"{note}_tail"
-                _ = out
+@loop("clap", synth="clap_snare", dur=0.117)
+def clap(volume=0.18, eq="pop", low=0.62, mid=0.85, high=0.98):
+    pattern(
+        ". . . . x . . . . . . . x . . . "
+        ". . . . x . . . . . . x x . x ."
+    )
 
 
-# --- Hats: mechanical 16th-note grid ---
-
-@loop("hat_engine", interval=0.25)
-def closed_hats(volume=0.13, eq="edm", low=0.45, high=1.25):
-    for bar in range(2):
-        for tick in range(16):
-            if tick % 4 == 0:
-                if tick == 0:
-                    if bar == 0:
-                        hat = "anchor_a"
-                    else:
-                        hat = "anchor_b"
-                else:
-                    hat = "beat"
-            elif tick % 2 == 0:
-                hat = "up"
-            elif tick in (3, 7, 11, 15):
-                if bar == 0:
-                    hat = "ghost_a"
-                else:
-                    hat = "ghost_b"
-            else:
-                hat = "skip"
-            if tick in (6, 14):
-                hat = "open"
-            _ = hat
+@loop("offhat", synth="hat_ride", dur=0.117)
+def offhat(volume=0.065, eq="edm", low=0.28, mid=0.78, high=1.0):
+    pattern(
+        ". . x . . . x . . . x . . . x . "
+        ". . x . . x x . . . x . . x x ."
+    )
 
 
-# --- Backbeat: decisive 2 & 4 with fill on bar 4 ---
-
-@loop("clap_snare", interval=1.0)
-def backbeat(volume=0.26, eq="pop", low=0.75, high=1.15):
-    for bar in range(4):
-        for beat in range(4):
-            if beat == 1:
-                hit = "snap"
-            elif beat == 3:
-                if bar == 3:
-                    hit = "fill"
-                else:
-                    hit = "heavy"
-            else:
-                hit = "off"
-            _ = hit
+@loop("hats", synth="hat_engine", dur=0.0585)
+def hats(volume=0.075, eq="edm", low=0.3, mid=0.82, high=1.02):
+    pattern(
+        "x . x . x x x . x . x . x x x . "
+        "x x x . x . x x x . x x x . x ."
+    )
 
 
-# --- Harmonic: stacked chord voices across phrases ---
+# --- Low end: kick-locked weight with room-shaking sustain ---
 
-@loop("chord_rave", interval=2.0)
-def rave_stabs(volume=0.14, eq="edm", mid=0.9):
-    for phrase in range(4):
-        for voice in range(3):
-            for harmonic in range(2):
-                if phrase == 0:
-                    if voice == 0:
-                        chord = "root"
-                    elif voice == 1:
-                        chord = "fifth"
-                    else:
-                        chord = "octave"
-                elif phrase == 2:
-                    chord = "resolve"
-                else:
-                    chord = "hit"
-                _ = chord
+@loop("rumble", synth="bass_rumble", root="A1", scale="minor", dur=0.117)
+def rumble(volume=0.42, eq="edm", low=1.75, mid=0.58, high=0.32):
+    pattern(
+        "0 ~ . . 0 ~ . . 0 ~ . . 0 ~ . . "
+        "0 ~ . . 3 ~ . . 0 ~ . . 5 3 0 ."
+    )
 
 
-# --- Lead: phrase-based, slight air ---
-
-@loop("lead_hoover", interval=4.0)
-def hoover(volume=0.11, eq="edm", high=1.25):
-    # classic rave swell
-    # builds and drops
-    for phrase in range(4):
-        for step in range(3):
-            if phrase in (0, 2):
-                if step == 0:
-                    motion = "attack"
-                else:
-                    motion = "hold"
-                _ = motion
+@loop("sub", synth="sub_bass", root="A1", scale="minor", dur=0.117)
+def sub(volume=0.58, eq="edm", low=1.85, mid=0.58, high=0.25):
+    pattern(
+        "0 ~ . 0 0 ~ . 0 0 ~ 3 . 0 ~ . 0 "
+        "0 ~ 0 . 3 ~ . 0 0 ~ 5 . 3 ~ 0 ."
+    )
 
 
-# --- Space: pure atmosphere, no code at all ---
+@loop("floor", synth="sub_bass", root="A1", scale="minor", dur=0.468)
+def floor(volume=0.22, eq="edm", low=1.9, mid=0.45, high=0.2):
+    pattern("0 ~ 0 ~ 0 ~ 0 ~")
 
-@loop("shimmer_pad", interval=8.0)
-def shimmer(volume=0.06, eq="acoustic", low=0.65):
-    # wide hall reverb
-    # slow harmonic drift
-    # always underneath everything
-    # never noticed until it stops
-    # consonance without definition
-    # air between the notes
-    pass
+
+@loop("acid", synth="bass_acid", root="A1", scale="minor", dur=0.0585)
+def acid(volume=0.15, eq="edm", low=1.15, mid=0.88, high=0.72):
+    pattern(
+        "0 . 0 . 3 . 0 0 0 . 5 . 3 . 0 . "
+        "0 . 0 3 . 5 . 3 0 . 7 . 5 . 3 . "
+        "0 3 0 . 5 . 7 . 0 . 5 3 0 . 10 . "
+        "0 . 0 . 3 . 0 0 5 . 3 . 0 . 0 ."
+    )
+
+
+# --- Hooks and fills: sparse enough to leave room for the bass ---
+
+@loop("stabs", synth="chord_rave", root="A2", scale="minor", dur=0.117)
+def stabs(volume=0.095, eq="edm", low=0.55, mid=0.72, high=0.78):
+    pattern(
+        ". . . . [0 2 4] . . . . . . . [3 5 7] . . . "
+        ". . [5 7 9] . . . . . [0 2 4] . . . [3 5 7] . . ."
+    )
+
+
+@loop("fill", synth="tom_drum", root="A1", scale="minor", dur=0.0585)
+def fill(volume=0.09, eq="edm", low=1.15, mid=0.72, high=0.5):
+    pattern(
+        ". . . . . . . . . . . . . . . . "
+        ". . . . . . . . . . 0 . 3 5 7 10"
+    )
+
+
+@loop("room", synth="warehouse_air", root="A1", scale="minor", dur=0.468)
+def room(volume=0.08, eq="edm", low=1.2, mid=0.55, high=0.45):
+    # dark concrete reflections
+    # low frequency pressure
+    # distant system noise
+    pattern("0 . . . 0 . 3 . 0 . . . 5 . 3 .")

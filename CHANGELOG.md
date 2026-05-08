@@ -1,5 +1,18 @@
 # Changelog
 
+## [0.5.1] - 2026-05-08
+
+### Improvements
+
+- `examples/club_set.py` を `pattern()` / `synth=` ベースの重低音クラブセットに刷新。4つ打ちキック、ランブル、サブ、アシッド、ハット、フィル、空間ノイズを含む 11 ループ構成に変更
+- `pycodedj --version` を追加し、公開前チェックでパッケージバージョンを確認できるようにした
+
+### Docs
+
+- `docs/manual.ja.md` / `docs/manual.md` / `docs/manual.html` — ループ名と音色名の違いを明確化し、音色は `synth=` で指定することを追記
+- `docs/manual.ja.md` / `docs/manual.md` / `docs/manual.html` — `examples/club_set.py` の重低音クラブセットの使い方と主要レイヤー一覧を追加
+- `README.ja.md` / `README.md` — `examples/club_set.py` の説明を現在の 11 ループ構成に更新
+
 ## [0.5.0] - 2026-05-08
 
 ### Features

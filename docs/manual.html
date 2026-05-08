@@ -808,6 +808,8 @@ def kick_drum():
 
         <h3>@loop のパラメーター（pattern 用）</h3>
 
+        <p><strong>音色は <code>synth=</code> で指定します。</strong> <code>@loop("bass", synth="floor_kick")</code> と書くと、ループ名は <code>bass</code> のまま、鳴る音色だけが <code>floor_kick</code> になります。</p>
+
         <table>
           <thead><tr><th>引数</th><th>説明</th><th>例</th></tr></thead>
           <tbody>
@@ -817,6 +819,10 @@ def kick_drum():
             <tr><td><code>dur=</code></td><td>1 ステップの長さ（秒）</td><td><code>dur=0.25</code>（16 分音符相当）</td></tr>
           </tbody>
         </table>
+
+        <blockquote>
+          <p><code>@loop("kick", synth="floor_kick")</code> の <code>"kick"</code> はループ名、<code>"floor_kick"</code> は音色名です。<code>pycodedj eval demo.py::kick</code> や <code>pycodedj mute kick</code> ではループ名を使います。</p>
+        </blockquote>
 
         <h3>トリガーパターン — x と . だけで</h3>
 
@@ -965,9 +971,29 @@ def atmosphere(volume=0.08):
 
         <pre data-lang="bash"><code id="code-s8-2">pycodedj watch myfile.py</code></pre>
 
+        <h3>重低音クラブセットを試す</h3>
+
+        <p><code>examples/club_set.py</code> は、クラブのフロアで鳴る低域を意識したサンプルです。4つ打ちキック、2・4拍のクラップ、オフビートハット、16分ハット、ランブル、サブベース、アシッドベース、スタブ、フィル、空間ノイズを重ねています。</p>
+
+        <pre data-lang="bash"><code id="code-s8-3">pycodedj watch examples/club_set.py</code></pre>
+
+        <p>主なループ名は次の通りです。<code>mute</code> / <code>unmute</code> で足し引きすると、クラブトラックのレイヤー構造がわかりやすくなります。</p>
+
+        <table>
+          <thead><tr><th>ループ名</th><th>役割</th><th>音色名</th></tr></thead>
+          <tbody>
+            <tr><td><code>kick</code></td><td>4つ打ちの土台</td><td><code>floor_kick</code></td></tr>
+            <tr><td><code>rumble</code></td><td>床鳴りする低域</td><td><code>bass_rumble</code></td></tr>
+            <tr><td><code>sub</code> / <code>floor</code></td><td>持続する重低音</td><td><code>sub_bass</code></td></tr>
+            <tr><td><code>acid</code></td><td>動くベースライン</td><td><code>bass_acid</code></td></tr>
+            <tr><td><code>offhat</code> / <code>hats</code></td><td>グルーヴの推進力</td><td><code>hat_ride</code>, <code>hat_engine</code></td></tr>
+            <tr><td><code>room</code></td><td>倉庫のような空間感</td><td><code>warehouse_air</code></td></tr>
+          </tbody>
+        </table>
+
         <h3>演奏中のコントロール</h3>
 
-        <pre data-lang="bash"><code id="code-s8-3">pycodedj mute bass        # bass を消音（停止はしない）
+        <pre data-lang="bash"><code id="code-s8-4">pycodedj mute bass        # bass を消音（停止はしない）
 pycodedj unmute bass      # bass の音量を元に戻す
 pycodedj panic            # すべてのループを即時停止
 pycodedj status           # ループの状態を確認</code></pre>
@@ -980,7 +1006,7 @@ pycodedj status           # ループの状態を確認</code></pre>
           <thead><tr><th>ファイル</th><th>内容</th></tr></thead>
           <tbody>
             <tr><td><code>examples/demo.py</code></td><td>bass / melody / pad の 3 ループ入門デモ</td></tr>
-            <tr><td><code>examples/club_set.py</code></td><td>EDM クラブグルーヴ（キック・ベース・ハット・コード・パッドを含む 8 ループ）</td></tr>
+            <tr><td><code>examples/club_set.py</code></td><td>重低音クラブセット（キック、ランブル、サブ、アシッド、ハット、空間ノイズを含む 11 ループ）</td></tr>
             <tr><td><code>examples/sound_showcase.py</code></td><td>全 30 音色 — 1 音ずつ eval して確認できる</td></tr>
           </tbody>
         </table>
@@ -992,16 +1018,35 @@ pycodedj status           # ループの状態を確認</code></pre>
       <section id="s9">
         <h2>9. 音色リファレンス</h2>
 
-        <p><code>@loop</code> の第一引数（ループ名）を変えると、SuperCollider 側で使う音色を選べます。全 30 音色を 1 音ずつ確認したい場合は <code>examples/sound_showcase.py</code> を使います。</p>
+        <p>PyCodeDJ では <strong>ループ名</strong> と <strong>音色名</strong> を分けて考えます。</p>
 
-        <pre data-lang="bash"><code id="code-s9-1">pycodedj eval examples/sound_showcase.py::bass_acid
-pycodedj eval examples/sound_showcase.py::riser_noise
-pycodedj eval examples/sound_showcase.py::bell_rave</code></pre>
+        <ul>
+          <li>ループ名: <code>@loop("kick", ...)</code> の第一引数。<code>pycodedj eval demo.py::kick</code>、<code>mute</code>、<code>solo</code> などで指定する名前</li>
+          <li>音色名: SuperCollider 側のシンセ名。pattern ループでは <code>synth="floor_kick"</code> のように指定する名前</li>
+        </ul>
+
+        <p>音色を選ぶときは、下の表から音色名を選んで <code>synth=</code> に入れます。たとえば <code>@loop("bass", synth="floor_kick")</code> は、<code>bass</code> というループ名で <code>floor_kick</code> の音色を鳴らします。</p>
+
+        <p><code>pattern()</code> を使う場合は、<code>@loop("kick", synth="floor_kick")</code> のように、短いループ名と具体的な音色名を分けて書けます。</p>
+
+        <p><code>pattern()</code> を使わない構造マッピングのループでは、互換性のためにループ名と同じ名前の音色があればそれが使われます。たとえば <code>@loop("bass_acid", interval=0.5)</code> は <code>bass_acid</code> 音色で鳴ります。</p>
+
+        <p>全 30 音色を 1 音ずつ確認したい場合は <code>examples/sound_showcase.py</code> を使います。</p>
+
+        <pre data-lang="bash"><code id="code-s9-1">pycodedj eval examples/sound_showcase.py::floor_kick
+pycodedj eval examples/sound_showcase.py::bass_acid
+pycodedj eval examples/sound_showcase.py::acid_lead</code></pre>
+
+        <p><code>examples/sound_showcase.py</code> では試聴しやすいように、ループ名を音色名と同じにしています。通常の pattern ループでは、次のように <code>synth=</code> にこの表の音色名を指定します。</p>
+
+        <pre data-lang="python"><code id="code-s9-2">@loop("kick", synth="floor_kick", dur=0.25)
+def kick():
+    pattern("x . x .")</code></pre>
 
         <h3>キック</h3>
         <table>
           <thead>
-            <tr><th>ループ名</th><th>音</th></tr>
+            <tr><th>音色名</th><th>音</th></tr>
           </thead>
           <tbody>
             <tr><td><code>kick_hard</code></td><td>硬めでアタックの強いキック</td></tr>
@@ -1013,7 +1058,7 @@ pycodedj eval examples/sound_showcase.py::bell_rave</code></pre>
         <h3>ベース</h3>
         <table>
           <thead>
-            <tr><th>ループ名</th><th>音</th></tr>
+            <tr><th>音色名</th><th>音</th></tr>
           </thead>
           <tbody>
             <tr><td><code>bass_rumble</code></td><td>キック由来の低いランブル</td></tr>
@@ -1026,7 +1071,7 @@ pycodedj eval examples/sound_showcase.py::bell_rave</code></pre>
         <h3>パーカッション</h3>
         <table>
           <thead>
-            <tr><th>ループ名</th><th>音</th></tr>
+            <tr><th>音色名</th><th>音</th></tr>
           </thead>
           <tbody>
             <tr><td><code>hat_engine</code></td><td>クローズ/オープンのハットグリッド</td></tr>
@@ -1042,7 +1087,7 @@ pycodedj eval examples/sound_showcase.py::bell_rave</code></pre>
         <h3>コード・スタブ</h3>
         <table>
           <thead>
-            <tr><th>ループ名</th><th>音</th></tr>
+            <tr><th>音色名</th><th>音</th></tr>
           </thead>
           <tbody>
             <tr><td><code>chord_rave</code></td><td>明るいレイブスタブ</td></tr>
@@ -1057,7 +1102,7 @@ pycodedj eval examples/sound_showcase.py::bell_rave</code></pre>
         <h3>リード・メロディー</h3>
         <table>
           <thead>
-            <tr><th>ループ名</th><th>音</th></tr>
+            <tr><th>音色名</th><th>音</th></tr>
           </thead>
           <tbody>
             <tr><td><code>acid_lead</code></td><td>アシッド系リード</td></tr>
@@ -1071,7 +1116,7 @@ pycodedj eval examples/sound_showcase.py::bell_rave</code></pre>
         <h3>アトモスフィア</h3>
         <table>
           <thead>
-            <tr><th>ループ名</th><th>音</th></tr>
+            <tr><th>音色名</th><th>音</th></tr>
           </thead>
           <tbody>
             <tr><td><code>shimmer_pad</code></td><td>深いシマーパッド</td></tr>
@@ -1083,7 +1128,7 @@ pycodedj eval examples/sound_showcase.py::bell_rave</code></pre>
         <h3>FX</h3>
         <table>
           <thead>
-            <tr><th>ループ名</th><th>音</th></tr>
+            <tr><th>音色名</th><th>音</th></tr>
           </thead>
           <tbody>
             <tr><td><code>fx_impact</code></td><td>低いインパクト</td></tr>
@@ -1377,7 +1422,7 @@ pycodedj eval demo.py::pad --sc-port 57200</code></pre>
         <p><strong>使用例:</strong></p>
 
         <pre data-lang="bash"><code id="code-s12-2">pycodedj watch examples/demo.py
-pycodedj watch club_set.py --debounce 0.5
+pycodedj watch examples/club_set.py --debounce 0.5
 pycodedj watch myfile.py --sc-host 192.168.1.10</code></pre>
 
         <h3><code>pycodedj panic</code></h3>

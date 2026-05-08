@@ -185,7 +185,7 @@ Token reference:
 | File | Contents |
 | :--- | :--- |
 | `examples/demo.py` | Intro demo: bass / melody / pad |
-| `examples/club_set.py` | EDM groove: 8 loops (kick, bass, hat, chords, pad) |
+| `examples/club_set.py` | Sub-heavy club set: 11 loops with kick, rumble, sub, acid, hats, and room noise |
 | `examples/sound_showcase.py` | All 30 synths — evaluate one at a time to audition |
 
 ---

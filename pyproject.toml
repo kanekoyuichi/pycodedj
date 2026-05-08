@@ -1,6 +1,6 @@
 [project]
 name = "pycodedj"
-version = "0.5.0"
+version = "0.5.1"
 requires-python = ">=3.10"
 readme = "README.md"
 license = {file = "LICENSE"}

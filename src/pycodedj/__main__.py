@@ -4,6 +4,7 @@ import argparse
 import sys
 from pathlib import Path
 
+from . import __version__
 from .block_parser import parse_blocks
 from .engine import Engine
 from .osc_bridge import OscBridge, OscEndpoint, OscError
@@ -11,6 +12,7 @@ from .osc_bridge import OscBridge, OscEndpoint, OscError
 
 def _build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(prog="pycodedj")
+    parser.add_argument("--version", action="version", version=f"%(prog)s {__version__}")
     sub = parser.add_subparsers(dest="command")
 
     eval_p = sub.add_parser("eval", help="Evaluate a loop block and send OSC parameters")

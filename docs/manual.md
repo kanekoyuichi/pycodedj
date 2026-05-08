@@ -484,6 +484,8 @@ Tokens are separated by spaces. `"x . x ."` is a 4-step pattern.
 
 ### @loop arguments for pattern mode
 
+**Choose the sound with `synth=`.** `@loop("bass", synth="floor_kick")` keeps the loop name as `bass`, but plays the `floor_kick` synth.
+
 | Argument | Description | Example |
 | :--- | :--- | :--- |
 | `synth=` | Synth name | `synth="floor_kick"` |
@@ -492,6 +494,7 @@ Tokens are separated by spaces. `"x . x ."` is a 4-step pattern.
 | `dur=` | Step length in seconds | `dur=0.25` (sixteenth note) |
 
 > `volume=`, `eq=`, and `interval=` still work alongside pattern arguments.
+> In `@loop("kick", synth="floor_kick")`, `"kick"` is the loop name and `"floor_kick"` is the synth name. Use the loop name for commands such as `pycodedj eval demo.py::kick` and `pycodedj mute kick`.
 
 ### Trigger patterns — x and . only
 
@@ -670,6 +673,25 @@ Start watching and each save updates only the changed loops:
 pycodedj watch myfile.py
 ```
 
+### Try the sub-heavy club set
+
+`examples/club_set.py` is a low-end club-floor example. It layers a four-on-the-floor kick, clap on beats 2 and 4, offbeat hats, 16th-note hats, rumble, sub bass, acid bass, sparse stabs, fills, and room noise.
+
+```bash
+pycodedj watch examples/club_set.py
+```
+
+These are the main loop names. Use `mute` / `unmute` to bring layers in and out and hear how the groove is built.
+
+| Loop name | Role | Synth name |
+| :--- | :--- | :--- |
+| `kick` | Four-on-the-floor foundation | `floor_kick` |
+| `rumble` | Floor-shaking low end | `bass_rumble` |
+| `sub` / `floor` | Sustained sub pressure | `sub_bass` |
+| `acid` | Moving bassline | `bass_acid` |
+| `offhat` / `hats` | Groove and forward motion | `hat_ride`, `hat_engine` |
+| `room` | Warehouse-like space | `warehouse_air` |
+
 ### Live controls
 
 **Mute and unmute**
@@ -706,7 +728,16 @@ Delete the `@loop` block (decorator + function) and save. In watch mode, the loo
 
 ## 9. Sound Reference
 
-The first argument to `@loop` (the loop name) selects the synth on the SuperCollider side.
+PyCodeDJ has two related names:
+
+- Loop name: the first argument to `@loop("kick", ...)`. Use it with `pycodedj eval demo.py::kick`, `mute`, `solo`, and status commands.
+- Synth name: the SuperCollider synth name. Pattern loops set it with `synth="floor_kick"`.
+
+To choose a sound, pick a synth name from the tables below and put it in `synth=`. For example, `@loop("bass", synth="floor_kick")` creates a loop called `bass` that plays the `floor_kick` synth.
+
+With `pattern()`, you can keep these names separate: `@loop("kick", synth="floor_kick")` means the loop is called `kick`, and it plays the `floor_kick` synth.
+
+For non-pattern structure-mapping loops, PyCodeDJ keeps the older shorthand: if the loop name matches a synth name, that synth is used. For example, `@loop("bass_acid", interval=0.5)` plays the `bass_acid` synth.
 
 To audition all 30 synths one at a time, use `examples/sound_showcase.py`:
 
@@ -716,11 +747,17 @@ pycodedj eval examples/sound_showcase.py::bass_acid
 pycodedj eval examples/sound_showcase.py::acid_lead
 ```
 
-The same names work with the `synth=` argument in pattern mode.
+In `examples/sound_showcase.py`, loop names intentionally match synth names so each sound is easy to audition. In normal pattern loops, put one of the synth names below in `synth=`:
+
+```python
+@loop("kick", synth="floor_kick", dur=0.25)
+def kick():
+    pattern("x . x .")
+```
 
 ### Kick
 
-| Name | Sound |
+| Synth name | Sound |
 | :--- | :--- |
 | `kick_hard` | Hard, punchy kick |
 | `floor_kick` | Full four-on-the-floor kick |
@@ -728,7 +765,7 @@ The same names work with the `synth=` argument in pattern mode.
 
 ### Bass
 
-| Name | Sound |
+| Synth name | Sound |
 | :--- | :--- |
 | `bass_rumble` | Deep low rumble |
 | `bass_reese` | Reese-style wobble bass |
@@ -737,7 +774,7 @@ The same names work with the `synth=` argument in pattern mode.
 
 ### Percussion
 
-| Name | Sound |
+| Synth name | Sound |
 | :--- | :--- |
 | `hat_engine` | Closed/open hi-hat grid |
 | `hat_ride` | Long ride/open hat |
@@ -749,7 +786,7 @@ The same names work with the `synth=` argument in pattern mode.
 
 ### Chords / Stabs
 
-| Name | Sound |
+| Synth name | Sound |
 | :--- | :--- |
 | `chord_rave` | Bright rave stab |
 | `neon_stab` | Neon-style stab chord |
@@ -760,7 +797,7 @@ The same names work with the `synth=` argument in pattern mode.
 
 ### Lead / Melody
 
-| Name | Sound |
+| Synth name | Sound |
 | :--- | :--- |
 | `acid_lead` | Acid-style lead |
 | `lead_hoover` | Hoover-style lead |
@@ -770,7 +807,7 @@ The same names work with the `synth=` argument in pattern mode.
 
 ### Atmosphere
 
-| Name | Sound |
+| Synth name | Sound |
 | :--- | :--- |
 | `shimmer_pad` | Deep shimmer pad |
 | `warehouse_air` | Industrial air texture |
@@ -778,7 +815,7 @@ The same names work with the `synth=` argument in pattern mode.
 
 ### FX
 
-| Name | Sound |
+| Synth name | Sound |
 | :--- | :--- |
 | `fx_impact` | Low impact hit |
 | `riser_noise` | Noise riser (8-second upward sweep) |
@@ -1058,7 +1095,7 @@ pycodedj watch FILE [--sc-host HOST] [--sc-port PORT] [--debounce SECS]
 
 ```bash
 pycodedj watch examples/demo.py
-pycodedj watch club_set.py --debounce 0.5
+pycodedj watch examples/club_set.py --debounce 0.5
 ```
 
 ### `pycodedj panic`

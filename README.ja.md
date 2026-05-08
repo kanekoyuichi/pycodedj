@@ -185,7 +185,7 @@ def chord():
 | ファイル | 内容 |
 | :--- | :--- |
 | `examples/demo.py` | bass / melody / pad の 3 ループ入門デモ |
-| `examples/club_set.py` | EDM クラブグルーヴ（キック・ベース・ハット・コード・パッドを含む 8 ループ） |
+| `examples/club_set.py` | 重低音クラブセット（キック、ランブル、サブ、アシッド、ハット、空間ノイズを含む 11 ループ） |
 | `examples/sound_showcase.py` | 全 30 音色 — 1 音ずつ eval して確認できる |
 
 ---

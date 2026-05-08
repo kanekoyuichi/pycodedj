@@ -505,6 +505,8 @@ def kick_drum():
 
 `pattern()` を使うループでは、`@loop` デコレータに次の引数を追加します。
 
+**音色は `synth=` で指定します。** `@loop("bass", synth="floor_kick")` と書くと、ループ名は `bass` のまま、鳴る音色だけが `floor_kick` になります。
+
 | 引数 | 説明 | 例 |
 | :--- | :--- | :--- |
 | `synth=` | 使うシンセ名 | `synth="floor_kick"` |
@@ -513,6 +515,7 @@ def kick_drum():
 | `dur=` | 1 ステップの長さ（秒） | `dur=0.25`（16 分音符相当） |
 
 > **ポイント:** `volume=` / `eq=` / `interval=` は pattern ループでも引き続き使えます。
+> `@loop("kick", synth="floor_kick")` の `"kick"` はループ名、`"floor_kick"` は音色名です。`pycodedj eval demo.py::kick` や `pycodedj mute kick` ではループ名を使います。
 
 ### トリガーパターン — x と . だけで
 
@@ -693,6 +696,25 @@ watch で起動すれば、保存するたびに変更したループだけが�
 pycodedj watch myfile.py
 ```
 
+### 重低音クラブセットを試す
+
+`examples/club_set.py` は、クラブのフロアで鳴る低域を意識したサンプルです。4つ打ちキック、2・4拍のクラップ、オフビートハット、16分ハット、ランブル、サブベース、アシッドベース、スタブ、フィル、空間ノイズを重ねています。
+
+```bash
+pycodedj watch examples/club_set.py
+```
+
+主なループ名は次の通りです。`mute` / `unmute` で足し引きすると、クラブトラックのレイヤー構造がわかりやすくなります。
+
+| ループ名 | 役割 | 音色名 |
+| :--- | :--- | :--- |
+| `kick` | 4つ打ちの土台 | `floor_kick` |
+| `rumble` | 床鳴りする低域 | `bass_rumble` |
+| `sub` / `floor` | 持続する重低音 | `sub_bass` |
+| `acid` | 動くベースライン | `bass_acid` |
+| `offhat` / `hats` | グルーヴの推進力 | `hat_ride`, `hat_engine` |
+| `room` | 倉庫のような空間感 | `warehouse_air` |
+
 ### 演奏中のコントロール
 
 **ミュートとアンミュート**
@@ -729,7 +751,16 @@ pad          muted    0.08   200Hz
 
 ## 9. 音色リファレンス
 
-`@loop` の第一引数（ループ名）で、SuperCollider 側で使う音色が決まります。
+PyCodeDJ では **ループ名** と **音色名** を分けて考えます。
+
+- ループ名: `@loop("kick", ...)` の第一引数。`pycodedj eval demo.py::kick`、`mute`、`solo` などで指定する名前
+- 音色名: SuperCollider 側のシンセ名。pattern ループでは `synth="floor_kick"` のように指定する名前
+
+音色を選ぶときは、下の表から音色名を選んで `synth=` に入れます。たとえば `@loop("bass", synth="floor_kick")` は、`bass` というループ名で `floor_kick` の音色を鳴らします。
+
+`pattern()` を使う場合は、`@loop("kick", synth="floor_kick")` のように、短いループ名と具体的な音色名を分けて書けます。
+
+`pattern()` を使わない構造マッピングのループでは、互換性のためにループ名と同じ名前の音色があればそれが使われます。たとえば `@loop("bass_acid", interval=0.5)` は `bass_acid` 音色で鳴ります。
 
 全 30 音色を 1 音ずつ確認したい場合は `examples/sound_showcase.py` を使います。
 
@@ -739,11 +770,17 @@ pycodedj eval examples/sound_showcase.py::bass_acid
 pycodedj eval examples/sound_showcase.py::acid_lead
 ```
 
-`synth=` パラメーター（pattern 使用時）でも同じ名前を指定できます。
+`examples/sound_showcase.py` では試聴しやすいように、ループ名を音色名と同じにしています。通常の pattern ループでは、次のように `synth=` にこの表の音色名を指定します。
+
+```python
+@loop("kick", synth="floor_kick", dur=0.25)
+def kick():
+    pattern("x . x .")
+```
 
 ### キック
 
-| 名前 | 音の特徴 |
+| 音色名 | 音の特徴 |
 | :--- | :--- |
 | `kick_hard` | 硬めでアタックの強いキック |
 | `floor_kick` | 太い四つ打ちキック |
@@ -751,7 +788,7 @@ pycodedj eval examples/sound_showcase.py::acid_lead
 
 ### ベース
 
-| 名前 | 音の特徴 |
+| 音色名 | 音の特徴 |
 | :--- | :--- |
 | `bass_rumble` | 深い低音ランブル |
 | `bass_reese` | 揺れる Reese 系ベース |
@@ -760,7 +797,7 @@ pycodedj eval examples/sound_showcase.py::acid_lead
 
 ### パーカッション
 
-| 名前 | 音の特徴 |
+| 音色名 | 音の特徴 |
 | :--- | :--- |
 | `hat_engine` | クローズ/オープンのハットグリッド |
 | `hat_ride` | 長めのライド/オープンハット |
@@ -772,7 +809,7 @@ pycodedj eval examples/sound_showcase.py::acid_lead
 
 ### コード・スタブ
 
-| 名前 | 音の特徴 |
+| 音色名 | 音の特徴 |
 | :--- | :--- |
 | `chord_rave` | 明るいレイブスタブ |
 | `neon_stab` | ネオン系スタブコード |
@@ -783,7 +820,7 @@ pycodedj eval examples/sound_showcase.py::acid_lead
 
 ### リード・メロディー
 
-| 名前 | 音の特徴 |
+| 音色名 | 音の特徴 |
 | :--- | :--- |
 | `acid_lead` | アシッド系リード |
 | `lead_hoover` | Hoover 風リード |
@@ -793,7 +830,7 @@ pycodedj eval examples/sound_showcase.py::acid_lead
 
 ### アトモスフィア
 
-| 名前 | 音の特徴 |
+| 音色名 | 音の特徴 |
 | :--- | :--- |
 | `shimmer_pad` | 深いシマーパッド |
 | `warehouse_air` | 倉庫っぽい空気感 |
@@ -801,7 +838,7 @@ pycodedj eval examples/sound_showcase.py::acid_lead
 
 ### FX
 
-| 名前 | 音の特徴 |
+| 音色名 | 音の特徴 |
 | :--- | :--- |
 | `fx_impact` | 低いインパクト |
 | `riser_noise` | ノイズライザー（8 秒でスイープ上昇） |
@@ -1089,7 +1126,7 @@ pycodedj watch FILE [--sc-host HOST] [--sc-port PORT] [--debounce SECS]
 
 ```bash
 pycodedj watch examples/demo.py
-pycodedj watch club_set.py --debounce 0.5
+pycodedj watch examples/club_set.py --debounce 0.5
 ```
 
 ### `pycodedj panic`
