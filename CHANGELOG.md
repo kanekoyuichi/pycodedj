@@ -1,5 +1,20 @@
 # Changelog
 
+## [0.5.0] - 2026-05-08
+
+### Features
+
+- `pattern()` にコード構文 `[0 3]` を追加。1 ステップで複数の度数を同時発音できる
+- `pattern()` にタイ構文 `~` を追加。直前の音（または コード）を次のステップまで延長できる
+
+### Improvements
+
+- OSC パターン payload を v2 フォーマット（`"v2"` マーカー付き flat encoding）に統一
+- SC 側 `~setupPattern` を v2 専用 decode に変更。`\sustain` を `Pseq` で制御し、chord/tie の発音長を正確に管理
+- `encode_steps()` を `pattern.py` に追加。Python 内部の `list[PatternStep]` を OSC flat encoding に変換する
+
+---
+
 ## [0.4.0] - 2026-05-08
 
 ### Features

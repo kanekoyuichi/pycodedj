@@ -697,47 +697,105 @@ s.waitForBoot({
         };
     };
 
-    ~setupPattern = { |name, rootMidi, scaleName, dur, synthName, steps|
-        var scale, pitches, instrSym;
+    ~setupPattern = { |name, rootMidi, scaleName, dur, synthName, version, encoded|
+        var scale, pitches, sustains, instrSym, i, hasDegree, decodeError, tieTargetIndex, degreeToMidi;
         scale = Scale.at(scaleName.asSymbol) ?? { Scale.chromatic };
-        pitches = steps.collect({ |step|
-            if (step == -2) {
-                Rest()
-            } {
-                if (step == -1) {
-                    rootMidi.asInteger
-                } {
-                    (scale.degrees[step % scale.size] + rootMidi + (step.div(scale.size) * 12)).asInteger
-                }
-            }
-        });
-        // Degree tokens require a freq-aware synth; trigger-only patterns can use the
-        // caller-specified synth= or fall back to the loop's default.
-        instrSym = if (steps.detect({ |s| s >= 0 }).notNil) {
-            \pycodedj_note
-        } {
-            if (synthName.size > 0) {
-                ~synthForLoop.value(synthName)
-            } {
-                ~synthForLoop.value(name)
-            }
+        pitches = List.new;
+        sustains = List.new;
+        i = 0;
+        hasDegree = false;
+        decodeError = false;
+        tieTargetIndex = nil;
+        degreeToMidi = { |degree|
+            (scale.degrees[degree % scale.size] + rootMidi + (degree.div(scale.size) * 12)).asInteger
         };
-        Pdef(name.asSymbol,
-            Pbind(
-                \instrument, instrSym,
-                \midinote, Pseq(pitches, inf),
-                \dur, dur,
-                \amp,       Pfunc({ (~loopParams[name] ?? { (amp: 0.3) })[\amp] }),
-                \cutoff,    Pfunc({ (~loopParams[name] ?? { (cutoff: 800) })[\cutoff] }),
-                \lfoRate,   Pfunc({ (~loopParams[name] ?? { (lfoRate: 0.5) })[\lfoRate] }),
-                \reverbMix, Pfunc({ (~loopParams[name] ?? { (reverbMix: 0.2) })[\reverbMix] }),
-                \eqLow,     Pfunc({ (~loopParams[name] ?? { (low: 1) })[\low] }),
-                \eqMid,     Pfunc({ (~loopParams[name] ?? { (mid: 1) })[\mid] }),
-                \eqHigh,    Pfunc({ (~loopParams[name] ?? { (high: 1) })[\high] }),
-            )
-        ).play(TempoClock.default);
-        ~patterns[name] = true;
-        ("PyCodeDJ pattern started: " ++ name).postln;
+        if (version.asString != "v2") {
+            ("PyCodeDJ pattern error: unsupported pattern payload version: " ++ version.asString).postln;
+        } {
+            while ({ (i < encoded.size) and: { decodeError.not } }, {
+                var count = encoded[i].asInteger;
+                if (count == 0) {
+                    pitches.add(Rest());
+                    sustains.add(dur);
+                    tieTargetIndex = nil;
+                    i = i + 1;
+                } {
+                    if (count == -3) {
+                        if (tieTargetIndex.isNil) {
+                            "PyCodeDJ pattern error: tie must follow a note or chord.".postln;
+                            decodeError = true;
+                        } {
+                            sustains[tieTargetIndex] = sustains[tieTargetIndex] + dur;
+                            pitches.add(Rest());
+                            sustains.add(dur);
+                            i = i + 1;
+                        };
+                    } {
+                        if ((i + count) >= encoded.size) {
+                            "PyCodeDJ pattern error: truncated v2 pattern payload.".postln;
+                            decodeError = true;
+                        } {
+                            if (count == 1) {
+                                var degree = encoded[i + 1].asInteger;
+                                if (degree == -1) {
+                                    pitches.add(rootMidi.asInteger);
+                                    tieTargetIndex = nil;
+                                } {
+                                    pitches.add(degreeToMidi.value(degree));
+                                    hasDegree = true;
+                                    tieTargetIndex = sustains.size;
+                                };
+                                sustains.add(dur);
+                                i = i + 2;
+                            } {
+                                if (count > 1) {
+                                    pitches.add(Array.fill(count, { |j|
+                                        degreeToMidi.value(encoded[i + 1 + j].asInteger)
+                                    }));
+                                    sustains.add(dur);
+                                    hasDegree = true;
+                                    tieTargetIndex = sustains.size - 1;
+                                    i = i + 1 + count;
+                                } {
+                                    ("PyCodeDJ pattern error: invalid v2 pattern count: " ++ count).postln;
+                                    decodeError = true;
+                                };
+                            };
+                        };
+                    };
+                };
+            });
+            if (decodeError.not) {
+                // Degree and chord tokens require a freq-aware synth; trigger-only patterns can use the
+                // caller-specified synth= or fall back to the loop's default.
+                instrSym = if (hasDegree) {
+                    \pycodedj_note
+                } {
+                    if (synthName.size > 0) {
+                        ~synthForLoop.value(synthName)
+                    } {
+                        ~synthForLoop.value(name)
+                    }
+                };
+                Pdef(name.asSymbol,
+                    Pbind(
+                        \instrument, instrSym,
+                        \midinote, Pseq(pitches.asArray, inf),
+                        \dur, dur,
+                        \sustain, Pseq(sustains.asArray, inf),
+                        \amp,       Pfunc({ (~loopParams[name] ?? { (amp: 0.3) })[\amp] }),
+                        \cutoff,    Pfunc({ (~loopParams[name] ?? { (cutoff: 800) })[\cutoff] }),
+                        \lfoRate,   Pfunc({ (~loopParams[name] ?? { (lfoRate: 0.5) })[\lfoRate] }),
+                        \reverbMix, Pfunc({ (~loopParams[name] ?? { (reverbMix: 0.2) })[\reverbMix] }),
+                        \eqLow,     Pfunc({ (~loopParams[name] ?? { (low: 1) })[\low] }),
+                        \eqMid,     Pfunc({ (~loopParams[name] ?? { (mid: 1) })[\mid] }),
+                        \eqHigh,    Pfunc({ (~loopParams[name] ?? { (high: 1) })[\high] }),
+                    )
+                ).play(TempoClock.default);
+                ~patterns[name] = true;
+                ("PyCodeDJ pattern started: " ++ name).postln;
+            };
+        };
     };
 
     // Single handler for all /pycodedj/loop/<name>/<param> addresses.
@@ -813,15 +871,16 @@ s.waitForBoot({
                     };
                 },
                 "pattern",   {
-                    // msg: [addr, rootMidi, scaleName, dur, synthName, step...]
-                    if (msg.size >= 5) {
+                    // msg: [addr, rootMidi, scaleName, dur, synthName, "v2", encoded...]
+                    if (msg.size >= 6) {
                         ~setupPattern.value(
                             name,
                             msg[1].asInteger,
                             msg[2].asString,
                             msg[3].asFloat,
                             msg[4].asString,
-                            msg[5..]
+                            msg[5].asString,
+                            msg[6..]
                         );
                     };
                 },

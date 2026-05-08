@@ -5,6 +5,8 @@ from typing import TYPE_CHECKING
 
 from pythonosc import udp_client
 
+from .pattern import PatternStep, encode_steps
+
 if TYPE_CHECKING:
     from .mapper import MusicParams
 
@@ -48,7 +50,7 @@ class OscBridge:
         root_midi: int,
         scale: str,
         dur: float,
-        steps: list[int],
+        steps: list[PatternStep],
         synth: str = "",
     ) -> None:
         self.audio.send(
@@ -57,7 +59,8 @@ class OscBridge:
             scale,
             dur,
             synth,
-            *steps,
+            "v2",
+            *encode_steps(steps),
         )
 
     def send_synth(self, name: str, synth: str) -> None:

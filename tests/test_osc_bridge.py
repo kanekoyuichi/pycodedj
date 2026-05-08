@@ -5,6 +5,7 @@ import pytest
 
 from pycodedj.mapper import MusicParams
 from pycodedj.osc_bridge import OscBridge, OscEndpoint, OscError
+from pycodedj.pattern import REST, TIE, TRIGGER
 
 
 def _make_mock_endpoint(port: int) -> OscEndpoint:
@@ -133,11 +134,23 @@ def test_send_pattern_address(mock_endpoint: OscEndpoint) -> None:
 
 def test_send_pattern_values(mock_endpoint: OscEndpoint) -> None:
     bridge = OscBridge(audio=mock_endpoint)
-    bridge.send_pattern("kick", 48, "chromatic", 0.25, [-1, -2, -1, -2])
+    bridge.send_pattern("kick", 48, "chromatic", 0.25, [TRIGGER, REST, TRIGGER, REST])
 
     call_map = {c.args[0]: c.args[1] for c in _send_mock(mock_endpoint).call_args_list}
-    # order: root_midi, scale, dur, synth(""), steps...
-    assert call_map["/pycodedj/loop/kick/pattern"] == [48, "chromatic", 0.25, "", -1, -2, -1, -2]
+    # order: root_midi, scale, dur, synth(""), version, encoded steps...
+    assert call_map["/pycodedj/loop/kick/pattern"] == [
+        48,
+        "chromatic",
+        0.25,
+        "",
+        "v2",
+        1,
+        TRIGGER,
+        0,
+        1,
+        TRIGGER,
+        0,
+    ]
 
 
 def test_send_pattern_with_synth(mock_endpoint: OscEndpoint) -> None:
@@ -145,7 +158,7 @@ def test_send_pattern_with_synth(mock_endpoint: OscEndpoint) -> None:
     bridge.send_pattern("bass", 33, "minor", 0.5, [0, -2], synth="bass_acid")
 
     call_map = {c.args[0]: c.args[1] for c in _send_mock(mock_endpoint).call_args_list}
-    assert call_map["/pycodedj/loop/bass/pattern"] == [33, "minor", 0.5, "bass_acid", 0, -2]
+    assert call_map["/pycodedj/loop/bass/pattern"] == [33, "minor", 0.5, "bass_acid", "v2", 1, 0, 0]
 
 
 def test_send_pattern_empty_steps(mock_endpoint: OscEndpoint) -> None:
@@ -153,7 +166,34 @@ def test_send_pattern_empty_steps(mock_endpoint: OscEndpoint) -> None:
     bridge.send_pattern("bass", 33, "minor", 0.5, [])
 
     call_map = {c.args[0]: c.args[1] for c in _send_mock(mock_endpoint).call_args_list}
-    assert call_map["/pycodedj/loop/bass/pattern"] == [33, "minor", 0.5, ""]
+    assert call_map["/pycodedj/loop/bass/pattern"] == [33, "minor", 0.5, "", "v2"]
+
+
+def test_send_pattern_chord_and_tie_payload(mock_endpoint: OscEndpoint) -> None:
+    bridge = OscBridge(audio=mock_endpoint)
+    bridge.send_pattern("lead", 60, "minor", 0.25, [0, REST, [0, 3], TIE, 5, REST, 3, REST])
+
+    call_map = {c.args[0]: c.args[1] for c in _send_mock(mock_endpoint).call_args_list}
+    assert call_map["/pycodedj/loop/lead/pattern"] == [
+        60,
+        "minor",
+        0.25,
+        "",
+        "v2",
+        1,
+        0,
+        0,
+        2,
+        0,
+        3,
+        TIE,
+        1,
+        5,
+        0,
+        1,
+        3,
+        0,
+    ]
 
 
 def test_send_pattern_stop(mock_endpoint: OscEndpoint) -> None:

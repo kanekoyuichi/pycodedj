@@ -8,6 +8,7 @@ from .analyzer import analyze
 from .block_parser import LoopBlock
 from .mapper import MusicParams, map_features
 from .osc_bridge import OscBridge, OscError
+from .pattern import PatternStep
 
 
 @dataclass
@@ -76,7 +77,7 @@ class Engine:
 
     def _make_pattern_args(
         self, block: LoopBlock
-    ) -> tuple[int, str, float, list[int], str]:
+    ) -> tuple[int, str, float, list[PatternStep], str]:
         from .pattern import parse_pattern, root_to_midi
         steps = parse_pattern(block.pattern_str or "")
         midi = root_to_midi(block.root or "C4")

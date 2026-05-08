@@ -801,6 +801,8 @@ def kick_drum():
             <tr><td><code>x</code></td><td>ここで音を鳴らす（トリガー）</td></tr>
             <tr><td><code>.</code></td><td>休符（無音）</td></tr>
             <tr><td><code>0</code>, <code>1</code>, <code>2</code> …</td><td>音を鳴らす + 音程（スケール度数）</td></tr>
+            <tr><td><code>[0 3]</code></td><td>コード（複数の度数を同時発音）</td></tr>
+            <tr><td><code>~</code></td><td>タイ（直前の音を 1 ステップ延長）</td></tr>
           </tbody>
         </table>
 
@@ -872,6 +874,28 @@ def melody():
           </tbody>
         </table>
 
+        <h3>コード — 複数の音を同時に鳴らす</h3>
+
+        <p>角括弧で複数の度数を囲むと、1 ステップで複数の音を同時に鳴らせます。</p>
+
+        <pre data-lang="python"><code id="code-s7-chord">@loop("chord", synth="note", root="C3", scale="minor", dur=0.5)
+def chord():
+    pattern("[0 2 4] . [0 3] .")
+    # [0 2 4]→C3+Eb3+G3（短三和音）, 休, [0 3]→C3+Eb3, 休</code></pre>
+
+        <p>コード内に書けるのは <strong>0 以上の整数のみ</strong>です。<code>.</code>・<code>x</code>・<code>~</code> は書けません。</p>
+
+        <h3>タイ — 音を伸ばす</h3>
+
+        <p><code>~</code> を使うと、直前の音（またはコード）を次のステップまで伸ばせます。</p>
+
+        <pre data-lang="python"><code id="code-s7-tie">@loop("bass", synth="note", root="A1", scale="minor", dur=0.25)
+def bass():
+    pattern("0 . [0 3] ~ 5 . 3 .")
+    # 0→A1, 休, [0 3]→和音（2ステップ持続）, 5→F2, 休, 3→D2, 休</code></pre>
+
+        <p><code>~</code> は単音・コードの直後にのみ書けます。先頭・<code>.</code> や <code>x</code> の直後は書けません。</p>
+
         <h3>実例: キック・ベース・メロディー</h3>
 
         <pre data-lang="python"><code id="code-s7-4">from pycodedj import loop, pattern
@@ -882,7 +906,8 @@ def kick():
 
 @loop("bass", synth="bass_acid", root="A1", scale="minor", dur=0.25)
 def bass():
-    pattern("0 . 0 . 3 . 5 .")
+    pattern("0 . [0 3] ~ 5 . 3 .")
+    # 0→A1, 休, [0 3]→和音（2ステップ持続）, 5→F2, 休, 3→D2, 休
 
 @loop("melody", synth="acid_lead", root="A3", scale="minor", dur=0.5)
 def melody():

@@ -477,6 +477,8 @@ The string passed to `pattern()` describes a sequence of steps:
 | `x` | Trigger: play the sound here |
 | `.` | Rest: silence |
 | `0`, `1`, `2` … | Play the sound at this scale degree |
+| `[0 3]` | Chord: play multiple degrees simultaneously |
+| `~` | Tie: extend the previous note or chord by one step |
 
 Tokens are separated by spaces. `"x . x ."` is a 4-step pattern.
 
@@ -563,6 +565,32 @@ def bass():
     # 0→C3, rest, x→C3, rest, 3→Eb3, rest, x→C3, rest
 ```
 
+### Chords — multiple notes at once
+
+Wrap multiple degrees in square brackets to play them simultaneously in one step:
+
+```python
+@loop("chord", synth="note", root="C3", scale="minor", dur=0.5)
+def chord():
+    pattern("[0 2 4] . [0 3] .")
+    # [0 2 4]→C3+Eb3+G3 (minor triad), rest, [0 3]→C3+Eb3, rest
+```
+
+Only non-negative integers are allowed inside brackets. `.`, `x`, and `~` are not valid inside a chord.
+
+### Ties — sustaining a note
+
+Use `~` to extend the previous note or chord by one additional step:
+
+```python
+@loop("bass", synth="note", root="A1", scale="minor", dur=0.25)
+def bass():
+    pattern("0 . [0 3] ~ 5 . 3 .")
+    # 0→A1, rest, [0 3] chord held for 2 steps, 5→F2, rest, 3→D2, rest
+```
+
+`~` can only follow a degree or chord. Placing it at the start, or after `.` or `x`, raises a `ValueError`.
+
 ### Root note notation
 
 | Notation | Note |
@@ -573,7 +601,7 @@ def bass():
 | `"F#3"` | F♯3 (also writable as `"Fs3"`) |
 | `"C1"` | Low C |
 
-### Full example: kick, bass, and melody
+### Full example: kick, bass, and chord
 
 ```python
 from pycodedj import loop, pattern
@@ -584,7 +612,8 @@ def kick():
 
 @loop("bass", synth="bass_acid", root="A1", scale="minor", dur=0.25)
 def bass():
-    pattern("0 . 0 . 3 . 5 .")
+    pattern("0 . [0 3] ~ 5 . 3 .")
+    # 0→A1, rest, [0 3] chord held for 2 steps, 5→F2, rest, 3→D2, rest
 
 @loop("melody", synth="acid_lead", root="A3", scale="minor", dur=0.5)
 def melody():

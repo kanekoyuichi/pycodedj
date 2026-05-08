@@ -151,7 +151,23 @@ def kick():
 @loop("bass", synth="bass_acid", root="A1", scale="minor", dur=0.25)
 def bass():
     pattern("0 . 3 . 5 .")
+
+# コードとタイ
+@loop("chord", synth="note", root="A1", scale="minor", dur=0.25)
+def chord():
+    pattern("0 . [0 3] ~ 5 . 3 .")
+    # [0 3] = 2音コード、~ = 直前の音を伸ばす
 ```
+
+`pattern()` のトークン一覧:
+
+| トークン | 意味 |
+| :--- | :--- |
+| `x` | トリガー（ルート音で鳴らす） |
+| `.` | 休符 |
+| `0`, `1`, `2` … | スケール度数 |
+| `[0 3]` | コード（複数の度数を同時発音） |
+| `~` | タイ（直前の音を 1 ステップ延長） |
 
 `@loop` に渡す引数:
 

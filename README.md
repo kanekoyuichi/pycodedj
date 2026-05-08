@@ -151,7 +151,23 @@ def kick():
 @loop("bass", synth="bass_acid", root="A1", scale="minor", dur=0.25)
 def bass():
     pattern("0 . 3 . 5 .")
+
+# Chords and ties
+@loop("chord", synth="note", root="A1", scale="minor", dur=0.25)
+def chord():
+    pattern("0 . [0 3] ~ 5 . 3 .")
+    # [0 3] = two-note chord, ~ = sustain the previous note one more step
 ```
+
+Token reference:
+
+| Token | Meaning |
+| :--- | :--- |
+| `x` | Trigger (plays root note) |
+| `.` | Rest (silence) |
+| `0`, `1`, `2` … | Scale degree (pitch) |
+| `[0 3]` | Chord (multiple degrees simultaneously) |
+| `~` | Tie (extends the previous note/chord by one step) |
 
 `@loop` arguments for pattern mode:
 

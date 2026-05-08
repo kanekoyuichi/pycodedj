@@ -386,7 +386,39 @@ def test_eval_block_pattern_values_correct() -> None:
     assert values[1] == "minor"
     assert values[2] == 0.25
     assert values[3] == "kick_pulse"
-    assert values[4:] == [-1, -2, -1, -2]
+    assert values[4:] == ["v2", 1, -1, 0, 1, -1, 0]
+
+
+def test_eval_block_pattern_chord_and_tie_values_correct() -> None:
+    engine = _make_engine()
+    from typing import cast
+    mock_send = cast(MagicMock, engine.bridge.audio._client).send_message
+    mock_send.reset_mock()
+
+    engine.eval_block(_pattern_block(pattern_str="0 . [0 3] ~ 5 . 3 .", root="C4", scale="minor", dur=0.25))
+
+    call_map = {c.args[0]: c.args[1] for c in mock_send.call_args_list}
+    values = call_map["/pycodedj/loop/kick/pattern"]
+    assert values == [
+        60,
+        "minor",
+        0.25,
+        "kick_pulse",
+        "v2",
+        1,
+        0,
+        0,
+        2,
+        0,
+        3,
+        -3,
+        1,
+        5,
+        0,
+        1,
+        3,
+        0,
+    ]
 
 
 def test_eval_block_pattern_uses_defaults_for_missing_root_scale_dur() -> None:
