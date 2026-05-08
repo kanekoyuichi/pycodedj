@@ -237,3 +237,274 @@ def test_status_reflects_muted_state() -> None:
 def test_status_empty_on_init() -> None:
     engine = _make_engine()
     assert engine.status() == []
+
+
+# --- pattern ---
+
+def _pattern_block(
+    pattern_str: str | None = "x . x .",
+    root: str | None = "C4",
+    scale: str | None = "chromatic",
+    dur: float | None = 0.25,
+) -> LoopBlock:
+    return LoopBlock(
+        name="kick",
+        interval=1.0,
+        source="def f(): pass",
+        synth="kick_pulse",
+        root=root,
+        scale=scale,
+        dur=dur,
+        pattern_str=pattern_str,
+    )
+
+
+def test_mute_pattern_loop_keeps_voice_count_zero() -> None:
+    engine = _make_engine()
+    engine.eval_block(_pattern_block())
+    from typing import cast
+    mock_send = cast(MagicMock, engine.bridge.audio._client).send_message
+    mock_send.reset_mock()
+
+    engine.mute("kick")
+
+    params_calls = [c for c in mock_send.call_args_list if "/params" in c.args[0]]
+    assert len(params_calls) == 1
+    assert params_calls[0].args[1][0] == 0  # voice_count still 0
+
+
+def test_mute_pattern_loop_does_not_send_pattern_stop() -> None:
+    engine = _make_engine()
+    engine.eval_block(_pattern_block())
+    from typing import cast
+    mock_send = cast(MagicMock, engine.bridge.audio._client).send_message
+    mock_send.reset_mock()
+
+    engine.mute("kick")
+
+    addresses = [c.args[0] for c in mock_send.call_args_list]
+    assert "/pycodedj/loop/kick/pattern_stop" not in addresses
+
+
+def test_stop_loop_sends_pattern_stop_when_had_pattern() -> None:
+    engine = _make_engine()
+    engine.eval_block(_pattern_block())
+    from typing import cast
+    mock_send = cast(MagicMock, engine.bridge.audio._client).send_message
+    mock_send.reset_mock()
+
+    engine.stop_loop("kick")
+
+    addresses = [c.args[0] for c in mock_send.call_args_list]
+    assert "/pycodedj/loop/kick/pattern_stop" in addresses
+
+
+def test_stop_loop_does_not_send_pattern_stop_for_non_pattern_loop() -> None:
+    engine = _make_engine()
+    engine.eval_block(_block("def f(): pass", name="kick"))
+    from typing import cast
+    mock_send = cast(MagicMock, engine.bridge.audio._client).send_message
+    mock_send.reset_mock()
+
+    engine.stop_loop("kick")
+
+    addresses = [c.args[0] for c in mock_send.call_args_list]
+    assert "/pycodedj/loop/kick/pattern_stop" not in addresses
+
+
+def test_eval_block_pattern_suppresses_legacy_loop() -> None:
+    engine = _make_engine()
+    from typing import cast
+    mock_send = cast(MagicMock, engine.bridge.audio._client).send_message
+    mock_send.reset_mock()
+
+    engine.eval_block(_pattern_block())
+
+    # /params should have voice_count=0 when pattern is active
+    params_calls = [c for c in mock_send.call_args_list if "/params" in c.args[0]]
+    assert len(params_calls) == 1
+    assert params_calls[0].args[1][0] == 0  # voice_count at index 0
+
+
+def test_eval_block_pattern_osc_fail_does_not_update_state() -> None:
+    engine = _make_engine()
+    # Make send_pattern fail (second call fails)
+    call_count = 0
+    original_send = engine.bridge.audio.send
+
+    def failing_send(address: str, *args: object) -> None:
+        nonlocal call_count
+        call_count += 1
+        if "pattern" in address and "stop" not in address:
+            from pycodedj.osc_bridge import OscError
+            raise OscError("pattern send failed")
+        original_send(address, *args)
+
+    engine.bridge.audio.send = failing_send  # type: ignore[method-assign]
+
+    result = engine.eval_block(_pattern_block())
+    assert result is None
+    assert "kick" not in engine.list_loops()
+
+
+def test_eval_block_calls_send_pattern_when_pattern_str_set() -> None:
+    engine = _make_engine()
+    from typing import cast
+    mock_send = cast(MagicMock, engine.bridge.audio._client).send_message
+    mock_send.reset_mock()
+
+    engine.eval_block(_pattern_block())
+
+    addresses = [c.args[0] for c in mock_send.call_args_list]
+    assert "/pycodedj/loop/kick/pattern" in addresses
+
+
+def test_eval_block_does_not_call_send_pattern_when_pattern_str_none() -> None:
+    engine = _make_engine()
+    from typing import cast
+    mock_send = cast(MagicMock, engine.bridge.audio._client).send_message
+    mock_send.reset_mock()
+
+    engine.eval_block(_pattern_block(pattern_str=None))
+
+    addresses = [c.args[0] for c in mock_send.call_args_list]
+    assert "/pycodedj/loop/kick/pattern" not in addresses
+
+
+def test_eval_block_pattern_values_correct() -> None:
+    engine = _make_engine()
+    from typing import cast
+    mock_send = cast(MagicMock, engine.bridge.audio._client).send_message
+    mock_send.reset_mock()
+
+    engine.eval_block(_pattern_block(pattern_str="x . x .", root="C4", scale="minor", dur=0.25))
+
+    call_map = {c.args[0]: c.args[1] for c in mock_send.call_args_list}
+    values = call_map["/pycodedj/loop/kick/pattern"]
+    # order: root_midi=60, scale="minor", dur=0.25, synth="kick_pulse", steps...
+    assert values[0] == 60
+    assert values[1] == "minor"
+    assert values[2] == 0.25
+    assert values[3] == "kick_pulse"
+    assert values[4:] == [-1, -2, -1, -2]
+
+
+def test_eval_block_pattern_uses_defaults_for_missing_root_scale_dur() -> None:
+    engine = _make_engine()
+    from typing import cast
+    mock_send = cast(MagicMock, engine.bridge.audio._client).send_message
+    mock_send.reset_mock()
+
+    engine.eval_block(_pattern_block(pattern_str="x .", root=None, scale=None, dur=None))
+
+    call_map = {c.args[0]: c.args[1] for c in mock_send.call_args_list}
+    values = call_map["/pycodedj/loop/kick/pattern"]
+    assert values[0] == 60   # C4 default
+    assert values[1] == "chromatic"
+    assert values[2] == 0.25
+
+
+def test_eval_block_invalid_pattern_does_not_update_state() -> None:
+    engine = _make_engine()
+    result = engine.eval_block(_pattern_block(pattern_str="x y ."))
+    assert result is None
+    assert "kick" not in engine.list_loops()
+
+
+def test_eval_block_invalid_pattern_returns_none() -> None:
+    engine = _make_engine()
+    result = engine.eval_block(_pattern_block(pattern_str="x y ."))
+    assert result is None
+
+
+def test_eval_block_sends_synth_for_non_pattern_loop() -> None:
+    engine = _make_engine()
+    from typing import cast
+    mock_send = cast(MagicMock, engine.bridge.audio._client).send_message
+    mock_send.reset_mock()
+
+    block = LoopBlock(name="beat", interval=1.0, source="def f(): pass", synth="kick_pulse")
+    engine.eval_block(block)
+
+    addresses = [c.args[0] for c in mock_send.call_args_list]
+    assert "/pycodedj/loop/beat/synth" in addresses
+
+
+def test_eval_block_sends_synth_clear_when_no_synth() -> None:
+    engine = _make_engine()
+    from typing import cast
+    mock_send = cast(MagicMock, engine.bridge.audio._client).send_message
+    mock_send.reset_mock()
+
+    engine.eval_block(_block("def f(): pass", name="beat"))
+
+    call_map = {c.args[0]: c.args[1] for c in mock_send.call_args_list}
+    assert "/pycodedj/loop/beat/synth" in call_map
+    assert call_map["/pycodedj/loop/beat/synth"] == [""]
+
+
+def test_eval_block_does_not_send_synth_for_pattern_loop() -> None:
+    engine = _make_engine()
+    from typing import cast
+    mock_send = cast(MagicMock, engine.bridge.audio._client).send_message
+    mock_send.reset_mock()
+
+    engine.eval_block(_pattern_block())
+
+    addresses = [c.args[0] for c in mock_send.call_args_list]
+    assert "/pycodedj/loop/kick/synth" not in addresses
+
+
+def test_send_synth() -> None:
+    with patch("pycodedj.osc_bridge.udp_client.SimpleUDPClient"):
+        ep = OscEndpoint(host="127.0.0.1", port=57120)
+    client = MagicMock()
+    ep._client = client
+    bridge = OscBridge(audio=ep)
+    bridge.send_synth("beat", "kick_pulse")
+    assert client.send_message.call_args.args[0] == "/pycodedj/loop/beat/synth"
+    assert client.send_message.call_args.args[1] == ["kick_pulse"]
+
+
+def test_eval_block_pattern_to_non_pattern_sends_stop_before_params() -> None:
+    engine = _make_engine()
+    engine.eval_block(_pattern_block(pattern_str="x . x ."))
+
+    from typing import cast
+    mock_send = cast(MagicMock, engine.bridge.audio._client).send_message
+    mock_send.reset_mock()
+
+    engine.eval_block(_pattern_block(pattern_str=None))
+
+    addresses = [c.args[0] for c in mock_send.call_args_list]
+    stop_idx = next(i for i, a in enumerate(addresses) if "pattern_stop" in a)
+    params_idx = next(i for i, a in enumerate(addresses) if "/params" in a)
+    assert stop_idx < params_idx
+
+
+def test_eval_block_pattern_removed_sends_stop() -> None:
+    engine = _make_engine()
+    engine.eval_block(_pattern_block(pattern_str="x . x ."))
+
+    from typing import cast
+    mock_send = cast(MagicMock, engine.bridge.audio._client).send_message
+    mock_send.reset_mock()
+
+    # Re-eval without pattern_str — should send pattern_stop
+    engine.eval_block(_pattern_block(pattern_str=None))
+
+    addresses = [c.args[0] for c in mock_send.call_args_list]
+    assert "/pycodedj/loop/kick/pattern_stop" in addresses
+
+
+def test_eval_block_always_sends_pattern_stop_for_non_pattern_block() -> None:
+    engine = _make_engine()
+    from typing import cast
+    mock_send = cast(MagicMock, engine.bridge.audio._client).send_message
+    mock_send.reset_mock()
+
+    # Eval without pattern — pattern_stop is always sent (SC no-ops when no Pdef is running)
+    engine.eval_block(_pattern_block(pattern_str=None))
+
+    addresses = [c.args[0] for c in mock_send.call_args_list]
+    assert "/pycodedj/loop/kick/pattern_stop" in addresses

@@ -153,3 +153,126 @@ def test_valid_source_error_is_none() -> None:
 
 def test_parse_result_type() -> None:
     assert isinstance(parse_blocks(_MULTI), ParseResult)
+
+
+# --- Sprint 2: @loop synth/root/scale/dur ---
+
+_WITH_SYNTH_PARAMS = """\
+from pycodedj import loop
+
+@loop("kick", synth="kick_pulse", root="C2", scale="minor", dur=0.25)
+def my_kick():
+    pass
+"""
+
+_WITH_PARTIAL_PARAMS = """\
+from pycodedj import loop
+
+@loop("bass", synth="bass_reese", dur=0.5)
+def my_bass():
+    pass
+"""
+
+
+def test_synth_extracted() -> None:
+    blocks = parse_blocks(_WITH_SYNTH_PARAMS).blocks
+    assert len(blocks) == 1
+    assert blocks[0].synth == "kick_pulse"
+
+
+def test_root_extracted() -> None:
+    blocks = parse_blocks(_WITH_SYNTH_PARAMS).blocks
+    assert blocks[0].root == "C2"
+
+
+def test_scale_extracted() -> None:
+    blocks = parse_blocks(_WITH_SYNTH_PARAMS).blocks
+    assert blocks[0].scale == "minor"
+
+
+def test_dur_extracted() -> None:
+    blocks = parse_blocks(_WITH_SYNTH_PARAMS).blocks
+    assert blocks[0].dur == 0.25
+
+
+def test_synth_without_root_scale() -> None:
+    blocks = parse_blocks(_WITH_PARTIAL_PARAMS).blocks
+    assert blocks[0].synth == "bass_reese"
+    assert blocks[0].root is None
+    assert blocks[0].scale is None
+    assert blocks[0].dur == 0.5
+
+
+def test_new_fields_default_to_none() -> None:
+    blocks = parse_blocks(_NO_VOLUME).blocks
+    assert blocks[0].synth is None
+    assert blocks[0].root is None
+    assert blocks[0].scale is None
+    assert blocks[0].dur is None
+    assert blocks[0].pattern_str is None
+
+
+# --- Sprint 2: pattern() extraction ---
+
+_WITH_PATTERN = """\
+from pycodedj import loop, pattern
+
+@loop("kick", synth="kick_pulse", dur=0.25)
+def my_kick():
+    pattern("x . x .")
+"""
+
+_WITH_PATTERN_AND_DEGREE = """\
+from pycodedj import loop, pattern
+
+@loop("bass", synth="bass_acid", root="A1", scale="minor", dur=0.25)
+def my_bass():
+    pattern("0 . 3 .")
+"""
+
+
+def test_pattern_str_extracted() -> None:
+    blocks = parse_blocks(_WITH_PATTERN).blocks
+    assert blocks[0].pattern_str == "x . x ."
+
+
+def test_pattern_str_with_degrees() -> None:
+    blocks = parse_blocks(_WITH_PATTERN_AND_DEGREE).blocks
+    assert blocks[0].pattern_str == "0 . 3 ."
+
+
+def test_pattern_str_none_when_absent() -> None:
+    blocks = parse_blocks(_WITH_SYNTH_PARAMS).blocks
+    assert blocks[0].pattern_str is None
+
+
+_WITH_NESTED_PATTERN = """\
+from pycodedj import loop, pattern
+
+@loop("bass", synth="bass_acid", dur=0.25)
+def my_bass():
+    def helper():
+        pattern("x . x .")  # inside nested function — should be ignored
+    helper()
+"""
+
+
+def test_pattern_str_ignores_nested_scope() -> None:
+    blocks = parse_blocks(_WITH_NESTED_PATTERN).blocks
+    assert blocks[0].pattern_str is None
+
+
+_WITH_MULTIPLE_PATTERNS = """\
+from pycodedj import loop, pattern
+
+@loop("kick", dur=0.25)
+def my_kick():
+    pattern("x . x .")
+    if True:
+        pattern("x x . .")
+"""
+
+
+def test_pattern_str_takes_first_in_source_order() -> None:
+    blocks = parse_blocks(_WITH_MULTIPLE_PATTERNS).blocks
+    assert blocks[0].pattern_str == "x . x ."

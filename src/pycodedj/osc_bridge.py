@@ -42,6 +42,30 @@ class OscBridge:
         if self.visual is not None:
             self.visual.send("/pycodedj/panic")
 
+    def send_pattern(
+        self,
+        name: str,
+        root_midi: int,
+        scale: str,
+        dur: float,
+        steps: list[int],
+        synth: str = "",
+    ) -> None:
+        self.audio.send(
+            f"/pycodedj/loop/{name}/pattern",
+            root_midi,
+            scale,
+            dur,
+            synth,
+            *steps,
+        )
+
+    def send_synth(self, name: str, synth: str) -> None:
+        self.audio.send(f"/pycodedj/loop/{name}/synth", synth)
+
+    def send_pattern_stop(self, name: str) -> None:
+        self.audio.send(f"/pycodedj/loop/{name}/pattern_stop")
+
     def send_params(self, name: str, params: "MusicParams") -> None:
         base = f"/pycodedj/loop/{name}"
         # Keep audio updates atomic so SuperCollider does not set params on stale nodes.

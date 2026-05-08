@@ -490,11 +490,24 @@ s.waitForBoot({
         Out.ar(0, ~applySimpleEQ.value(sig ! 2, eqLow, eqMid, eqHigh));
     }).add;
 
+    // Default melodic synth for pattern mode — supports \freq / \midinote and full mapped controls.
+    SynthDef(\pycodedj_note, {
+        arg freq = 440, amp = 0.3, gate = 1, cutoff = 2000, reverbMix = 0.15, eqLow = 1, eqMid = 1, eqHigh = 1;
+        var sig, env;
+        sig = Mix.ar(Saw.ar(freq * [1.0, 1.004, 0.996])) * 0.18;
+        sig = RLPF.ar(sig, cutoff.clip(400, 12000), 0.45);
+        env = EnvGen.kr(Env.asr(0.005, 1, 0.08), gate, doneAction: 2);
+        sig = FreeVerb.ar(sig, reverbMix.clip(0, 0.7), 0.45, 0.25) * env * amp;
+        Out.ar(0, ~applySimpleEQ.value(sig ! 2, eqLow, eqMid, eqHigh));
+    }).add;
+
     s.sync;
 
     // Registry: loop name -> array of running Synth instances
     ~loops = Dictionary.new;
     ~loopParams = Dictionary.new;
+    ~patterns = Dictionary.new;
+    ~loopSynths = Dictionary.new;
 
     ~synthForLoop = { |name|
         var nameString, parts, role, variant;
@@ -521,6 +534,10 @@ s.waitForBoot({
             "chord_rave",   { \pycodedj_chord_rave },
             "lead_hoover",  { \pycodedj_lead_hoover },
             "fx_impact",    { \pycodedj_fx_impact },
+            // common shorthands
+            "acid",         { \pycodedj_bass_acid },
+            "kick",         { \pycodedj_floor_kick },
+            "note",         { \pycodedj_note },
             // new DJ sounds
             "tom_drum",     { \pycodedj_tom_drum },
             "snare_roll",   { \pycodedj_snare_roll },
@@ -610,27 +627,35 @@ s.waitForBoot({
 
     // Helper: start or restart a loop with given voice count
     ~startLoop = { |name, voiceCount = 1|
-        var synthName, synths, params;
-        if (~loops[name].notNil) {
-            ~loops[name].do({ |synth| synth.set(\gate, 0) });
+        // Do not start a legacy synth while a Pdef pattern is active for this name.
+        if (~patterns[name].isNil) {
+            var synthName, synths, params;
+            if (~loops[name].notNil) {
+                ~loops[name].do({ |synth| synth.set(\gate, 0) });
+            };
+            params = ~loopParams[name] ?? {
+                (cutoff: 800, lfoRate: 0.5, reverbMix: 0.2, amp: 0.3, low: 1, mid: 1, high: 1)
+            };
+            ~loopParams[name] = params;
+            // Honor synth= override when set; fall back to name-based selection.
+            synthName = if (~loopSynths[name].notNil) {
+                ~synthForLoop.value(~loopSynths[name])
+            } {
+                ~synthForLoop.value(name)
+            };
+            synths = voiceCount.collect({
+                Synth(synthName, [
+                    \cutoff, params[\cutoff],
+                    \lfoRate, params[\lfoRate],
+                    \reverbMix, params[\reverbMix],
+                    \amp, params[\amp],
+                    \eqLow, params[\low],
+                    \eqMid, params[\mid],
+                    \eqHigh, params[\high]
+                ])
+            });
+            ~loops[name] = synths;
         };
-        params = ~loopParams[name] ?? {
-            (cutoff: 800, lfoRate: 0.5, reverbMix: 0.2, amp: 0.3, low: 1, mid: 1, high: 1)
-        };
-        ~loopParams[name] = params;
-        synthName = ~synthForLoop.value(name);
-        synths = voiceCount.collect({
-            Synth(synthName, [
-                \cutoff, params[\cutoff],
-                \lfoRate, params[\lfoRate],
-                \reverbMix, params[\reverbMix],
-                \amp, params[\amp],
-                \eqLow, params[\low],
-                \eqMid, params[\mid],
-                \eqHigh, params[\high]
-            ])
-        });
-        ~loops[name] = synths;
     };
 
     ~setLoopParam = { |name, key, val|
@@ -650,11 +675,19 @@ s.waitForBoot({
         };
     };
 
+    ~stopPattern = { |name|
+        if (~patterns[name].notNil) {
+            Pdef(name.asSymbol).stop;
+            ~patterns.removeAt(name);
+        };
+    };
+
     ~applyLoopParams = { |name, voiceCount, cutoff, lfoRate, reverbMix, amp, low = 1, mid = 1, high = 1|
         var params;
         params = (cutoff: cutoff, lfoRate: lfoRate, reverbMix: reverbMix, amp: amp, low: low, mid: mid, high: high);
         ~loopParams[name] = params;
         if (voiceCount.asInteger <= 0) {
+            // Gate legacy synths; pattern Pdefs are stopped only via /pattern_stop.
             if (~loops[name].notNil) {
                 ~loops[name].do({ |synth| synth.set(\gate, 0) });
                 ~loops[name] = nil;
@@ -662,6 +695,49 @@ s.waitForBoot({
         } {
             ~startLoop.value(name, voiceCount.asInteger);
         };
+    };
+
+    ~setupPattern = { |name, rootMidi, scaleName, dur, synthName, steps|
+        var scale, pitches, instrSym;
+        scale = Scale.at(scaleName.asSymbol) ?? { Scale.chromatic };
+        pitches = steps.collect({ |step|
+            if (step == -2) {
+                Rest()
+            } {
+                if (step == -1) {
+                    rootMidi.asInteger
+                } {
+                    (scale.degrees[step % scale.size] + rootMidi + (step.div(scale.size) * 12)).asInteger
+                }
+            }
+        });
+        // Degree tokens require a freq-aware synth; trigger-only patterns can use the
+        // caller-specified synth= or fall back to the loop's default.
+        instrSym = if (steps.detect({ |s| s >= 0 }).notNil) {
+            \pycodedj_note
+        } {
+            if (synthName.size > 0) {
+                ~synthForLoop.value(synthName)
+            } {
+                ~synthForLoop.value(name)
+            }
+        };
+        Pdef(name.asSymbol,
+            Pbind(
+                \instrument, instrSym,
+                \midinote, Pseq(pitches, inf),
+                \dur, dur,
+                \amp,       Pfunc({ (~loopParams[name] ?? { (amp: 0.3) })[\amp] }),
+                \cutoff,    Pfunc({ (~loopParams[name] ?? { (cutoff: 800) })[\cutoff] }),
+                \lfoRate,   Pfunc({ (~loopParams[name] ?? { (lfoRate: 0.5) })[\lfoRate] }),
+                \reverbMix, Pfunc({ (~loopParams[name] ?? { (reverbMix: 0.2) })[\reverbMix] }),
+                \eqLow,     Pfunc({ (~loopParams[name] ?? { (low: 1) })[\low] }),
+                \eqMid,     Pfunc({ (~loopParams[name] ?? { (mid: 1) })[\mid] }),
+                \eqHigh,    Pfunc({ (~loopParams[name] ?? { (high: 1) })[\high] }),
+            )
+        ).play(TempoClock.default);
+        ~patterns[name] = true;
+        ("PyCodeDJ pattern started: " ++ name).postln;
     };
 
     // Single handler for all /pycodedj/loop/<name>/<param> addresses.
@@ -679,8 +755,13 @@ s.waitForBoot({
                 synths.do({ |synth| synth.set(\gate, 0) });
             };
         });
+        ~patterns.keys.do({ |name|
+            Pdef(name.asSymbol).stop;
+        });
         ~loops = Dictionary.new;
         ~loopParams = Dictionary.new;
+        ~patterns = Dictionary.new;
+        ~loopSynths = Dictionary.new;
         "PyCodeDJ panic: all loops stopped.".postln;
     }, '/pycodedj/panic');
 
@@ -704,6 +785,7 @@ s.waitForBoot({
                             ~loops[name].do({ |synth| synth.set(\gate, 0) });
                             ~loops[name] = nil;
                         };
+                        // Pattern Pdefs are stopped only via /pattern_stop.
                     } {
                         ~startLoop.value(name, val.asInteger);
                     };
@@ -728,6 +810,30 @@ s.waitForBoot({
                             if (msg.size >= 9) { msg[7].asFloat } { 1 },
                             if (msg.size >= 9) { msg[8].asFloat } { 1 }
                         );
+                    };
+                },
+                "pattern",   {
+                    // msg: [addr, rootMidi, scaleName, dur, synthName, step...]
+                    if (msg.size >= 5) {
+                        ~setupPattern.value(
+                            name,
+                            msg[1].asInteger,
+                            msg[2].asString,
+                            msg[3].asFloat,
+                            msg[4].asString,
+                            msg[5..]
+                        );
+                    };
+                },
+                "pattern_stop", {
+                    ~stopPattern.value(name);
+                },
+                "synth", {
+                    var s = val.asString;
+                    if (s.size > 0) {
+                        ~loopSynths[name] = s;
+                    } {
+                        ~loopSynths.removeAt(name);
                     };
                 }
             );

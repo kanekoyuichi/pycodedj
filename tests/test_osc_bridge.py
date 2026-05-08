@@ -119,3 +119,46 @@ def test_send_panic_skips_visual_when_none(mock_endpoint: OscEndpoint) -> None:
     bridge.send_panic()
 
     assert _send_mock(mock_endpoint).call_count == 1
+
+
+# --- send_pattern ---
+
+def test_send_pattern_address(mock_endpoint: OscEndpoint) -> None:
+    bridge = OscBridge(audio=mock_endpoint)
+    bridge.send_pattern("kick", 48, "chromatic", 0.25, [-1, -2, -1, -2])
+
+    calls = [c.args[0] for c in _send_mock(mock_endpoint).call_args_list]
+    assert calls == ["/pycodedj/loop/kick/pattern"]
+
+
+def test_send_pattern_values(mock_endpoint: OscEndpoint) -> None:
+    bridge = OscBridge(audio=mock_endpoint)
+    bridge.send_pattern("kick", 48, "chromatic", 0.25, [-1, -2, -1, -2])
+
+    call_map = {c.args[0]: c.args[1] for c in _send_mock(mock_endpoint).call_args_list}
+    # order: root_midi, scale, dur, synth(""), steps...
+    assert call_map["/pycodedj/loop/kick/pattern"] == [48, "chromatic", 0.25, "", -1, -2, -1, -2]
+
+
+def test_send_pattern_with_synth(mock_endpoint: OscEndpoint) -> None:
+    bridge = OscBridge(audio=mock_endpoint)
+    bridge.send_pattern("bass", 33, "minor", 0.5, [0, -2], synth="bass_acid")
+
+    call_map = {c.args[0]: c.args[1] for c in _send_mock(mock_endpoint).call_args_list}
+    assert call_map["/pycodedj/loop/bass/pattern"] == [33, "minor", 0.5, "bass_acid", 0, -2]
+
+
+def test_send_pattern_empty_steps(mock_endpoint: OscEndpoint) -> None:
+    bridge = OscBridge(audio=mock_endpoint)
+    bridge.send_pattern("bass", 33, "minor", 0.5, [])
+
+    call_map = {c.args[0]: c.args[1] for c in _send_mock(mock_endpoint).call_args_list}
+    assert call_map["/pycodedj/loop/bass/pattern"] == [33, "minor", 0.5, ""]
+
+
+def test_send_pattern_stop(mock_endpoint: OscEndpoint) -> None:
+    bridge = OscBridge(audio=mock_endpoint)
+    bridge.send_pattern_stop("kick")
+
+    calls = [c.args[0] for c in _send_mock(mock_endpoint).call_args_list]
+    assert calls == ["/pycodedj/loop/kick/pattern_stop"]
