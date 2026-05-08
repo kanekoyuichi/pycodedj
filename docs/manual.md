@@ -1046,7 +1046,7 @@ bridge = OscBridge(audio=OscEndpoint("127.0.0.1", 57120))
 engine = Engine(bridge=bridge)
 
 source = open("demo.py").read()
-blocks = {b.name: b for b in parse_blocks(source)}
+blocks = {b.name: b for b in parse_blocks(source).blocks}
 
 params = engine.eval_block(blocks["bass"])
 if params is not None:

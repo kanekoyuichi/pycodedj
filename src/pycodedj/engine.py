@@ -43,9 +43,9 @@ class Engine:
             )
             existing = self._states.get(block.name)
             muted = existing.muted if existing is not None else False
-            self._states[block.name] = LoopState(params=params, muted=muted)
             send = dataclasses.replace(params, amp=0.0) if muted else params
             self.bridge.send_params(block.name, send)
+            self._states[block.name] = LoopState(params=params, muted=muted)
             return params
         except SyntaxError as e:
             sys.stderr.write(f"[pycodedj] syntax error ({block.name}): {e}\n")
