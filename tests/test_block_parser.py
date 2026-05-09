@@ -92,16 +92,16 @@ def test_syntax_error_returns_empty() -> None:
 def test_volume_extracted() -> None:
     blocks = parse_blocks(_WITH_VOLUME).blocks
     assert len(blocks) == 1
-    assert blocks[0].volume == 0.8
+    assert blocks[0].volume == 0.3
 
 
 def test_eq_defaults_extracted() -> None:
     blocks = parse_blocks(_WITH_EQ).blocks
     assert len(blocks) == 1
-    assert blocks[0].eq == "edm"
-    assert blocks[0].low == 1.5
+    assert blocks[0].eq == "flat"
+    assert blocks[0].low is None
     assert blocks[0].mid is None
-    assert blocks[0].high == 0.8
+    assert blocks[0].high is None
 
 
 def test_volume_default() -> None:
@@ -129,7 +129,7 @@ def test_source_contains_function() -> None:
 
 def test_block_volume_and_interval() -> None:
     blocks = parse_blocks(_MIXED).blocks
-    assert blocks[0].volume == 0.6
+    assert blocks[0].volume == 0.3
     assert blocks[0].interval == 2.0
     assert blocks[1].volume == 0.3
     assert blocks[1].interval == 1.0
@@ -173,6 +173,14 @@ def my_bass():
     pass
 """
 
+_WITH_FUNCTION_NAME_LOOP = """\
+from pycodedj import loop
+
+@loop(synth="bass_acid", root="A1", scale="minor", beat=0.25)
+def bass():
+    pass
+"""
+
 
 def test_synth_extracted() -> None:
     blocks = parse_blocks(_WITH_SYNTH_PARAMS).blocks
@@ -201,6 +209,17 @@ def test_synth_without_root_scale() -> None:
     assert blocks[0].root is None
     assert blocks[0].scale is None
     assert blocks[0].dur == 0.5
+
+
+def test_loop_name_defaults_to_function_name() -> None:
+    blocks = parse_blocks(_WITH_FUNCTION_NAME_LOOP).blocks
+    assert len(blocks) == 1
+    assert blocks[0].name == "bass"
+
+
+def test_beat_alias_sets_dur() -> None:
+    blocks = parse_blocks(_WITH_FUNCTION_NAME_LOOP).blocks
+    assert blocks[0].dur == 0.25
 
 
 def test_new_fields_default_to_none() -> None:
@@ -276,3 +295,82 @@ def my_kick():
 def test_pattern_str_takes_first_in_source_order() -> None:
     blocks = parse_blocks(_WITH_MULTIPLE_PATTERNS).blocks
     assert blocks[0].pattern_str == "x . x ."
+
+
+# --- dj namespace metadata ---
+
+_WITH_DJ_METADATA = """\
+from pycodedj import dj, loop
+
+@loop(synth="bass_acid", root="A1", scale="minor", beat=0.25)
+def bass(volume=0.9):
+    dj.volume = 0.35
+    dj.eq = "edm"
+    dj.low = 1.7
+    dj.mid = 0.78
+    dj.high = 0.82
+    dj.pattern = "0 . [0 3] ~ 5 . 3 ."
+"""
+
+_WITH_DJ_PATTERN_NAME = """\
+from pycodedj import dj, loop
+
+p1 = "0 . 3 ."
+
+@loop(synth="bass_acid")
+def bass():
+    dj.pattern = p1
+"""
+
+_WITH_NESTED_DJ_METADATA = """\
+from pycodedj import dj, loop
+
+@loop(synth="bass_acid")
+def bass():
+    def helper():
+        dj.volume = 0.9
+        dj.pattern = "x . x ."
+    helper()
+"""
+
+
+def test_dj_volume_extracted() -> None:
+    blocks = parse_blocks(_WITH_DJ_METADATA).blocks
+    assert blocks[0].volume == 0.35
+
+
+def test_dj_eq_extracted() -> None:
+    blocks = parse_blocks(_WITH_DJ_METADATA).blocks
+    assert blocks[0].eq == "edm"
+    assert blocks[0].low == 1.7
+    assert blocks[0].mid == 0.78
+    assert blocks[0].high == 0.82
+
+
+def test_dj_pattern_extracted() -> None:
+    blocks = parse_blocks(_WITH_DJ_METADATA).blocks
+    assert blocks[0].pattern_str == "0 . [0 3] ~ 5 . 3 ."
+
+
+def test_dj_pattern_name_is_ignored() -> None:
+    blocks = parse_blocks(_WITH_DJ_PATTERN_NAME).blocks
+    assert blocks[0].pattern_str is None
+
+
+def test_dj_metadata_ignores_nested_scope() -> None:
+    blocks = parse_blocks(_WITH_NESTED_DJ_METADATA).blocks
+    assert blocks[0].volume == 0.3
+    assert blocks[0].pattern_str is None
+
+
+def test_dj_pattern_preferred_over_pattern_call() -> None:
+    source = """\
+from pycodedj import dj, loop, pattern
+
+@loop(synth="bass_acid")
+def bass():
+    dj.pattern = "0 . 3 ."
+    pattern("x . x .")
+"""
+    blocks = parse_blocks(source).blocks
+    assert blocks[0].pattern_str == "0 . 3 ."

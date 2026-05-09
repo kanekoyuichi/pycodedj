@@ -37,11 +37,16 @@ def _extract_loop_decorator(
             continue
         if not (isinstance(dec.func, ast.Name) and dec.func.id == "loop"):
             continue
-        if not dec.args:
+
+        loop_name = node.name
+        if dec.args:
+            name_node = dec.args[0]
+            if not isinstance(name_node, ast.Constant) or not isinstance(name_node.value, str):
+                continue
+            loop_name = name_node.value
+        if len(dec.args) > 1:
             continue
-        name_node = dec.args[0]
-        if not isinstance(name_node, ast.Constant) or not isinstance(name_node.value, str):
-            continue
+
         interval = _DEFAULT_INTERVAL
         kwargs: dict[str, object] = {}
         for kw in dec.keywords:
@@ -55,19 +60,11 @@ def _extract_loop_decorator(
             elif kw.arg == "dur":
                 if isinstance(kw.value.value, (int, float)):
                     kwargs["dur"] = float(kw.value.value)
-        return name_node.value, interval, kwargs
+            elif kw.arg == "beat":
+                if isinstance(kw.value.value, (int, float)):
+                    kwargs["dur"] = float(kw.value.value)
+        return loop_name, interval, kwargs
     return None
-
-
-def _default_arg_map(node: ast.FunctionDef) -> dict[str, object]:
-    args = node.args.args
-    defaults = node.args.defaults
-    offset = len(args) - len(defaults)
-    values: dict[str, object] = {}
-    for i, default in enumerate(defaults):
-        if isinstance(default, ast.Constant):
-            values[args[offset + i].arg] = default.value
-    return values
 
 
 def _optional_float(value: object) -> float | None:
@@ -107,6 +104,25 @@ def _extract_pattern_call(node: ast.FunctionDef) -> str | None:
     return None
 
 
+def _extract_dj_assignments(node: ast.FunctionDef) -> dict[str, object]:
+    dj_attrs = {"volume", "eq", "low", "mid", "high", "pattern"}
+    values: dict[str, object] = {}
+    for child in _walk_body(node):
+        if not isinstance(child, ast.Assign):
+            continue
+        for target in child.targets:
+            if (
+                isinstance(target, ast.Attribute)
+                and isinstance(target.value, ast.Name)
+                and target.value.id == "dj"
+                and target.attr in dj_attrs
+                and target.attr not in values
+                and isinstance(child.value, ast.Constant)
+            ):
+                values[target.attr] = child.value.value
+    return values
+
+
 @dataclass
 class ParseResult:
     ok: bool
@@ -130,9 +146,9 @@ def parse_blocks(source: str) -> ParseResult:
         if result is None:
             continue
         loop_name, interval, loop_kwargs = result
-        arg_defaults = _default_arg_map(node)
-        volume = _optional_float(arg_defaults.get("volume"))
-        eq = arg_defaults.get("eq")
+        dj_values = _extract_dj_assignments(node)
+        volume = _optional_float(dj_values.get("volume"))
+        eq = dj_values.get("eq")
         func_source = "".join(lines[node.lineno - 1 : node.end_lineno])
         blocks.append(LoopBlock(
             name=loop_name,
@@ -140,14 +156,14 @@ def parse_blocks(source: str) -> ParseResult:
             source=func_source,
             volume=volume if volume is not None else _DEFAULT_VOLUME,
             eq=eq if isinstance(eq, str) else _DEFAULT_EQ,
-            low=_optional_float(arg_defaults.get("low")),
-            mid=_optional_float(arg_defaults.get("mid")),
-            high=_optional_float(arg_defaults.get("high")),
+            low=_optional_float(dj_values.get("low")),
+            mid=_optional_float(dj_values.get("mid")),
+            high=_optional_float(dj_values.get("high")),
             synth=_optional_str(loop_kwargs.get("synth")),
             root=_optional_str(loop_kwargs.get("root")),
             scale=_optional_str(loop_kwargs.get("scale")),
             dur=_optional_float(loop_kwargs.get("dur")),
-            pattern_str=_extract_pattern_call(node),
+            pattern_str=_optional_str(dj_values.get("pattern")) or _extract_pattern_call(node),
         ))
 
     return ParseResult(ok=True, blocks=blocks)
