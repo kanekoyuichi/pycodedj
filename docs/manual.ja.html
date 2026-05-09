@@ -611,7 +611,7 @@ def bass(volume=0.7):   # ← 大きくする
       <section id="s5">
         <h2>5. 保存するだけで音が変わる — watch モード</h2>
 
-        <p>毎回 <code>pycodedj eval</code> を打つのは面倒です。<code>watch</code> コマンドを使うと、起動時に一度すべてのループを評価し、その後は<strong>ファイルを保存するだけで自動的に全ループが再評価されます</strong>。</p>
+        <p>毎回 <code>pycodedj eval</code> を打つのは面倒です。<code>watch</code> コマンドを使うと、起動時に一度すべてのループを評価し、その後は<strong>ファイルを保存するだけで変更されたループだけが再評価されます</strong>。</p>
 
         <h3>起動方法</h3>
 
@@ -620,7 +620,7 @@ def bass(volume=0.7):   # ← 大きくする
         <pre data-lang="text"><code>[pycodedj] watching demo.py — save to reload (Ctrl+C to stop)
 [pycodedj] reloaded demo.py (3 loop(s))</code></pre>
 
-        <p>起動直後に一度音が鳴ります。あとはエディタでコードを書いて保存するだけです。保存のたびに次のように出力されます。</p>
+        <p>起動直後に一度音が鳴ります。あとはエディタでコードを書いて保存するだけです。変更していないループは再送信されず、そのまま鳴り続けます。保存のたびに次のように出力されます。</p>
 
         <pre data-lang="text"><code>[pycodedj] reloaded demo.py (3 loop(s))</code></pre>
 

@@ -19,6 +19,10 @@ def _make_handler(
 
 _BASS_BLOCK = '@loop("bass")\ndef f(): pass\n'
 _BASS_PAD_BLOCK = '@loop("bass")\ndef bass(): pass\n@loop("pad")\ndef pad(): pass\n'
+_BASS_PAD_CHANGED_BLOCK = (
+    '@loop("bass")\ndef bass(): pass\n'
+    '@loop("pad")\ndef pad(volume=0.5): pass\n'
+)
 _BASS_MELODY_BLOCK = '@loop("bass")\ndef bass(): pass\n@loop("melody")\ndef melody(): pass\n'
 
 
@@ -67,6 +71,36 @@ def test_eval_all_loops_in_file(tmp_path: Path) -> None:
     time.sleep(0.05)
 
     assert engine.eval_block.call_count == 2
+
+
+def test_eval_only_changed_loop_on_reload(tmp_path: Path) -> None:
+    target = tmp_path / "demo.py"
+    target.write_text(_BASS_PAD_BLOCK)
+    handler, engine = _make_handler(path=str(target), debounce=0.0)
+
+    handler.eval_now()
+    engine.eval_block.reset_mock()
+
+    target.write_text(_BASS_PAD_CHANGED_BLOCK)
+    handler.dispatch(str(target))
+    time.sleep(0.05)
+
+    assert engine.eval_block.call_count == 1
+    assert engine.eval_block.call_args.args[0].name == "pad"
+
+
+def test_eval_skips_unchanged_loops_on_reload(tmp_path: Path) -> None:
+    target = tmp_path / "demo.py"
+    target.write_text(_BASS_PAD_BLOCK)
+    handler, engine = _make_handler(path=str(target), debounce=0.0)
+
+    handler.eval_now()
+    engine.eval_block.reset_mock()
+
+    handler.dispatch(str(target))
+    time.sleep(0.05)
+
+    engine.eval_block.assert_not_called()
 
 
 def test_eval_now_evaluates_without_file_event(tmp_path: Path) -> None:
@@ -150,6 +184,7 @@ def test_adapter_on_moved_fires_eval(tmp_path: Path) -> None:
     adapter = _make_watchdog_adapter(str(target), engine)
     engine.reset_mock()
 
+    target.write_text('@loop("bass")\ndef bass(volume=0.5): pass\n')
     event = MagicMock()
     event.dest_path = str(target)
     adapter.on_moved(event)
@@ -166,6 +201,7 @@ def test_adapter_on_created_fires_eval(tmp_path: Path) -> None:
     adapter = _make_watchdog_adapter(str(target), engine)
     engine.reset_mock()
 
+    target.write_text('@loop("bass")\ndef bass(volume=0.5): pass\n')
     event = MagicMock()
     event.src_path = str(target)
     adapter.on_created(event)

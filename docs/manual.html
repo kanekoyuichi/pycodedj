@@ -513,12 +513,12 @@ def bass(volume=0.4):
 <hr>
 </section>
 <section id="s5"><h2>5. Watch mode &mdash; save to reload</h2>
-<p>Running <code>pycodedj eval</code> manually each time gets tedious. The <code>watch</code> command evaluates all loops at startup and then <strong>re-evaluates automatically on every save</strong>.</p>
+<p>Running <code>pycodedj eval</code> manually each time gets tedious. The <code>watch</code> command evaluates all loops at startup and then <strong>re-evaluates only changed loops on every save</strong>.</p>
 <h3>Start watching</h3>
 <pre data-lang="bash"><code>pycodedj watch examples/demo.py</code></pre>
 <pre data-lang="text"><code>[pycodedj] watching demo.py — save to reload (Ctrl+C to stop)
 [pycodedj] reloaded demo.py (3 loop(s))</code></pre>
-<p>All loops play immediately. From here, just write code and save. Every save shows:</p>
+<p>All loops play immediately. From here, just write code and save. Unchanged loops keep running without being resent. Every save shows:</p>
 <pre data-lang="text"><code>[pycodedj] reloaded demo.py (3 loop(s))</code></pre>
 <p><strong>Write code → Save → Sound changes.</strong> That&#x27;s the live-coding workflow.</p>
 <h3>Stop watching</h3>
@@ -1359,7 +1359,7 @@ s.boot;</code></pre>
 pycodedj eval demo.py::melody --sc-host 192.168.1.10
 pycodedj eval demo.py::pad --sc-port 57200</code></pre>
 <h3><code>pycodedj watch</code></h3>
-<p>Watch a file and re-evaluate all loops at startup and on every save. Stop with Ctrl+C.</p>
+<p>Watch a file, evaluate all loops at startup, and re-evaluate changed loops on every save. Stop with Ctrl+C.</p>
 <pre data-lang="text"><code>pycodedj watch FILE [--sc-host HOST] [--sc-port PORT] [--debounce SECS]</code></pre>
 <table>
 <thead><tr>

@@ -301,7 +301,7 @@ The filter opened up and the modulation got faster. Deeper nesting = brighter so
 
 ## 5. Watch mode — save to reload
 
-Running `pycodedj eval` manually each time gets tedious. The `watch` command evaluates all loops at startup and then **re-evaluates automatically on every save**.
+Running `pycodedj eval` manually each time gets tedious. The `watch` command evaluates all loops at startup and then **re-evaluates only changed loops on every save**.
 
 ### Start watching
 
@@ -314,7 +314,7 @@ pycodedj watch examples/demo.py
 [pycodedj] reloaded demo.py (3 loop(s))
 ```
 
-All loops play immediately. From here, just write code and save. Every save shows:
+All loops play immediately. From here, just write code and save. Unchanged loops keep running without being resent. Every save shows:
 
 ```
 [pycodedj] reloaded demo.py (3 loop(s))
@@ -1081,7 +1081,7 @@ pycodedj eval demo.py::pad --sc-port 57200
 
 ### `pycodedj watch`
 
-Watch a file and re-evaluate all loops at startup and on every save. Stop with Ctrl+C.
+Watch a file, evaluate all loops at startup, and re-evaluate changed loops on every save. Stop with Ctrl+C.
 
 ```
 pycodedj watch FILE [--sc-host HOST] [--sc-port PORT] [--debounce SECS]

@@ -24,7 +24,7 @@ def _build_parser() -> argparse.ArgumentParser:
     eval_p.add_argument("--sc-host", default="127.0.0.1", help="SuperCollider host")
     eval_p.add_argument("--sc-port", default=57120, type=int, help="SuperCollider port")
 
-    watch_p = sub.add_parser("watch", help="Watch a file and re-eval all loops on save")
+    watch_p = sub.add_parser("watch", help="Watch a file and re-eval changed loops on save")
     watch_p.add_argument("file", metavar="FILE", help="Source file to watch")
     watch_p.add_argument("--sc-host", default="127.0.0.1", help="SuperCollider host")
     watch_p.add_argument("--sc-port", default=57120, type=int, help="SuperCollider port")

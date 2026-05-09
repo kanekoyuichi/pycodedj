@@ -6,13 +6,13 @@ import threading
 from pathlib import Path
 from typing import Callable
 
-from .block_parser import parse_blocks
+from .block_parser import LoopBlock, parse_blocks
 from .engine import Engine
 from .osc_bridge import OscError
 
 
 class _LoopFileHandler:
-    """ファイル変更イベントを受け取り、デバウンス後に全ループを再評価する。"""
+    """ファイル変更イベントを受け取り、デバウンス後に変更ループを再評価する。"""
 
     def __init__(
         self,
@@ -27,6 +27,7 @@ class _LoopFileHandler:
         self._debounce = debounce
         self._timer: threading.Timer | None = None
         self._active_names: set[str] = set()
+        self._blocks_by_name: dict[str, LoopBlock] = {}
 
     def dispatch(self, src_path: str) -> None:
         """watchdog の on_modified から呼ぶ。対象ファイル以外は無視する。"""
@@ -50,17 +51,23 @@ class _LoopFileHandler:
         if not result.ok:
             sys.stderr.write(f"[pycodedj] syntax error in {self._path}: {result.error}\n")
             return  # _active_names を維持してループを継続する
-        current_names = {b.name for b in result.blocks}
+        current_blocks = {b.name: b for b in result.blocks}
+        current_names = set(current_blocks)
 
         for name in self._active_names - current_names:
             try:
                 self._engine.stop_loop(name)
             except OscError:
                 pass
+            self._blocks_by_name.pop(name, None)
         self._active_names = current_names
 
         for block in result.blocks:
-            self._engine.eval_block(block)
+            if self._blocks_by_name.get(block.name) == block:
+                continue
+            params = self._engine.eval_block(block)
+            if params is not None:
+                self._blocks_by_name[block.name] = block
         if self._on_eval is not None:
             self._on_eval(self._path, len(result.blocks))
 
@@ -71,7 +78,7 @@ def watch(
     debounce: float = 0.3,
     on_eval: Callable[[str, int], None] | None = None,
 ) -> None:
-    """ファイルを監視し、変更のたびに全ループを再評価する。Ctrl+C で停止。
+    """ファイルを監視し、変更のたびに変更されたループを再評価する。Ctrl+C で停止。
 
     Args:
         path: 監視するファイルのパス
