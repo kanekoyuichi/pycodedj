@@ -229,3 +229,11 @@ Token reference:
 ## License
 
 MIT + Commons Clause — free to use, modify, and perform (including paid live performances). Selling or commercially distributing the software itself is not permitted. See [LICENSE](LICENSE) for details.
+
+---
+
+## Support
+
+This project is maintained on a best-effort basis.
+
+Bug reports and suggestions may be submitted through GitHub Issues, but responses and fixes are not guaranteed.
