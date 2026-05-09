@@ -242,6 +242,83 @@
     }
     .param-val.updating { opacity: 0.4; }
 
+    .sample-player {
+      width: 100%;
+      max-width: 780px;
+      margin: 1rem auto 0;
+      display: grid;
+      grid-template-columns: auto 1fr auto;
+      gap: 1rem;
+      align-items: center;
+      padding: 0.9rem 1rem;
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      border-radius: 0.75rem;
+      text-align: left;
+    }
+    .sample-btn {
+      width: 44px;
+      height: 44px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      border: 1px solid rgba(166,227,161,0.35);
+      border-radius: 50%;
+      background: rgba(166,227,161,0.12);
+      color: var(--green);
+      cursor: pointer;
+      font-size: 1rem;
+      transition: transform 0.2s, background 0.2s, border-color 0.2s;
+    }
+    .sample-btn:hover {
+      transform: translateY(-1px);
+      background: rgba(166,227,161,0.18);
+      border-color: rgba(166,227,161,0.55);
+    }
+    .sample-btn:disabled {
+      cursor: not-allowed;
+      opacity: 0.45;
+      transform: none;
+    }
+    .sample-title {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.75rem;
+      color: var(--green);
+      margin-bottom: 0.35rem;
+    }
+    .sample-track {
+      position: relative;
+      height: 6px;
+      background: var(--border);
+      border-radius: 3px;
+      overflow: hidden;
+    }
+    .sample-progress {
+      position: absolute;
+      inset: 0 auto 0 0;
+      width: 0%;
+      background: var(--green);
+      border-radius: 3px;
+      box-shadow: 0 0 12px rgba(166,227,161,0.35);
+    }
+    .sample-meta {
+      min-width: 74px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.72rem;
+      color: var(--muted);
+      text-align: right;
+    }
+    .sample-status {
+      margin-top: 0.25rem;
+      font-size: 0.72rem;
+      color: var(--muted);
+    }
+    @media (max-width: 640px) {
+      .sample-player { grid-template-columns: 1fr; text-align: center; }
+      .sample-btn { margin: 0 auto; }
+      .sample-meta { min-width: 0; text-align: center; }
+    }
+
     /* ── Section base ── */
     section { padding: 6rem 2rem; }
     .container { max-width: 960px; margin: 0 auto; }
@@ -600,6 +677,18 @@
       </div>
     </div>
   </div>
+  <div class="sample-player">
+    <button class="sample-btn" id="sampleBtn" type="button" aria-label="Play sample music">▶</button>
+    <div>
+      <div class="sample-title">sample music</div>
+      <div class="sample-track" id="sampleTrack" aria-hidden="true">
+        <div class="sample-progress" id="sampleProgress"></div>
+      </div>
+      <div class="sample-status" id="sampleStatus">recorded with PyCodeDJ</div>
+    </div>
+    <div class="sample-meta" id="sampleTime">0:00</div>
+    <audio id="sampleAudio" preload="metadata" loop src="/assets/pycodedj-sample.wav"></audio>
+  </div>
 </section>
 
 <!-- How it works -->
@@ -896,6 +985,71 @@
     fi = (fi + 1) % frames.length;
     setFrame(frames[fi]);
   }, 3000);
+
+  // ── Sample music player ──
+  const sampleAudio = document.getElementById('sampleAudio');
+  const sampleBtn = document.getElementById('sampleBtn');
+  const sampleProgress = document.getElementById('sampleProgress');
+  const sampleTrack = document.getElementById('sampleTrack');
+  const sampleTime = document.getElementById('sampleTime');
+  const sampleStatus = document.getElementById('sampleStatus');
+
+  function formatTime(seconds) {
+    if (!Number.isFinite(seconds)) return '0:00';
+    const mins = Math.floor(seconds / 60);
+    const secs = Math.floor(seconds % 60).toString().padStart(2, '0');
+    return `${mins}:${secs}`;
+  }
+
+  function updateSampleProgress() {
+    const duration = sampleAudio.duration || 0;
+    const pct = duration > 0 ? (sampleAudio.currentTime / duration) * 100 : 0;
+    sampleProgress.style.width = `${Math.min(100, pct)}%`;
+    sampleTime.textContent = `${formatTime(sampleAudio.currentTime)} / ${formatTime(duration)}`;
+  }
+
+  sampleBtn.addEventListener('click', async () => {
+    try {
+      if (sampleAudio.paused) {
+        await sampleAudio.play();
+      } else {
+        sampleAudio.pause();
+      }
+    } catch (error) {
+      sampleStatus.textContent = 'sample file not available yet';
+      sampleBtn.disabled = true;
+    }
+  });
+
+  sampleTrack.addEventListener('click', (event) => {
+    if (!Number.isFinite(sampleAudio.duration) || sampleAudio.duration <= 0) return;
+    const rect = sampleTrack.getBoundingClientRect();
+    sampleAudio.currentTime = ((event.clientX - rect.left) / rect.width) * sampleAudio.duration;
+    updateSampleProgress();
+  });
+
+  sampleAudio.addEventListener('loadedmetadata', updateSampleProgress);
+  sampleAudio.addEventListener('timeupdate', updateSampleProgress);
+  sampleAudio.addEventListener('play', () => {
+    sampleBtn.textContent = '■';
+    sampleBtn.setAttribute('aria-label', 'Stop sample music');
+    sampleStatus.textContent = 'playing';
+  });
+  sampleAudio.addEventListener('pause', () => {
+    sampleBtn.textContent = '▶';
+    sampleBtn.setAttribute('aria-label', 'Play sample music');
+    sampleStatus.textContent = sampleAudio.currentTime > 0 ? 'paused' : 'recorded with PyCodeDJ';
+  });
+  sampleAudio.addEventListener('ended', () => {
+    sampleBtn.textContent = '▶';
+    sampleBtn.setAttribute('aria-label', 'Play sample music');
+    sampleAudio.currentTime = 0;
+    sampleStatus.textContent = 'recorded with PyCodeDJ';
+    updateSampleProgress();
+  });
+  sampleAudio.addEventListener('error', () => {
+    sampleStatus.textContent = 'sample file not available yet';
+  });
 
   // ── Copy install command ──
   function copyInstall(btn) {
