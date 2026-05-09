@@ -16,7 +16,7 @@ from pycodedj import dj, loop
 
 # --- Drum engine: stable pulse first, variations second ---
 
-@loop(synth="floor_kick", beat=0.117)
+@loop(synth="kick_floor", beat=0.117)
 def kick():
     dj.volume = 1.0
     dj.eq = "edm"
@@ -83,7 +83,7 @@ def rumble():
     )
 
 
-@loop(synth="sub_bass", root="A1", scale="minor", beat=0.117)
+@loop(synth="bass_sub", root="A1", scale="minor", beat=0.117)
 def sub():
     dj.volume = 0.58
     dj.eq = "edm"
@@ -96,7 +96,7 @@ def sub():
     )
 
 
-@loop(synth="sub_bass", root="A1", scale="minor", beat=0.468)
+@loop(synth="bass_sub", root="A1", scale="minor", beat=0.468)
 def floor():
     dj.volume = 0.22
     dj.eq = "edm"
@@ -149,7 +149,7 @@ def fill():
     )
 
 
-@loop(synth="warehouse_air", root="A1", scale="minor", beat=0.468)
+@loop(synth="air_warehouse", root="A1", scale="minor", beat=0.468)
 def room():
     dj.volume = 0.08
     dj.eq = "edm"

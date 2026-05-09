@@ -13,7 +13,7 @@ s.waitForBoot({
         Limiter.ar(sig, 0.98);
     };
 
-    SynthDef(\pycodedj_sub_bass, {
+    SynthDef(\pycodedj_bass_sub, {
         arg cutoff = 900, lfoRate = 1.0, reverbMix = 0.05, amp = 0.5, gate = 1, eqLow = 1, eqMid = 1, eqHigh = 1;
         var trig, pumpTrig, freq, env, pump, click, sub, mid, sig;
         trig = Impulse.kr((lfoRate * 0.85).clip(1.2, 3.4));
@@ -60,7 +60,7 @@ s.waitForBoot({
         Out.ar(0, ~applySimpleEQ.value(sig ! 2, eqLow, eqMid, eqHigh));
     }).add;
 
-    SynthDef(\pycodedj_neon_stab, {
+    SynthDef(\pycodedj_stab_neon, {
         arg cutoff = 1200, lfoRate = 0.25, reverbMix = 0.25, amp = 0.14, gate = 1, eqLow = 1, eqMid = 1, eqHigh = 1;
         var trig, root, freqs, env, sig, gateEnv;
         trig = Impulse.kr((lfoRate * 0.75).clip(0.08, 1.5));
@@ -74,7 +74,7 @@ s.waitForBoot({
         Out.ar(0, ~applySimpleEQ.value(sig, eqLow, eqMid, eqHigh));
     }).add;
 
-    SynthDef(\pycodedj_acid_lead, {
+    SynthDef(\pycodedj_lead_acid, {
         arg cutoff = 2100, lfoRate = 2.0, reverbMix = 0.12, amp = 0.15, gate = 1, eqLow = 1, eqMid = 1, eqHigh = 1;
         var trig, note, freq, env, filterEnv, sig, gateEnv;
         trig = Impulse.kr((lfoRate * 3).clip(2, 14));
@@ -89,7 +89,7 @@ s.waitForBoot({
         Out.ar(0, ~applySimpleEQ.value(Pan2.ar(sig, SinOsc.kr(0.21).range(-0.35, 0.35)), eqLow, eqMid, eqHigh));
     }).add;
 
-    SynthDef(\pycodedj_warehouse_air, {
+    SynthDef(\pycodedj_air_warehouse, {
         arg cutoff = 700, lfoRate = 0.1, reverbMix = 0.6, amp = 0.08, gate = 1, eqLow = 1, eqMid = 1, eqHigh = 1;
         var sweep, dust, tail, sig, env;
         sweep = LFNoise1.kr(lfoRate.clip(0.03, 0.8)).range(0, 1).exprange(180, cutoff.clip(350, 3600));
@@ -114,7 +114,7 @@ s.waitForBoot({
         Out.ar(0, ~applySimpleEQ.value(sig ! 2, eqLow, eqMid, eqHigh));
     }).add;
 
-    SynthDef(\pycodedj_floor_kick, {
+    SynthDef(\pycodedj_kick_floor, {
         arg cutoff = 1100, lfoRate = 1.0, reverbMix = 0.08, amp = 0.72, gate = 1, eqLow = 1, eqMid = 1, eqHigh = 1;
         var trig, bodyEnv, punchEnv, tailEnv, pitch, body, punch, tail, room, sig, gateEnv;
         trig = Impulse.kr(2.133); // 128 BPM four-on-the-floor
@@ -132,7 +132,7 @@ s.waitForBoot({
         Out.ar(0, ~applySimpleEQ.value(sig ! 2, eqLow, eqMid, eqHigh));
     }).add;
 
-    SynthDef(\pycodedj_glitch_ticks, {
+    SynthDef(\pycodedj_fx_glitch, {
         arg cutoff = 5000, lfoRate = 2.0, reverbMix = 0.08, amp = 0.06, gate = 1, eqLow = 1, eqMid = 1, eqHigh = 1;
         var trig, rate, env, sig, gateEnv;
         rate = (lfoRate * 8).clip(4, 28);
@@ -145,7 +145,7 @@ s.waitForBoot({
         Out.ar(0, ~applySimpleEQ.value(sig, eqLow, eqMid, eqHigh));
     }).add;
 
-    SynthDef(\pycodedj_soft_pluck, {
+    SynthDef(\pycodedj_pluck_soft, {
         arg cutoff = 1600, lfoRate = 1.0, reverbMix = 0.18, amp = 0.11, gate = 1, eqLow = 1, eqMid = 1, eqHigh = 1;
         var trig, note, freq, env, sig, gateEnv;
         trig = Impulse.kr(lfoRate.clip(0.2, 6.0));
@@ -159,7 +159,7 @@ s.waitForBoot({
         Out.ar(0, ~applySimpleEQ.value(sig ! 2, eqLow, eqMid, eqHigh));
     }).add;
 
-    SynthDef(\pycodedj_dub_chord, {
+    SynthDef(\pycodedj_chord_dub, {
         arg cutoff = 1200, lfoRate = 0.5, reverbMix = 0.35, amp = 0.13, gate = 1, eqLow = 1, eqMid = 1, eqHigh = 1;
         var trig, root, freqs, env, sig, gateEnv;
         trig = Impulse.kr((lfoRate * 0.75).clip(0.08, 1.0));
@@ -173,7 +173,7 @@ s.waitForBoot({
         Out.ar(0, ~applySimpleEQ.value(sig, eqLow, eqMid, eqHigh));
     }).add;
 
-    SynthDef(\pycodedj_shimmer_pad, {
+    SynthDef(\pycodedj_pad_shimmer, {
         arg cutoff = 1400, lfoRate = 0.15, reverbMix = 0.55, amp = 0.08, gate = 1, eqLow = 1, eqMid = 1, eqHigh = 1;
         var drift, freqs, sig, gateEnv;
         drift = LFNoise1.kr(lfoRate.clip(0.03, 0.7)).range(-0.08, 0.08);
@@ -292,7 +292,7 @@ s.waitForBoot({
         Out.ar(0, ~applySimpleEQ.value(sig, eqLow, eqMid, eqHigh));
     }).add;
 
-    SynthDef(\pycodedj_fx_impact, {
+    SynthDef(\pycodedj_fx_drop, {
         arg cutoff = 1600, lfoRate = 0.25, reverbMix = 0.55, amp = 0.16, gate = 1, eqLow = 1, eqMid = 1, eqHigh = 1;
         var trig, env, thump, noise, tail, sig, gateEnv;
         trig = Impulse.kr(lfoRate.clip(0.05, 1.0));
@@ -337,8 +337,8 @@ s.waitForBoot({
         Out.ar(0, ~applySimpleEQ.value(sig ! 2, eqLow, eqMid, eqHigh));
     }).add;
 
-    // noise_crash: metallic crash cymbal with long tail
-    SynthDef(\pycodedj_noise_crash, {
+    // crash_noise: metallic crash cymbal with long tail
+    SynthDef(\pycodedj_crash_noise, {
         arg cutoff = 8000, lfoRate = 0.5, reverbMix = 0.35, amp = 0.22, gate = 1, eqLow = 1, eqMid = 1, eqHigh = 1;
         var trig, env, tone, metal, sig, gateEnv;
         trig = Impulse.kr(lfoRate.clip(0.1, 2.0));
@@ -384,8 +384,8 @@ s.waitForBoot({
         Out.ar(0, ~applySimpleEQ.value(sig, eqLow, eqMid, eqHigh));
     }).add;
 
-    // riser_noise: noise sweep that climbs over 8s — restart synth to retrigger
-    SynthDef(\pycodedj_riser_noise, {
+    // fx_riser: noise sweep that climbs over 8s — restart synth to retrigger
+    SynthDef(\pycodedj_fx_riser, {
         arg cutoff = 1000, lfoRate = 0.5, reverbMix = 0.35, amp = 0.15, gate = 1, eqLow = 1, eqMid = 1, eqHigh = 1;
         var startPitch, endPitch, sweep, env, sig, gateEnv;
         startPitch = cutoff.clip(120, 2000) * 0.2;
@@ -421,8 +421,8 @@ s.waitForBoot({
         Out.ar(0, ~applySimpleEQ.value(sig ! 2, eqLow, eqMid, eqHigh));
     }).add;
 
-    // organ_chord: Hammond-style drawbar organ with harmonic stack
-    SynthDef(\pycodedj_organ_chord, {
+    // chord_organ: Hammond-style drawbar organ with harmonic stack
+    SynthDef(\pycodedj_chord_organ, {
         arg cutoff = 2200, lfoRate = 0.5, reverbMix = 0.22, amp = 0.14, gate = 1, eqLow = 1, eqMid = 1, eqHigh = 1;
         var trig, root, freq, sig, gateEnv;
         trig = Impulse.kr((lfoRate * 0.5).clip(0.1, 1.5));
@@ -443,8 +443,8 @@ s.waitForBoot({
         Out.ar(0, ~applySimpleEQ.value(sig ! 2, eqLow, eqMid, eqHigh));
     }).add;
 
-    // synth_arp: fast arpeggio, filter opens with each trigger
-    SynthDef(\pycodedj_synth_arp, {
+    // arp_synth: fast arpeggio, filter opens with each trigger
+    SynthDef(\pycodedj_arp_synth, {
         arg cutoff = 2000, lfoRate = 2.0, reverbMix = 0.18, amp = 0.14, gate = 1, eqLow = 1, eqMid = 1, eqHigh = 1;
         var trig, note, freq, env, filterEnv, sig, gateEnv;
         trig = Impulse.kr((lfoRate * 4).clip(4, 20));
@@ -477,6 +477,389 @@ s.waitForBoot({
         gateEnv = EnvGen.kr(Env.asr(0.12, 1, 0.3), gate, doneAction: 2);
         sig = FreeVerb.ar(sig, reverbMix.clip(0.08, 0.75), 0.6, 0.35) * gateEnv * amp;
         Out.ar(0, ~applySimpleEQ.value(sig ! 2, eqLow, eqMid, eqHigh));
+    }).add;
+
+    // ── Extended sound bank: 60 named sounds total ─────────────────────
+
+    SynthDef(\pycodedj_kick_soft, {
+        arg cutoff = 1000, lfoRate = 1.0, reverbMix = 0.04, amp = 0.46, gate = 1, eqLow = 1, eqMid = 1, eqHigh = 1;
+        var trig, env, pitch, body, sig, gateEnv;
+        trig = Impulse.kr(lfoRate.clip(0.4, 4.0));
+        env = Decay2.kr(trig, 0.002, 0.34);
+        pitch = EnvGen.kr(Env([70, 42, 35], [0.02, 0.18], \exp), trig).midicps;
+        body = SinOsc.ar(pitch) * env;
+        sig = LPF.ar(body + (PinkNoise.ar(0.03) * Decay2.kr(trig, 0.001, 0.018)), cutoff.clip(220, 3200)).tanh;
+        gateEnv = EnvGen.kr(Env.asr(0.01, 1, 0.1), gate, doneAction: 2);
+        sig = FreeVerb.ar(sig, reverbMix.clip(0, 0.22), 0.22, 0.12) * gateEnv * amp;
+        Out.ar(0, ~applySimpleEQ.value(sig ! 2, eqLow, eqMid, eqHigh));
+    }).add;
+
+    SynthDef(\pycodedj_kick_909, {
+        arg cutoff = 1400, lfoRate = 1.0, reverbMix = 0.05, amp = 0.62, gate = 1, eqLow = 1, eqMid = 1, eqHigh = 1;
+        var trig, bodyEnv, clickEnv, pitch, sig, gateEnv;
+        trig = Impulse.kr(lfoRate.clip(0.4, 4.0));
+        bodyEnv = Decay2.kr(trig, 0.001, 0.52);
+        clickEnv = Decay2.kr(trig, 0.001, 0.012);
+        pitch = EnvGen.kr(Env([82, 46, 37], [0.018, 0.22], \exp), trig).midicps;
+        sig = (SinOsc.ar(pitch) * bodyEnv) + (HPF.ar(WhiteNoise.ar(0.22), cutoff.clip(1200, 9000)) * clickEnv);
+        gateEnv = EnvGen.kr(Env.asr(0.005, 1, 0.12), gate, doneAction: 2);
+        sig = Compander.ar(sig.tanh, sig, 0.45, 1, 0.25, 0.002, 0.06) * gateEnv * amp;
+        Out.ar(0, ~applySimpleEQ.value(sig ! 2, eqLow, eqMid, eqHigh));
+    }).add;
+
+    SynthDef(\pycodedj_kick_click, {
+        arg cutoff = 3200, lfoRate = 1.0, reverbMix = 0.02, amp = 0.42, gate = 1, eqLow = 1, eqMid = 1, eqHigh = 1;
+        var trig, bodyEnv, clickEnv, pitch, sig, gateEnv;
+        trig = Impulse.kr(lfoRate.clip(0.5, 6.0));
+        bodyEnv = Decay2.kr(trig, 0.001, 0.2);
+        clickEnv = Decay2.kr(trig, 0.0005, 0.02);
+        pitch = EnvGen.kr(Env([98, 48, 39], [0.01, 0.12], \exp), trig).midicps;
+        sig = (SinOsc.ar(pitch) * bodyEnv) + (BPF.ar(WhiteNoise.ar(0.5), cutoff.clip(1800, 10000), 0.32) * clickEnv);
+        gateEnv = EnvGen.kr(Env.asr(0.005, 1, 0.08), gate, doneAction: 2);
+        Out.ar(0, ~applySimpleEQ.value((sig.tanh * gateEnv * amp) ! 2, eqLow, eqMid, eqHigh));
+    }).add;
+
+    SynthDef(\pycodedj_bass_pluck, {
+        arg cutoff = 900, lfoRate = 1.0, reverbMix = 0.06, amp = 0.26, gate = 1, eqLow = 1, eqMid = 1, eqHigh = 1;
+        var trig, note, freq, env, sig, gateEnv;
+        trig = Impulse.kr((lfoRate * 2).clip(1, 10));
+        note = Demand.kr(trig, 0, Dseq([36, 43, 34, 39, 36, 31, 34, 36], inf));
+        freq = Lag.kr(note.midicps, 0.015);
+        env = Decay2.kr(trig, 0.002, 0.18);
+        sig = (Pulse.ar(freq, 0.38) + Saw.ar(freq * 0.5, 0.25)) * env;
+        sig = RLPF.ar(sig.tanh, cutoff.clip(120, 2400), 0.2);
+        gateEnv = EnvGen.kr(Env.asr(0.01, 1, 0.1), gate, doneAction: 2);
+        Out.ar(0, ~applySimpleEQ.value((sig * gateEnv * amp) ! 2, eqLow, eqMid, eqHigh));
+    }).add;
+
+    SynthDef(\pycodedj_bass_fm, {
+        arg cutoff = 850, lfoRate = 1.0, reverbMix = 0.05, amp = 0.24, gate = 1, eqLow = 1, eqMid = 1, eqHigh = 1;
+        var trig, note, freq, env, mod, sig, gateEnv;
+        trig = Impulse.kr((lfoRate * 1.5).clip(0.8, 8));
+        note = Demand.kr(trig, 0, Dseq([36, 36, 31, 34, 39, 36, 34, 31], inf));
+        freq = Lag.kr(note.midicps, 0.03);
+        env = Decay2.kr(trig, 0.003, 0.3);
+        mod = SinOsc.ar(freq * 2.01) * (freq * 1.8) * env;
+        sig = SinOsc.ar(freq + mod) * env;
+        sig = RLPF.ar((sig * 2).tanh, cutoff.clip(160, 2400), 0.32);
+        gateEnv = EnvGen.kr(Env.asr(0.02, 1, 0.12), gate, doneAction: 2);
+        Out.ar(0, ~applySimpleEQ.value((sig * gateEnv * amp) ! 2, eqLow, eqMid, eqHigh));
+    }).add;
+
+    SynthDef(\pycodedj_bass_mono, {
+        arg cutoff = 700, lfoRate = 1.0, reverbMix = 0.03, amp = 0.28, gate = 1, eqLow = 1, eqMid = 1, eqHigh = 1;
+        var trig, note, freq, env, sig, gateEnv;
+        trig = Impulse.kr((lfoRate * 1.25).clip(0.5, 6));
+        note = Demand.kr(trig, 0, Dseq([36, 38, 34, 31, 36, 43, 38, 34], inf));
+        freq = Lag.kr(note.midicps, 0.06);
+        env = Decay2.kr(trig, 0.008, 0.46);
+        sig = (Saw.ar(freq) * 0.5) + (SinOsc.ar(freq * 0.5) * 0.7);
+        sig = RLPF.ar(sig.tanh, cutoff.clip(90, 1800), 0.24) * env;
+        gateEnv = EnvGen.kr(Env.asr(0.03, 1, 0.16), gate, doneAction: 2);
+        Out.ar(0, ~applySimpleEQ.value((sig * gateEnv * amp) ! 2, eqLow, eqMid, eqHigh));
+    }).add;
+
+    SynthDef(\pycodedj_bass_wobble, {
+        arg cutoff = 1000, lfoRate = 1.0, reverbMix = 0.08, amp = 0.25, gate = 1, eqLow = 1, eqMid = 1, eqHigh = 1;
+        var trig, note, freq, env, wob, sig, gateEnv;
+        trig = Impulse.kr((lfoRate * 0.75).clip(0.3, 4));
+        note = Demand.kr(trig, 0, Dseq([36, 31, 34, 36], inf));
+        freq = Lag.kr(note.midicps, 0.08);
+        env = Decay2.kr(trig, 0.01, 0.8);
+        wob = SinOsc.kr((lfoRate * 2).clip(0.2, 8)).range(180, cutoff.clip(500, 2600));
+        sig = Splay.ar(Saw.ar(freq * [0.997, 1.003])) * 0.5;
+        sig = RLPF.ar((sig * 2.4).tanh, wob, 0.16) * env;
+        gateEnv = EnvGen.kr(Env.asr(0.04, 1, 0.18), gate, doneAction: 2);
+        sig = FreeVerb.ar(sig, reverbMix.clip(0, 0.35), 0.35, 0.18) * gateEnv * amp;
+        Out.ar(0, ~applySimpleEQ.value(sig, eqLow, eqMid, eqHigh));
+    }).add;
+
+    SynthDef(\pycodedj_rim_shot, {
+        arg cutoff = 3500, lfoRate = 1.0, reverbMix = 0.08, amp = 0.18, gate = 1, eqLow = 1, eqMid = 1, eqHigh = 1;
+        var trig, env, sig, gateEnv;
+        trig = Impulse.kr((lfoRate * 1.5).clip(0.8, 8));
+        env = Decay2.kr(trig, 0.001, 0.055);
+        sig = (SinOsc.ar(1800) * 0.45) + BPF.ar(WhiteNoise.ar(0.32), cutoff.clip(1800, 9000), 0.25);
+        gateEnv = EnvGen.kr(Env.asr(0.005, 1, 0.06), gate, doneAction: 2);
+        sig = FreeVerb.ar(sig * env, reverbMix.clip(0, 0.35), 0.35, 0.16) * gateEnv * amp;
+        Out.ar(0, ~applySimpleEQ.value(sig ! 2, eqLow, eqMid, eqHigh));
+    }).add;
+
+    SynthDef(\pycodedj_cowbell, {
+        arg cutoff = 4600, lfoRate = 1.0, reverbMix = 0.12, amp = 0.16, gate = 1, eqLow = 1, eqMid = 1, eqHigh = 1;
+        var trig, env, sig, gateEnv;
+        trig = Impulse.kr((lfoRate * 1.25).clip(0.6, 7));
+        env = Decay2.kr(trig, 0.001, 0.18);
+        sig = Pulse.ar([540, 800], 0.45).sum * 0.26;
+        sig = BPF.ar(sig, cutoff.clip(900, 7000), 0.45) * env;
+        gateEnv = EnvGen.kr(Env.asr(0.005, 1, 0.08), gate, doneAction: 2);
+        sig = FreeVerb.ar(sig, reverbMix.clip(0, 0.45), 0.42, 0.22) * gateEnv * amp;
+        Out.ar(0, ~applySimpleEQ.value(sig ! 2, eqLow, eqMid, eqHigh));
+    }).add;
+
+    SynthDef(\pycodedj_perc_blip, {
+        arg cutoff = 2200, lfoRate = 1.0, reverbMix = 0.12, amp = 0.13, gate = 1, eqLow = 1, eqMid = 1, eqHigh = 1;
+        var trig, note, freq, env, sig, gateEnv;
+        trig = Impulse.kr((lfoRate * 3).clip(2, 16));
+        note = Demand.kr(trig, 0, Dseq([72, 75, 67, 79, 70, 74], inf));
+        freq = note.midicps;
+        env = Decay2.kr(trig, 0.001, 0.06);
+        sig = SinOsc.ar(freq + (SinOsc.ar(freq * 3) * 80 * env)) * env;
+        sig = HPF.ar(sig, cutoff.clip(500, 6000) * 0.3);
+        gateEnv = EnvGen.kr(Env.asr(0.005, 1, 0.06), gate, doneAction: 2);
+        sig = FreeVerb.ar(sig, reverbMix.clip(0, 0.55), 0.38, 0.24) * gateEnv * amp;
+        Out.ar(0, ~applySimpleEQ.value(Pan2.ar(sig, LFNoise1.kr(2).range(-0.35, 0.35)), eqLow, eqMid, eqHigh));
+    }).add;
+
+    SynthDef(\pycodedj_shaker_loop, {
+        arg cutoff = 7600, lfoRate = 1.5, reverbMix = 0.08, amp = 0.08, gate = 1, eqLow = 1, eqMid = 1, eqHigh = 1;
+        var trig, accent, env, sig, gateEnv;
+        trig = Impulse.kr((lfoRate * 4).clip(4, 20));
+        accent = Demand.kr(trig, 0, Dseq([1.0, 0.45, 0.65, 0.4], inf));
+        env = Decay2.kr(trig, 0.001, 0.05) * accent;
+        sig = HPF.ar(WhiteNoise.ar(0.55), cutoff.clip(3000, 12000) * 0.6) * env;
+        gateEnv = EnvGen.kr(Env.asr(0.01, 1, 0.08), gate, doneAction: 2);
+        Out.ar(0, ~applySimpleEQ.value(Pan2.ar(sig * gateEnv * amp, SinOsc.kr(0.25).range(-0.25, 0.25)), eqLow, eqMid, eqHigh));
+    }).add;
+
+    SynthDef(\pycodedj_tick_metal, {
+        arg cutoff = 6800, lfoRate = 2.0, reverbMix = 0.1, amp = 0.09, gate = 1, eqLow = 1, eqMid = 1, eqHigh = 1;
+        var trig, env, sig, gateEnv;
+        trig = Impulse.kr((lfoRate * 5).clip(3, 24));
+        env = Decay2.kr(trig, 0.0005, 0.035);
+        sig = Mix.ar(SinOsc.ar([3210, 4890, 7340])) * 0.09;
+        sig = BPF.ar(sig + WhiteNoise.ar(0.08), cutoff.clip(3000, 12000), 0.22) * env;
+        gateEnv = EnvGen.kr(Env.asr(0.005, 1, 0.05), gate, doneAction: 2);
+        Out.ar(0, ~applySimpleEQ.value(Pan2.ar(sig * gateEnv * amp, LFNoise1.kr(3).range(-0.6, 0.6)), eqLow, eqMid, eqHigh));
+    }).add;
+
+    SynthDef(\pycodedj_wood_block, {
+        arg cutoff = 1800, lfoRate = 1.0, reverbMix = 0.1, amp = 0.14, gate = 1, eqLow = 1, eqMid = 1, eqHigh = 1;
+        var trig, env, sig, gateEnv;
+        trig = Impulse.kr((lfoRate * 1.7).clip(0.8, 9));
+        env = Decay2.kr(trig, 0.001, 0.09);
+        sig = BPF.ar(WhiteNoise.ar(0.4), cutoff.clip(700, 4200), 0.16) + (SinOsc.ar(820) * 0.12);
+        gateEnv = EnvGen.kr(Env.asr(0.005, 1, 0.07), gate, doneAction: 2);
+        sig = FreeVerb.ar(sig * env, reverbMix.clip(0, 0.4), 0.35, 0.16) * gateEnv * amp;
+        Out.ar(0, ~applySimpleEQ.value(sig ! 2, eqLow, eqMid, eqHigh));
+    }).add;
+
+    SynthDef(\pycodedj_pad_minor, {
+        arg cutoff = 1300, lfoRate = 0.2, reverbMix = 0.48, amp = 0.08, gate = 1, eqLow = 1, eqMid = 1, eqHigh = 1;
+        var drift, freqs, sig, gateEnv;
+        drift = LFNoise1.kr(lfoRate.clip(0.03, 0.8)).range(-0.06, 0.06);
+        freqs = ([48, 51, 55, 62] + drift).midicps;
+        sig = Splay.ar(VarSaw.ar(freqs * [0.998, 1.002, 1.005, 0.996], 0, 0.45)) * 0.18;
+        sig = RLPF.ar(sig, cutoff.clip(400, 5200), 0.38);
+        gateEnv = EnvGen.kr(Env.asr(1.0, 1, 1.5), gate, doneAction: 2);
+        sig = FreeVerb.ar(sig, reverbMix.clip(0.2, 0.92), 0.85, 0.52) * gateEnv * amp;
+        Out.ar(0, ~applySimpleEQ.value(sig, eqLow, eqMid, eqHigh));
+    }).add;
+
+    SynthDef(\pycodedj_chord_deep, {
+        arg cutoff = 900, lfoRate = 0.4, reverbMix = 0.35, amp = 0.12, gate = 1, eqLow = 1, eqMid = 1, eqHigh = 1;
+        var trig, root, freqs, env, sig, gateEnv;
+        trig = Impulse.kr((lfoRate * 0.5).clip(0.08, 1.2));
+        root = Demand.kr(trig, 0, Dseq([43, 46, 41, 38], inf));
+        freqs = (root + [0, 7, 10, 14]).midicps;
+        env = Decay2.kr(trig, 0.03, 0.9);
+        sig = Splay.ar(Pulse.ar(freqs, 0.48)) * 0.14;
+        sig = RLPF.ar(sig.tanh, cutoff.clip(280, 3200), 0.2) * env;
+        gateEnv = EnvGen.kr(Env.asr(0.08, 1, 0.35), gate, doneAction: 2);
+        sig = FreeVerb.ar(sig, reverbMix.clip(0.12, 0.85), 0.78, 0.5) * gateEnv * amp;
+        Out.ar(0, ~applySimpleEQ.value(sig, eqLow, eqMid, eqHigh));
+    }).add;
+
+    SynthDef(\pycodedj_chord_glass, {
+        arg cutoff = 3600, lfoRate = 0.5, reverbMix = 0.42, amp = 0.1, gate = 1, eqLow = 1, eqMid = 1, eqHigh = 1;
+        var trig, root, freqs, env, sig, gateEnv;
+        trig = Impulse.kr((lfoRate * 0.7).clip(0.1, 2.0));
+        root = Demand.kr(trig, 0, Dseq([60, 64, 67, 55], inf));
+        freqs = (root + [0, 4, 7, 11]).midicps;
+        env = Decay2.kr(trig, 0.006, 1.1);
+        sig = Splay.ar(SinOsc.ar(freqs * [1, 2.01, 3.01, 4.02])) * 0.13;
+        sig = RLPF.ar(sig * env, cutoff.clip(1200, 11000), 0.48);
+        gateEnv = EnvGen.kr(Env.asr(0.02, 1, 0.4), gate, doneAction: 2);
+        sig = FreeVerb.ar(sig, reverbMix.clip(0.15, 0.9), 0.82, 0.55) * gateEnv * amp;
+        Out.ar(0, ~applySimpleEQ.value(sig, eqLow, eqMid, eqHigh));
+    }).add;
+
+    SynthDef(\pycodedj_pad_warm, {
+        arg cutoff = 1200, lfoRate = 0.15, reverbMix = 0.5, amp = 0.08, gate = 1, eqLow = 1, eqMid = 1, eqHigh = 1;
+        var freqs, sig, gateEnv;
+        freqs = [48, 55, 60, 64].midicps;
+        sig = Splay.ar(Saw.ar(freqs * LFNoise1.kr(0.2 ! 4).range(0.997, 1.003))) * 0.12;
+        sig = RLPF.ar(sig, cutoff.clip(300, 4200), 0.45);
+        gateEnv = EnvGen.kr(Env.asr(1.5, 1, 2.0), gate, doneAction: 2);
+        sig = FreeVerb.ar(sig, reverbMix.clip(0.2, 0.95), 0.88, 0.6) * gateEnv * amp;
+        Out.ar(0, ~applySimpleEQ.value(sig, eqLow, eqMid, eqHigh));
+    }).add;
+
+    SynthDef(\pycodedj_pad_string, {
+        arg cutoff = 1800, lfoRate = 0.2, reverbMix = 0.45, amp = 0.08, gate = 1, eqLow = 1, eqMid = 1, eqHigh = 1;
+        var freqs, trem, sig, gateEnv;
+        freqs = [55, 62, 67, 71].midicps;
+        trem = SinOsc.kr(lfoRate.clip(0.05, 2.0)).range(0.75, 1.0);
+        sig = Splay.ar(VarSaw.ar(freqs * [0.996, 1.002, 1.006, 0.999], 0, 0.28)) * 0.14 * trem;
+        sig = BHiShelf.ar(RLPF.ar(sig, cutoff.clip(500, 6000), 0.5), 5000, 1, -4);
+        gateEnv = EnvGen.kr(Env.asr(1.2, 1, 1.6), gate, doneAction: 2);
+        sig = FreeVerb.ar(sig, reverbMix.clip(0.18, 0.9), 0.86, 0.55) * gateEnv * amp;
+        Out.ar(0, ~applySimpleEQ.value(sig, eqLow, eqMid, eqHigh));
+    }).add;
+
+    SynthDef(\pycodedj_pad_choir, {
+        arg cutoff = 1400, lfoRate = 0.2, reverbMix = 0.5, amp = 0.08, gate = 1, eqLow = 1, eqMid = 1, eqHigh = 1;
+        var freqs, raw, sig, gateEnv;
+        freqs = [48, 55, 60].midicps;
+        raw = Splay.ar(Saw.ar(freqs * [0.998, 1.002, 1.006])) * 0.16;
+        sig = BPF.ar(raw, cutoff.clip(500, 4000) * 0.65, 0.08) + BPF.ar(raw, cutoff.clip(500, 4000), 0.06) + BPF.ar(raw, cutoff.clip(500, 4000) * 1.9, 0.05);
+        gateEnv = EnvGen.kr(Env.asr(1.1, 1, 1.6), gate, doneAction: 2);
+        sig = FreeVerb.ar(sig, reverbMix.clip(0.2, 0.95), 0.88, 0.58) * gateEnv * amp;
+        Out.ar(0, ~applySimpleEQ.value(sig, eqLow, eqMid, eqHigh));
+    }).add;
+
+    SynthDef(\pycodedj_lead_square, {
+        arg cutoff = 2200, lfoRate = 1.5, reverbMix = 0.16, amp = 0.12, gate = 1, eqLow = 1, eqMid = 1, eqHigh = 1;
+        var trig, note, freq, env, sig, gateEnv;
+        trig = Impulse.kr((lfoRate * 2).clip(1, 12));
+        note = Demand.kr(trig, 0, Dseq([60, 63, 67, 70, 72, 70, 67, 63], inf));
+        freq = Lag.kr(note.midicps, 0.02);
+        env = Decay2.kr(trig, 0.004, 0.22);
+        sig = Pulse.ar(freq, 0.5) * env;
+        sig = RLPF.ar(sig, cutoff.clip(500, 7600), 0.28);
+        gateEnv = EnvGen.kr(Env.asr(0.01, 1, 0.12), gate, doneAction: 2);
+        sig = FreeVerb.ar(sig, reverbMix.clip(0, 0.6), 0.45, 0.28) * gateEnv * amp;
+        Out.ar(0, ~applySimpleEQ.value(Pan2.ar(sig, SinOsc.kr(0.2).range(-0.3, 0.3)), eqLow, eqMid, eqHigh));
+    }).add;
+
+    SynthDef(\pycodedj_lead_fm, {
+        arg cutoff = 3000, lfoRate = 1.5, reverbMix = 0.18, amp = 0.12, gate = 1, eqLow = 1, eqMid = 1, eqHigh = 1;
+        var trig, note, freq, env, mod, sig, gateEnv;
+        trig = Impulse.kr((lfoRate * 2.2).clip(1, 14));
+        note = Demand.kr(trig, 0, Dseq([72, 74, 75, 79, 82, 79, 75, 74], inf));
+        freq = Lag.kr(note.midicps, 0.015);
+        env = Decay2.kr(trig, 0.003, 0.2);
+        mod = SinOsc.ar(freq * 2.5) * (freq * 0.8) * env;
+        sig = SinOsc.ar(freq + mod) * env;
+        sig = RLPF.ar(sig, cutoff.clip(800, 10000), 0.42);
+        gateEnv = EnvGen.kr(Env.asr(0.01, 1, 0.12), gate, doneAction: 2);
+        sig = FreeVerb.ar(sig, reverbMix.clip(0, 0.65), 0.5, 0.3) * gateEnv * amp;
+        Out.ar(0, ~applySimpleEQ.value(Pan2.ar(sig, LFNoise1.kr(0.8).range(-0.35, 0.35)), eqLow, eqMid, eqHigh));
+    }).add;
+
+    SynthDef(\pycodedj_lead_chip, {
+        arg cutoff = 4200, lfoRate = 2.0, reverbMix = 0.08, amp = 0.1, gate = 1, eqLow = 1, eqMid = 1, eqHigh = 1;
+        var trig, note, freq, env, sig, gateEnv;
+        trig = Impulse.kr((lfoRate * 4).clip(4, 22));
+        note = Demand.kr(trig, 0, Dseq([72, 79, 76, 84, 79, 76, 74, 71], inf));
+        freq = note.midicps;
+        env = Decay2.kr(trig, 0.001, 0.08);
+        sig = Pulse.ar(freq, 0.5) * env;
+        sig = HPF.ar(RLPF.ar(sig, cutoff.clip(1200, 10000), 0.35), 300);
+        gateEnv = EnvGen.kr(Env.asr(0.005, 1, 0.06), gate, doneAction: 2);
+        sig = FreeVerb.ar(sig, reverbMix.clip(0, 0.42), 0.32, 0.18) * gateEnv * amp;
+        Out.ar(0, ~applySimpleEQ.value(Pan2.ar(sig, LFNoise1.kr(3).range(-0.5, 0.5)), eqLow, eqMid, eqHigh));
+    }).add;
+
+    SynthDef(\pycodedj_lead_saw, {
+        arg cutoff = 2600, lfoRate = 1.5, reverbMix = 0.16, amp = 0.13, gate = 1, eqLow = 1, eqMid = 1, eqHigh = 1;
+        var trig, note, freq, env, sig, gateEnv;
+        trig = Impulse.kr((lfoRate * 1.8).clip(0.8, 10));
+        note = Demand.kr(trig, 0, Dseq([60, 62, 67, 70, 72, 70, 67, 62], inf));
+        freq = Lag.kr(note.midicps, 0.04);
+        env = Decay2.kr(trig, 0.006, 0.3);
+        sig = Splay.ar(Saw.ar(freq * [0.996, 1.004, 2.002])) * 0.22;
+        sig = RLPF.ar((sig * 1.8).tanh, cutoff.clip(700, 9000), 0.22) * env;
+        gateEnv = EnvGen.kr(Env.asr(0.02, 1, 0.14), gate, doneAction: 2);
+        sig = FreeVerb.ar(sig, reverbMix.clip(0, 0.65), 0.46, 0.26) * gateEnv * amp;
+        Out.ar(0, ~applySimpleEQ.value(sig, eqLow, eqMid, eqHigh));
+    }).add;
+
+    SynthDef(\pycodedj_lead_whistle, {
+        arg cutoff = 5200, lfoRate = 1.0, reverbMix = 0.22, amp = 0.09, gate = 1, eqLow = 1, eqMid = 1, eqHigh = 1;
+        var trig, note, freq, env, sig, gateEnv;
+        trig = Impulse.kr((lfoRate * 1.4).clip(0.4, 8));
+        note = Demand.kr(trig, 0, Dseq([79, 82, 84, 86, 84, 82, 79, 74], inf));
+        freq = Lag.kr(note.midicps, 0.08);
+        env = Decay2.kr(trig, 0.02, 0.42);
+        sig = SinOsc.ar(freq + (SinOsc.kr(5.2).range(-3, 3))) * env;
+        sig = BPF.ar(sig, cutoff.clip(1800, 9000), 0.35);
+        gateEnv = EnvGen.kr(Env.asr(0.03, 1, 0.18), gate, doneAction: 2);
+        sig = FreeVerb.ar(sig, reverbMix.clip(0.05, 0.72), 0.58, 0.34) * gateEnv * amp;
+        Out.ar(0, ~applySimpleEQ.value(Pan2.ar(sig, SinOsc.kr(0.17).range(-0.4, 0.4)), eqLow, eqMid, eqHigh));
+    }).add;
+
+    SynthDef(\pycodedj_fx_down, {
+        arg cutoff = 5200, lfoRate = 0.25, reverbMix = 0.42, amp = 0.14, gate = 1, eqLow = 1, eqMid = 1, eqHigh = 1;
+        var trig, env, sweep, sig, gateEnv;
+        trig = Impulse.kr(lfoRate.clip(0.05, 1.0));
+        env = Decay2.kr(trig, 0.003, 2.5);
+        sweep = EnvGen.kr(Env([cutoff.clip(800, 9000), 140], [2.2], \exp), trig);
+        sig = BPF.ar(PinkNoise.ar(0.55), sweep, 0.45) * env;
+        gateEnv = EnvGen.kr(Env.asr(0.02, 1, 0.6), gate, doneAction: 2);
+        sig = FreeVerb.ar(sig, reverbMix.clip(0.1, 0.9), 0.86, 0.55) * gateEnv * amp;
+        Out.ar(0, ~applySimpleEQ.value(sig ! 2, eqLow, eqMid, eqHigh));
+    }).add;
+
+    SynthDef(\pycodedj_fx_zap, {
+        arg cutoff = 2400, lfoRate = 1.0, reverbMix = 0.18, amp = 0.14, gate = 1, eqLow = 1, eqMid = 1, eqHigh = 1;
+        var trig, env, pitch, sig, gateEnv;
+        trig = Impulse.kr((lfoRate * 1.2).clip(0.4, 6));
+        env = Decay2.kr(trig, 0.001, 0.12);
+        pitch = EnvGen.kr(Env([1800, 180], [0.09], \exp), trig);
+        sig = SinOsc.ar(pitch) * env;
+        sig = (sig + (BPF.ar(WhiteNoise.ar(0.12), cutoff.clip(700, 6000), 0.4) * env)).tanh;
+        gateEnv = EnvGen.kr(Env.asr(0.005, 1, 0.08), gate, doneAction: 2);
+        sig = FreeVerb.ar(sig, reverbMix.clip(0, 0.55), 0.45, 0.25) * gateEnv * amp;
+        Out.ar(0, ~applySimpleEQ.value(Pan2.ar(sig, LFNoise1.kr(1).range(-0.45, 0.45)), eqLow, eqMid, eqHigh));
+    }).add;
+
+    SynthDef(\pycodedj_fx_noise, {
+        arg cutoff = 1800, lfoRate = 0.5, reverbMix = 0.35, amp = 0.15, gate = 1, eqLow = 1, eqMid = 1, eqHigh = 1;
+        var trig, env, sig, gateEnv;
+        trig = Impulse.kr(lfoRate.clip(0.1, 3.0));
+        env = Decay2.kr(trig, 0.001, 0.55);
+        sig = LPF.ar(PinkNoise.ar(0.7), cutoff.clip(300, 6000)) * env;
+        sig = HPF.ar(sig, 80);
+        gateEnv = EnvGen.kr(Env.asr(0.01, 1, 0.2), gate, doneAction: 2);
+        sig = FreeVerb.ar(sig, reverbMix.clip(0.05, 0.8), 0.72, 0.42) * gateEnv * amp;
+        Out.ar(0, ~applySimpleEQ.value(sig ! 2, eqLow, eqMid, eqHigh));
+    }).add;
+
+    SynthDef(\pycodedj_fx_laser, {
+        arg cutoff = 3600, lfoRate = 1.0, reverbMix = 0.14, amp = 0.12, gate = 1, eqLow = 1, eqMid = 1, eqHigh = 1;
+        var trig, env, pitch, sig, gateEnv;
+        trig = Impulse.kr((lfoRate * 1.5).clip(0.6, 8));
+        env = Decay2.kr(trig, 0.001, 0.16);
+        pitch = EnvGen.kr(Env([360, 2200, 620], [0.03, 0.1], \exp), trig);
+        sig = SinOsc.ar(pitch) * env;
+        sig = BPF.ar(sig + (WhiteNoise.ar(0.08) * env), cutoff.clip(900, 9000), 0.45);
+        gateEnv = EnvGen.kr(Env.asr(0.005, 1, 0.08), gate, doneAction: 2);
+        sig = FreeVerb.ar(sig, reverbMix.clip(0, 0.55), 0.4, 0.22) * gateEnv * amp;
+        Out.ar(0, ~applySimpleEQ.value(Pan2.ar(sig, LFNoise1.kr(2).range(-0.55, 0.55)), eqLow, eqMid, eqHigh));
+    }).add;
+
+    SynthDef(\pycodedj_fx_vinyl, {
+        arg cutoff = 3000, lfoRate = 0.4, reverbMix = 0.18, amp = 0.07, gate = 1, eqLow = 1, eqMid = 1, eqHigh = 1;
+        var crackle, dust, sig, gateEnv;
+        crackle = Crackle.ar(1.92) * 0.08;
+        dust = Decay2.kr(Dust.kr((lfoRate * 16).clip(2, 24)), 0.001, 0.03) * WhiteNoise.ar(0.25);
+        sig = HPF.ar(LPF.ar(PinkNoise.ar(0.12) + crackle + dust, cutoff.clip(1000, 7000)), 180);
+        gateEnv = EnvGen.kr(Env.asr(0.2, 1, 0.4), gate, doneAction: 2);
+        sig = FreeVerb.ar(sig, reverbMix.clip(0, 0.5), 0.45, 0.24) * gateEnv * amp;
+        Out.ar(0, ~applySimpleEQ.value(sig ! 2, eqLow, eqMid, eqHigh));
+    }).add;
+
+    SynthDef(\pycodedj_drone_space, {
+        arg cutoff = 900, lfoRate = 0.08, reverbMix = 0.65, amp = 0.08, gate = 1, eqLow = 1, eqMid = 1, eqHigh = 1;
+        var drift, freqs, sig, gateEnv;
+        drift = LFNoise1.kr(lfoRate.clip(0.02, 0.4) ! 4).range(-0.12, 0.12);
+        freqs = ([36, 43, 50, 55] + drift).midicps;
+        sig = Splay.ar(SinOsc.ar(freqs) + (Saw.ar(freqs * 0.5) * 0.12)) * 0.13;
+        sig = RLPF.ar(sig, cutoff.clip(160, 2600), 0.5);
+        gateEnv = EnvGen.kr(Env.asr(2.0, 1, 2.5), gate, doneAction: 2);
+        sig = FreeVerb.ar(sig, reverbMix.clip(0.3, 0.98), 0.95, 0.7) * gateEnv * amp;
+        Out.ar(0, ~applySimpleEQ.value(sig, eqLow, eqMid, eqHigh));
     }).add;
 
     SynthDef(\pycodedj_base, {
@@ -514,18 +897,18 @@ s.waitForBoot({
         nameString = name.asString;
 
         switch (nameString,
-            "sub_bass",     { \pycodedj_sub_bass },
+            "bass_sub",     { \pycodedj_bass_sub },
             "hat_engine",   { \pycodedj_hat_engine },
             "clap_snap",    { \pycodedj_clap_snap },
-            "neon_stab",    { \pycodedj_neon_stab },
-            "acid_lead",    { \pycodedj_acid_lead },
-            "warehouse_air",{ \pycodedj_warehouse_air },
+            "stab_neon",    { \pycodedj_stab_neon },
+            "lead_acid",    { \pycodedj_lead_acid },
+            "air_warehouse",{ \pycodedj_air_warehouse },
             "kick_pulse",   { \pycodedj_kick_pulse },
-            "floor_kick",   { \pycodedj_floor_kick },
-            "glitch_ticks", { \pycodedj_glitch_ticks },
-            "soft_pluck",   { \pycodedj_soft_pluck },
-            "dub_chord",    { \pycodedj_dub_chord },
-            "shimmer_pad",  { \pycodedj_shimmer_pad },
+            "kick_floor",   { \pycodedj_kick_floor },
+            "fx_glitch", { \pycodedj_fx_glitch },
+            "pluck_soft",   { \pycodedj_pluck_soft },
+            "chord_dub",    { \pycodedj_chord_dub },
+            "pad_shimmer",  { \pycodedj_pad_shimmer },
             "kick_hard",    { \pycodedj_kick_hard },
             "bass_reese",   { \pycodedj_bass_reese },
             "bass_rumble",  { \pycodedj_bass_rumble },
@@ -533,22 +916,52 @@ s.waitForBoot({
             "clap_snare",   { \pycodedj_clap_snare },
             "chord_rave",   { \pycodedj_chord_rave },
             "lead_hoover",  { \pycodedj_lead_hoover },
-            "fx_impact",    { \pycodedj_fx_impact },
+            "fx_drop",    { \pycodedj_fx_drop },
             // common shorthands
             "acid",         { \pycodedj_bass_acid },
-            "kick",         { \pycodedj_floor_kick },
+            "kick",         { \pycodedj_kick_floor },
             "note",         { \pycodedj_note },
             // new DJ sounds
             "tom_drum",     { \pycodedj_tom_drum },
             "snare_roll",   { \pycodedj_snare_roll },
-            "noise_crash",  { \pycodedj_noise_crash },
+            "crash_noise",  { \pycodedj_crash_noise },
             "bass_acid",    { \pycodedj_bass_acid },
             "stab_saw",     { \pycodedj_stab_saw },
-            "riser_noise",  { \pycodedj_riser_noise },
+            "fx_riser",  { \pycodedj_fx_riser },
             "bell_rave",    { \pycodedj_bell_rave },
-            "organ_chord",  { \pycodedj_organ_chord },
-            "synth_arp",    { \pycodedj_synth_arp },
+            "chord_organ",  { \pycodedj_chord_organ },
+            "arp_synth",    { \pycodedj_arp_synth },
             "vox_ahh",      { \pycodedj_vox_ahh },
+            "kick_soft",    { \pycodedj_kick_soft },
+            "kick_909",     { \pycodedj_kick_909 },
+            "kick_click",   { \pycodedj_kick_click },
+            "bass_pluck",   { \pycodedj_bass_pluck },
+            "bass_fm",      { \pycodedj_bass_fm },
+            "bass_mono",    { \pycodedj_bass_mono },
+            "bass_wobble",  { \pycodedj_bass_wobble },
+            "rim_shot",     { \pycodedj_rim_shot },
+            "cowbell",      { \pycodedj_cowbell },
+            "perc_blip",    { \pycodedj_perc_blip },
+            "shaker_loop",  { \pycodedj_shaker_loop },
+            "tick_metal",   { \pycodedj_tick_metal },
+            "wood_block",   { \pycodedj_wood_block },
+            "pad_minor",    { \pycodedj_pad_minor },
+            "chord_deep",   { \pycodedj_chord_deep },
+            "chord_glass",  { \pycodedj_chord_glass },
+            "pad_warm",     { \pycodedj_pad_warm },
+            "pad_string",   { \pycodedj_pad_string },
+            "pad_choir",    { \pycodedj_pad_choir },
+            "lead_square",  { \pycodedj_lead_square },
+            "lead_fm",      { \pycodedj_lead_fm },
+            "lead_chip",    { \pycodedj_lead_chip },
+            "lead_saw",     { \pycodedj_lead_saw },
+            "lead_whistle", { \pycodedj_lead_whistle },
+            "fx_down",   { \pycodedj_fx_down },
+            "fx_zap",          { \pycodedj_fx_zap },
+            "fx_noise",    { \pycodedj_fx_noise },
+            "fx_laser",    { \pycodedj_fx_laser },
+            "fx_vinyl",  { \pycodedj_fx_vinyl },
+            "drone_space",  { \pycodedj_drone_space },
             {
                 parts = nameString.split($_);
                 role = parts[0];
@@ -559,7 +972,10 @@ s.waitForBoot({
                         switch (variant,
                             "hard",   { \pycodedj_kick_hard },
                             "pulse",  { \pycodedj_kick_pulse },
-                            { \pycodedj_floor_kick }
+                            "soft",   { \pycodedj_kick_soft },
+                            "909",    { \pycodedj_kick_909 },
+                            "click",  { \pycodedj_kick_click },
+                            { \pycodedj_kick_floor }
                         )
                     },
                     "bass",  {
@@ -567,7 +983,11 @@ s.waitForBoot({
                             "reese",  { \pycodedj_bass_reese },
                             "rumble", { \pycodedj_bass_rumble },
                             "acid",   { \pycodedj_bass_acid },
-                            { \pycodedj_sub_bass }
+                            "pluck",  { \pycodedj_bass_pluck },
+                            "fm",     { \pycodedj_bass_fm },
+                            "mono",   { \pycodedj_bass_mono },
+                            "wobble", { \pycodedj_bass_wobble },
+                            { \pycodedj_bass_sub }
                         )
                     },
                     "hat",   {
@@ -591,34 +1011,67 @@ s.waitForBoot({
                     },
                     "chord", {
                         switch (variant,
-                            "stab",   { \pycodedj_neon_stab },
+                            "stab",   { \pycodedj_stab_neon },
                             "rave",   { \pycodedj_chord_rave },
-                            { \pycodedj_dub_chord }
+                            "deep",   { \pycodedj_chord_deep },
+                            { \pycodedj_chord_dub }
                         )
                     },
                     "lead",  {
                         switch (variant,
-                            "acid",   { \pycodedj_acid_lead },
+                            "acid",   { \pycodedj_lead_acid },
                             "hoover", { \pycodedj_lead_hoover },
-                            { \pycodedj_soft_pluck }
+                            "square", { \pycodedj_lead_square },
+                            "fm",     { \pycodedj_lead_fm },
+                            "chip",   { \pycodedj_lead_chip },
+                            "saw",    { \pycodedj_lead_saw },
+                            "whistle",{ \pycodedj_lead_whistle },
+                            { \pycodedj_pluck_soft }
                         )
                     },
                     "fx",    {
                         switch (variant,
-                            "ticks",  { \pycodedj_glitch_ticks },
-                            "pad",    { \pycodedj_shimmer_pad },
-                            "impact", { \pycodedj_fx_impact },
-                            { \pycodedj_warehouse_air }
+                            "ticks",  { \pycodedj_fx_glitch },
+                            "pad",    { \pycodedj_pad_shimmer },
+                            "impact", { \pycodedj_fx_drop },
+                            "noise",  { \pycodedj_fx_noise },
+                            "laser",  { \pycodedj_fx_laser },
+                            { \pycodedj_air_warehouse }
                         )
                     },
                     "tom",   { \pycodedj_tom_drum },
                     "stab",  { \pycodedj_stab_saw },
-                    "riser", { \pycodedj_riser_noise },
+                    "riser", { \pycodedj_fx_riser },
                     "bell",  { \pycodedj_bell_rave },
-                    "organ", { \pycodedj_organ_chord },
-                    "arp",   { \pycodedj_synth_arp },
+                    "organ", { \pycodedj_chord_organ },
+                    "arp",   { \pycodedj_arp_synth },
                     "vox",   { \pycodedj_vox_ahh },
-                    "crash", { \pycodedj_noise_crash },
+                    "crash", { \pycodedj_crash_noise },
+                    "pluck", { \pycodedj_bass_pluck },
+                    "fm",    { \pycodedj_lead_fm },
+                    "mono",  { \pycodedj_bass_mono },
+                    "wobble",{ \pycodedj_bass_wobble },
+                    "rim",   { \pycodedj_rim_shot },
+                    "perc",  { \pycodedj_perc_blip },
+                    "shaker",{ \pycodedj_shaker_loop },
+                    "metal", { \pycodedj_tick_metal },
+                    "wood",  { \pycodedj_wood_block },
+                    "minor", { \pycodedj_pad_minor },
+                    "deep",  { \pycodedj_chord_deep },
+                    "glass", { \pycodedj_chord_glass },
+                    "warm",  { \pycodedj_pad_warm },
+                    "string",{ \pycodedj_pad_string },
+                    "choir", { \pycodedj_pad_choir },
+                    "square",{ \pycodedj_lead_square },
+                    "chip",  { \pycodedj_lead_chip },
+                    "saw",   { \pycodedj_lead_saw },
+                    "whistle",{ \pycodedj_lead_whistle },
+                    "fx_down", { \pycodedj_fx_down },
+                    "fx_zap",   { \pycodedj_fx_zap },
+                    "noise", { \pycodedj_fx_noise },
+                    "laser", { \pycodedj_fx_laser },
+                    "vinyl", { \pycodedj_fx_vinyl },
+                    "space", { \pycodedj_drone_space },
                     { \pycodedj_base }
                 );
             }

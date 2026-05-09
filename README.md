@@ -10,12 +10,12 @@ A live-coding environment that translates Python code structure into music in re
 
 PyCodeDJ connects "writing code" directly to "making sound."
 
-Add more `for` loops and the modulation speeds up. Deepen nesting and the filter opens up. Fill in comments and the space grows. Write `pattern("x . x .")` and that rhythm plays. Write `pattern("0 . 3 . 5 .")` and those pitches ring out.
+Add more `for` loops and the modulation speeds up. Deepen nesting and the filter opens up. Fill in comments and the space grows. Write `dj.pattern = "x . x ."` and that rhythm plays. Write `dj.pattern = "0 . 3 . 5 ."` and those pitches ring out.
 
 Two things set it apart from existing Python ↔ SuperCollider bridges (sc3nb, supriya):
 
 - **Hot-reload performance** — swap out a loop without stopping it. Saving a file is an immediate sound change.
-- **Two performance styles** — auto-generation from code structure, and explicit `pattern()` notation for rhythm and pitch. Mix them freely in the same file.
+- **Two performance styles** — auto-generation from code structure, and explicit `dj.pattern` notation for rhythm and pitch. Mix them freely in the same file.
 
 ---
 
@@ -45,8 +45,8 @@ BPM clock is held by SuperCollider's `TempoClock`. Python only sends parameter u
 | Control-flow count (if/for/while) | LFO rate (0.1–5.0 Hz) |
 | Function definition count | Polyphony voice count (1–4) |
 | Comment ratio | Reverb depth (0.0–0.8) |
-| `volume=` argument | Amplitude (0.0–1.0) |
-| `eq=` / `low=` / `mid=` / `high=` arguments | Simple 3-band EQ |
+| `dj.volume` | Amplitude (0.0–1.0) |
+| `dj.eq` / `dj.low` / `dj.mid` / `dj.high` | Simple 3-band EQ |
 
 ---
 
@@ -86,27 +86,31 @@ PyCodeDJ synths loaded. Ready. OSC port: 57120
 **2. Write a live-coding file**
 
 ```python
-from pycodedj import loop, pattern
+from pycodedj import dj, loop
 
 # Code-structure mode: the shape of your code maps to sound
-@loop("bass", interval=2.0)
-def bass(volume=0.4):
+@loop(interval=2.0)
+def bass():
+    dj.volume = 0.4
     for i in range(8):
         if i % 2 == 0:
             pass
 
-# pattern() mode: specify rhythm and pitch explicitly
-@loop("kick", synth="floor_kick", dur=0.25)
+# Pattern mode: specify rhythm and pitch explicitly
+@loop(synth="kick_floor", beat=0.25)
 def kick():
-    pattern("x . x .")
+    dj.volume = 0.8
+    dj.pattern = "x . x ."
 
-@loop("melody", synth="acid_lead", root="A3", scale="minor", dur=0.25)
+@loop(synth="lead_acid", root="A3", scale="minor", beat=0.25)
 def melody():
-    pattern("0 . 3 . 5 .")
+    dj.volume = 0.3
+    dj.pattern = "0 . 3 . 5 ."
 
 # Comments create space (reverb)
-@loop("pad", interval=4.0)
-def pad(volume=0.1):
+@loop(interval=4.0)
+def pad():
+    dj.volume = 0.1
     # ambient space
     # silence is music
     pass
@@ -141,27 +145,30 @@ pycodedj unmute bass
 
 ---
 
-## Using pattern()
+## Using dj.pattern
 
-`pattern()` lets you specify rhythm and pitch explicitly.
+`dj.pattern` lets you specify rhythm and pitch explicitly.
 
 ```python
-from pycodedj import loop, pattern
+from pycodedj import dj, loop
 
 # Trigger pattern (x = hit, . = rest)
-@loop("kick", synth="floor_kick", dur=0.25)
+@loop(synth="kick_floor", beat=0.25)
 def kick():
-    pattern("x . x .")
+    dj.volume = 0.8
+    dj.pattern = "x . x ."
 
 # Pitch pattern (integer = scale degree)
-@loop("bass", synth="bass_acid", root="A1", scale="minor", dur=0.25)
+@loop(synth="bass_acid", root="A1", scale="minor", beat=0.25)
 def bass():
-    pattern("0 . 3 . 5 .")
+    dj.volume = 0.35
+    dj.pattern = "0 . 3 . 5 ."
 
 # Chords and ties
-@loop("chord", synth="note", root="A1", scale="minor", dur=0.25)
+@loop(synth="note", root="A1", scale="minor", beat=0.25)
 def chord():
-    pattern("0 . [0 3] ~ 5 . 3 .")
+    dj.volume = 0.25
+    dj.pattern = "0 . [0 3] ~ 5 . 3 ."
     # [0 3] = two-note chord, ~ = sustain the previous note one more step
 ```
 
@@ -182,7 +189,7 @@ Token reference:
 | `synth=` | Synth name to use |
 | `root=` | Root note (e.g. `"A3"`, `"C4"`) |
 | `scale=` | Scale name (e.g. `"minor"`, `"major"`, `"pentatonicMinor"`) |
-| `dur=` | Step length in seconds. `0.25` = sixteenth note at 60 BPM |
+| `beat=` | Step length in seconds. `0.25` = sixteenth note at 60 BPM |
 
 ---
 
@@ -192,7 +199,7 @@ Token reference:
 | :--- | :--- |
 | `examples/demo.py` | Intro demo: bass / melody / pad |
 | `examples/club_set.py` | Sub-heavy club set: 11 loops with kick, rumble, sub, acid, hats, and room noise |
-| `examples/sound_showcase.py` | All 30 synths — evaluate one at a time to audition |
+| `examples/sound_showcase.py` | All 60 synths — evaluate one at a time to audition |
 
 ---
 
@@ -220,7 +227,7 @@ Token reference:
 - [x] Python → SuperCollider OSC prototype
 - [x] Hot-reload live loop implementation (`pycodedj watch`)
 - [x] Sprint 1: Live stability (`panic`, SyntaxError recovery, `mute`/`solo`, `status`)
-- [x] Sprint 2: Music DSL (`pattern()`, `@loop` parameter expansion: `synth`, `root`, `scale`, `dur`)
+- [x] Sprint 2: Music DSL (`dj.pattern`, `@loop` parameter expansion: `synth`, `root`, `scale`, `beat`)
 - [ ] Sprint 3: Sound design and playability (SynthDef cleanup, `bpm`, `list-synths`, `sample()`)
 - [ ] Sprint 4: Hydra visualiser integration
 

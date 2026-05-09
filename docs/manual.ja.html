@@ -1,1775 +1,231 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="ja">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>PyCodeDJ マニュアル</title>
   <link rel="icon" href="favicon.svg" type="image/svg+xml">
-  <!-- Google tag (gtag.js) -->
-  <script async src="https://www.googletagmanager.com/gtag/js?id=G-J87606964E"></script>
-  <script>
-    window.dataLayer = window.dataLayer || [];
-    function gtag(){dataLayer.push(arguments);}
-    gtag('js', new Date());
-
-    gtag('config', 'G-J87606964E');
-  </script>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,300;0,400;0,600;1,400&family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
   <style>
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
-    :root {
-      --bg:     #08080e;
-      --bg2:    #0f0f18;
-      --bg3:    #16161f;
-      --border: #1e1e2e;
-      --text:   #cdd6f4;
-      --muted:  #585b70;
-      --green:  #a6e3a1;
-      --pink:   #f38ba8;
-      --blue:   #89b4fa;
-      --cyan:   #89dceb;
-      --yellow: #f9e2af;
-      --mauve:  #cba6f7;
-    }
-
-    html { scroll-behavior: smooth; }
-
-    body {
-      background: var(--bg);
-      color: var(--text);
-      font-family: 'Inter', sans-serif;
-      font-size: 16px;
-      line-height: 1.7;
-      overflow-x: hidden;
-    }
-
-    /* ── Nav ── */
-    nav {
-      position: fixed;
-      top: 0; left: 0; right: 0;
-      z-index: 100;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 0 2rem;
-      height: 56px;
-      background: rgba(8,8,14,0.92);
-      backdrop-filter: blur(12px);
-      border-bottom: 1px solid var(--border);
-    }
-    .nav-logo {
-      font-family: 'JetBrains Mono', monospace;
-      font-weight: 600;
-      font-size: 1rem;
-      color: var(--green);
-      letter-spacing: 0.05em;
-      text-decoration: none;
-    }
-    .nav-back {
-      color: var(--muted);
-      text-decoration: none;
-      font-size: 0.875rem;
-      transition: color 0.2s;
-    }
-    .nav-back:hover { color: var(--text); }
-
-    /* ── Layout ── */
-    .layout {
-      display: flex;
-      padding-top: 56px;
-      min-height: 100vh;
-    }
-
-    /* ── Sidebar ── */
-    .sidebar {
-      position: fixed;
-      top: 56px;
-      left: 0;
-      width: 240px;
-      height: calc(100vh - 56px);
-      overflow-y: auto;
-      background: var(--bg2);
-      border-right: 1px solid var(--border);
-      padding: 2rem 0;
-    }
-    .sidebar-title {
-      font-family: 'JetBrains Mono', monospace;
-      font-size: 0.68rem;
-      letter-spacing: 0.12em;
-      text-transform: uppercase;
-      color: var(--muted);
-      padding: 0 1.5rem;
-      margin-bottom: 1rem;
-    }
-    .sidebar nav {
-      position: static;
-      display: block;
-      background: none;
-      border: none;
-      padding: 0;
-      height: auto;
-      backdrop-filter: none;
-    }
-    .sidebar-toc {
-      list-style: none;
-    }
-    .sidebar-toc li a {
-      display: block;
-      padding: 0.35rem 1.5rem;
-      color: var(--muted);
-      text-decoration: none;
-      font-size: 0.82rem;
-      line-height: 1.4;
-      transition: color 0.15s, background 0.15s;
-      border-left: 2px solid transparent;
-    }
-    .sidebar-toc li a:hover {
-      color: var(--text);
-      background: rgba(255,255,255,0.03);
-      border-left-color: var(--green);
-    }
-
-    /* ── Main content ── */
-    .main {
-      margin-left: 240px;
-      padding: 3rem 2rem 6rem;
-      max-width: calc(240px + 800px + 4rem);
-    }
-    .content {
-      max-width: 800px;
-    }
-
-    @media (max-width: 900px) {
-      .sidebar { display: none; }
-      .main { margin-left: 0; }
-    }
-
-    /* ── Typography ── */
-    h1 {
-      font-size: 2.2rem;
-      font-weight: 700;
-      letter-spacing: -0.02em;
-      color: var(--text);
-      margin-bottom: 0.5rem;
-    }
-    h2 {
-      font-size: 1.5rem;
-      font-weight: 700;
-      letter-spacing: -0.01em;
-      color: var(--text);
-      margin-top: 3rem;
-      margin-bottom: 1rem;
-      padding-bottom: 0.5rem;
-      border-bottom: 1px solid var(--border);
-    }
-    h3 {
-      font-size: 1.1rem;
-      font-weight: 600;
-      color: var(--blue);
-      margin-top: 2rem;
-      margin-bottom: 0.75rem;
-    }
-    h4 {
-      font-size: 0.95rem;
-      font-weight: 600;
-      color: var(--cyan);
-      margin-top: 1.5rem;
-      margin-bottom: 0.5rem;
-    }
-    p {
-      margin-bottom: 1rem;
-    }
-    a {
-      color: var(--blue);
-      text-decoration: none;
-    }
-    a:hover {
-      text-decoration: underline;
-    }
-    strong { color: var(--text); font-weight: 600; }
-    em { font-style: italic; color: var(--cyan); }
-
-    /* ── Inline code ── */
-    code {
-      font-family: 'JetBrains Mono', monospace;
-      font-size: 0.82em;
-      background: var(--bg3);
-      color: var(--green);
-      padding: 0.15em 0.4em;
-      border-radius: 0.25rem;
-      border: 1px solid var(--border);
-    }
-
-    /* ── Code blocks ── */
-    pre {
-      background: var(--bg3);
-      border: 1px solid var(--border);
-      border-left: 3px solid var(--border);
-      border-radius: 0.5rem;
-      padding: 1.25rem 1.5rem;
-      overflow-x: auto;
-      margin: 1rem 0 1.5rem;
-      position: relative;
-    }
-    pre code {
-      font-family: 'JetBrains Mono', monospace;
-      font-size: 0.83rem;
-      background: none;
-      border: none;
-      padding: 0;
-      color: var(--text);
-      border-radius: 0;
-      line-height: 1.7;
-      display: block;
-    }
-    /* language label */
-    pre[data-lang]::before {
-      content: attr(data-lang);
-      position: absolute;
-      top: 0.5rem;
-      right: 0.75rem;
-      font-family: 'JetBrains Mono', monospace;
-      font-size: 0.65rem;
-      color: var(--muted);
-      letter-spacing: 0.08em;
-      text-transform: uppercase;
-    }
-
-    /* ── Syntax highlight classes (JS fills these) ── */
-    .sh-keyword  { color: var(--mauve); }
-    .sh-string   { color: var(--green); }
-    .sh-comment  { color: var(--muted); font-style: italic; }
-    .sh-number   { color: var(--yellow); }
-    .sh-decorator{ color: var(--pink); }
-    .sh-builtin  { color: var(--blue); }
-
-    /* ── Blockquote ── */
-    blockquote {
-      border-left: 3px solid var(--mauve);
-      padding-left: 1rem;
-      margin: 1rem 0 1.5rem;
-      color: var(--muted);
-    }
-    blockquote p {
-      margin: 0;
-    }
-
-    /* ── HR ── */
-    hr {
-      border: none;
-      border-top: 1px solid var(--border);
-      margin: 2.5rem 0;
-    }
-
-    /* ── Tables ── */
-    table {
-      border-collapse: collapse;
-      width: 100%;
-      margin: 1rem 0 1.5rem;
-      font-size: 0.9rem;
-    }
-    th, td {
-      border: 1px solid var(--border);
-      padding: 0.5rem 0.75rem;
-      text-align: left;
-    }
-    th {
-      background: var(--bg3);
-      color: var(--blue);
-      font-weight: 600;
-    }
-    tr:nth-child(even) td {
-      background: var(--bg2);
-    }
-
-    /* ── Lists ── */
-    ul, ol {
-      margin: 0.5rem 0 1rem 1.5rem;
-    }
-    li {
-      margin-bottom: 0.3rem;
-    }
-    li > ul, li > ol {
-      margin-top: 0.3rem;
-    }
-
-    /* ── Sections ── */
-    section {
-      margin-bottom: 1rem;
-    }
-
-    /* ── Leading intro ── */
-    .intro-meta {
-      color: var(--muted);
-      font-size: 0.9rem;
-      margin-bottom: 2rem;
-    }
-    .intro-meta a {
-      color: var(--blue);
-    }
+    :root { color-scheme: dark; --bg:#0b0b10; --panel:#14141d; --text:#e6e6ef; --muted:#9ca3af; --line:#2a2a35; --green:#a6e3a1; --blue:#89b4fa; }
+    body { margin:0; background:var(--bg); color:var(--text); font:16px/1.75 system-ui,-apple-system,Segoe UI,sans-serif; }
+    main { max-width:920px; margin:0 auto; padding:48px 22px 80px; }
+    nav { margin:18px 0 34px; color:var(--muted); }
+    a { color:var(--blue); }
+    h1,h2,h3 { line-height:1.25; }
+    h1 { font-size:40px; margin:0 0 8px; }
+    h2 { margin-top:44px; border-top:1px solid var(--line); padding-top:28px; }
+    code, pre { font-family: ui-monospace,SFMono-Regular,Menlo,Consolas,monospace; }
+    pre { background:var(--panel); border:1px solid var(--line); border-radius:8px; padding:16px; overflow:auto; }
+    code { color:var(--green); }
+    table { width:100%; border-collapse:collapse; margin:18px 0; }
+    th,td { border:1px solid var(--line); padding:9px 10px; vertical-align:top; }
+    th { background:var(--panel); text-align:left; }
+    blockquote { margin:18px 0; padding:10px 16px; border-left:4px solid var(--green); color:var(--muted); background:#101018; }
   </style>
 </head>
 <body>
-
-<!-- Nav -->
-<nav>
-  <a href="index.html" class="nav-logo">PyCodeDJ</a>
-  <a href="manual.html" class="nav-back">English</a>
-</nav>
-
-<div class="layout">
-
-  <!-- Sidebar -->
-  <aside class="sidebar">
-    <p class="sidebar-title">目次</p>
-    <ul class="sidebar-toc">
-      <li><a href="#s1">1. PyCodeDJ って何？</a></li>
-      <li><a href="#s2">2. インストールする</a></li>
-      <li><a href="#s3">3. SuperCollider をセットアップする</a></li>
-      <li><a href="#s4">4. はじめての音を出す</a></li>
-      <li><a href="#s5">5. watch モード</a></li>
-      <li><a href="#s6">6. コードの構造が音を変える</a></li>
-      <li><a href="#s7">7. pattern() で音程とリズムを指定する</a></li>
-      <li><a href="#s8">8. 複数のループを同時に動かす</a></li>
-      <li><a href="#s9">9. 音色リファレンス</a></li>
-      <li><a href="#s10">10. 演奏のアイデア</a></li>
-      <li><a href="#s11">11. うまくいかないとき</a></li>
-      <li><a href="#s12">12. コマンドと設定の全リスト</a></li>
-      <li><a href="#s13">13. 仕組みをもっと知りたい人へ</a></li>
-    </ul>
-  </aside>
-
-  <!-- Main -->
-  <main class="main">
-    <div class="content">
-
-      <h1>PyCodeDJ マニュアル</h1>
-      <p class="intro-meta">
-        <a href="manual.html">English manual</a>
-      </p>
-
-      <blockquote><p>Python のコードを書くと、音が変わる</p></blockquote>
-
-      <hr>
-
-      <p>プログラムを書いたことがあれば、誰でも試せます。音楽の知識は不要です。SuperCollider は「名前も聞いたことがない」で大丈夫です。</p>
-      <p>このマニュアルを順番に読んでいくと、最終的に <strong>自分が書いた Python コードから音が鳴る体験</strong> ができます。セットアップも含めて 20〜30 分が目安です。</p>
-
-      <hr>
-
-      <!-- Section 1 -->
-      <section id="s1">
-        <h2>1. PyCodeDJ って何？</h2>
-
-        <h3>ひとことで言うと</h3>
-
-        <p><strong>「コードを書くこと」が「音楽を演奏すること」になるツールです。</strong></p>
-        <p><code>for</code> ループを増やすと音の揺らぎが速くなります。関数を 3 つ書くと 3 声のポリフォニーになります。コメントをたくさん書くと、リバーブが深くかかって空間が広がります。<code>pattern("x . x .")</code> と書けばそのリズムで音が鳴ります。</p>
-
-        <pre data-lang="python"><code id="code-s1-1">from pycodedj import loop, pattern
-
-# コードの「構造」が音を決める
-@loop("bass", interval=2.0)
-def bass_line(volume=0.4):
-    for i in range(8):
-        if i % 2 == 0:
-            pass
-
-# pattern() でリズムと音程を明示的に指定する
-@loop("kick", synth="floor_kick", dur=0.25)
-def kick_drum():
-    pattern("x . x .")
-
-@loop("melody", synth="acid_lead", root="A3", scale="minor", dur=0.25)
-def melody_line():
-    pattern("0 . 3 . 5 . 7 .")</code></pre>
-
-        <p>このコードをファイルに保存するだけで、音が変わります。追加説明もシンセの設定も必要ありません。</p>
-
-        <h3>何に使えるの？</h3>
-        <ul>
-          <li>ライブコーディングパフォーマンス（コードを書きながら音楽を演奏する）</li>
-          <li>コードを書く「感触」を音で感じながら開発する</li>
-          <li>プログラミングの学習に音のフィードバックを加える</li>
-        </ul>
-
-        <h3>音はどこから出るの？</h3>
-        <p>PyCodeDJ 自体は音を出しません。<strong>SuperCollider</strong>（無料のソフトウェア音響シンセサイザー）が音を出します。PyCodeDJ は「Python コードを分析して、SuperCollider にパラメーターを伝える橋渡し役」です。</p>
-
-        <pre data-lang="text"><code>あなたが書く Python コード
-        |
-        | pycodedj eval / watch を実行
-        v
-  PyCodeDJ がコードを分析
-  （どれだけネストしているか、
-    関数がいくつあるか、など）
-        |
-        | OSC という通信プロトコルで指示
-        v
-  SuperCollider が音を出す
-        |
-        v
-     スピーカー</code></pre>
-
-        <p>SuperCollider の操作は最小限で済みます。難しいことはしなくて大丈夫です。</p>
-      </section>
-
-      <hr>
-
-      <!-- Section 2 -->
-      <section id="s2">
-        <h2>2. インストールする</h2>
-
-        <h3>必要なもの</h3>
-        <ul>
-          <li>Python 3.10 以上（<code>python --version</code> で確認できます）</li>
-          <li>SuperCollider 3.12 以上（次のセクションでインストール方法を説明します）</li>
-          <li>ターミナル（コマンドを打てる環境）</li>
-        </ul>
-
-        <h3>PyCodeDJ をインストールする</h3>
-
-        <pre data-lang="bash"><code id="code-s2-1">pip install 'pycodedj[watch]'</code></pre>
-
-        <p><code>[watch]</code> を付けることで、ファイル保存を検知する <code>watch</code> コマンドも使えるようになります。これがあると演奏がずっとスムーズになるので、最初からインストールするのをおすすめします。</p>
-        <p>インストールできたか確認します。</p>
-
-        <pre data-lang="bash"><code id="code-s2-2">pycodedj --help</code></pre>
-
-        <p>次のように表示されれば成功です。</p>
-
-        <pre data-lang="text"><code>usage: pycodedj [-h] [--version] {eval,watch,panic,stop,mute,unmute,solo,unsolo,status} ...</code></pre>
-
-        <h3>SuperCollider をインストールする</h3>
-        <p>SuperCollider の公式サイト（supercollider.github.io）からインストーラーをダウンロードします。</p>
-        <ul>
-          <li>macOS: <code>.dmg</code> ファイルをダウンロードしてインストール</li>
-          <li>Linux: パッケージマネージャーか公式サイトから</li>
-          <li>Windows: <code>.exe</code> インストーラーをダウンロード</li>
-        </ul>
-        <p>インストール後に SuperCollider IDE（アプリ）を起動してください。画面が開けばインストール成功です。</p>
-      </section>
-
-      <hr>
-
-      <!-- Section 3 -->
-      <section id="s3">
-        <h2>3. SuperCollider をセットアップする</h2>
-
-        <p>SuperCollider は「音を出す担当」です。最初に一度だけ設定すれば、あとは自動的に動きます。</p>
-
-        <h3>SuperCollider で何をするの？</h3>
-        <p>PyCodeDJ では、Python は音を直接鳴らしません。Python 側はコードを分析して、OSC という短いメッセージを SuperCollider に送ります。</p>
-        <p>SuperCollider 側では、次の 3 つを行います。</p>
-        <ol>
-          <li>audio server を起動する</li>
-          <li><code>sc/synths.scd</code> を読み込んで、PyCodeDJ 用のシンセを登録する</li>
-          <li>Python から届く OSC メッセージを受け取り、音を鳴らす</li>
-        </ol>
-        <p>SuperCollider IDE には主に 2 つの場所があります。</p>
-        <ul>
-          <li>コードを書くドキュメント: <code>s.boot;</code> や <code>{ SinOsc... }.play;</code> などを入力して実行する場所</li>
-          <li>Post window: 実行結果、エラー、<code>PyCodeDJ synths loaded...</code> などのログが表示される場所</li>
-        </ul>
-        <p>このマニュアルで「SuperCollider で実行する」と書いてあるコードは、ターミナルではなく SuperCollider IDE のコードを書くドキュメントで実行します。</p>
-
-        <h3>ステップ 1: サーバーを起動する</h3>
-        <p>SuperCollider IDE を開き、メニューから <strong>Server &gt; Boot Server</strong> を選びます。</p>
-        <p>または、コード入力欄に次を書いて <strong>Ctrl+Enter</strong>（Mac は Cmd+Enter）で実行します。</p>
-
-        <pre data-lang="supercollider"><code id="code-s3-1">s.boot;</code></pre>
-
-        <p>画面下部に <code>localhost</code> が緑色に変わったら起動成功です。</p>
-        <p>この audio server が起動していないと、Python 側のコマンドが成功しても音は出ません。</p>
-
-        <h3>ステップ 2: シンセを読み込む</h3>
-        <p>PyCodeDJ のプロジェクトフォルダにある <code>sc/synths.scd</code> を SuperCollider IDE で開きます。</p>
-        <p><strong>File &gt; Open</strong> で <code>sc/synths.scd</code> を開いたら、<strong>Ctrl+A</strong>（Mac は Cmd+A）で全選択し、<strong>Ctrl+Enter</strong>（Mac は Cmd+Enter）で実行します。</p>
-        <p>右側の Post window に次のメッセージが出れば準備完了です。</p>
-
-        <pre data-lang="text"><code>PyCodeDJ synths loaded. Ready. OSC port: 57120</code></pre>
-
-        <p>このメッセージが出ない場合は <a href="#s11">うまくいかないとき</a> を参照してください。</p>
-        <p><code>sc/synths.scd</code> は、PyCodeDJ 用の音色と OSC 受信処理を SuperCollider に登録するファイルです。SuperCollider を再起動した後は、もう一度このファイルを実行してください。</p>
-
-        <h3>ステップ 3: 出力先を変更した場合</h3>
-        <p>SuperCollider は audio server を起動した時点の出力先を使います。Mac/PC 側でスピーカー、イヤホン、オーディオインターフェースなどの出力先を変更した場合は、SuperCollider の audio server を起動し直してください。</p>
-        <p>まず SuperCollider IDE のコードを書くドキュメントで、使えるデバイス名を確認します。これはターミナルではなく SuperCollider で実行します。</p>
-
-        <pre data-lang="supercollider"><code id="code-s3-2">ServerOptions.devices;</code></pre>
-
-        <p>Post window にデバイス名の一覧が表示されます。使いたい出力先の名前を確認したら、同じく SuperCollider IDE のコードを書くドキュメントで次のように指定します。</p>
-
-        <pre data-lang="supercollider"><code id="code-s3-3">s.quit;
-s.options.outDevice = "ここに出力デバイス名を書く";
-s.options.numInputBusChannels = 0;
-s.boot;</code></pre>
-
-        <p>入力を使わない場合は <code>numInputBusChannels = 0</code> にしておくと、入力デバイスとのサンプルレート不一致を避けやすくなります。</p>
-        <p>boot 後、SuperCollider 単体で音が出るか確認します。</p>
-
-        <pre data-lang="supercollider"><code id="code-s3-4">{ SinOsc.ar(110, 0, 0.03) ! 2 }.play;</code></pre>
-
-        <p>音が出たら、<code>sc/synths.scd</code> をもう一度実行します（Ctrl+A → Ctrl+Enter、Mac は Cmd+A → Cmd+Enter）。</p>
-
-        <h3>ステップ 4: 接続を確認する</h3>
-        <p>ターミナルに戻り、次を実行します。</p>
-
-        <pre data-lang="bash"><code id="code-s3-5">pycodedj eval examples/demo.py::bass</code></pre>
-
-        <p>ターミナルに <code>[pycodedj] bass ...</code> と表示され、SuperCollider から音が出れば接続成功です。</p>
-        <p>SuperCollider はこのまま起動したままにしておいてください。</p>
-      </section>
-
-      <hr>
-
-      <!-- Section 4 -->
-      <section id="s4">
-        <h2>4. はじめての音を出す</h2>
-
-        <h3>ステップ 1: デモファイルを確認する</h3>
-        <p><code>examples/demo.py</code> を開いてみましょう。</p>
-
-        <pre data-lang="python"><code id="code-s4-1">from pycodedj import loop
-
-@loop("bass", interval=2.0)
-def bass(volume=0.4):
-    for i in range(8):
-        if i % 2 == 0:
-            pass
-
-@loop("melody", interval=0.5)
-def melody(volume=0.3):
-    x = 1
-    y = 2
-    return x + y
-
-@loop("pad", interval=4.0)
-def pad(volume=0.15):
-    # ここに余白を置く
-    # もう少し置く
-    # 静寂も音楽
-    pass</code></pre>
-
-        <p><code>@loop("bass", ...)</code> が付いた関数が「bass ループ」です。関数名（<code>bass</code>, <code>melody</code>, <code>pad</code>）は自由につけられます。OSC に送られる名前は <code>@loop(...)</code> の第一引数です。</p>
-
-        <h3>ステップ 2: 音を出す</h3>
-        <p>ターミナルで次を実行します。</p>
-
-        <pre data-lang="bash"><code id="code-s4-2">pycodedj eval examples/demo.py::bass</code></pre>
-
-        <p><code>eval</code> は evaluate（評価する）の略です。このコマンドは <code>examples/demo.py</code> の <code>bass</code> ループを今すぐ読み取り、コード構造を分析して SuperCollider に音のパラメーターを送ります。</p>
-        <p>成功すると次のように表示されます。</p>
-
-        <pre data-lang="text"><code>[pycodedj] bass  cutoff=418Hz  lfo=1.08Hz  reverb=0.00  voices=1  amp=0.40</code></pre>
-
-        <p>これがあなたの最初のライブコーディングです。続けて melody と pad も評価してみましょう。</p>
-
-        <pre data-lang="bash"><code id="code-s4-3">pycodedj eval examples/demo.py::melody
-pycodedj eval examples/demo.py::pad</code></pre>
-
-        <p>3 つのループが同時に鳴っています。それぞれが独立して動いているのがわかるでしょうか。</p>
-
-        <h3>ステップ 3: コードを変えて音を変える</h3>
-        <p><code>examples/demo.py</code> をテキストエディタで開いて、bass ブロックを変えてみます。</p>
-
-        <p><strong>変更前:</strong></p>
-        <pre data-lang="python"><code id="code-s4-4">@loop("bass", interval=2.0)
-def bass(volume=0.4):
-    for i in range(8):
-        if i % 2 == 0:
-            pass</code></pre>
-
-        <p><strong>変更後（ネストを深くする）:</strong></p>
-        <pre data-lang="python"><code id="code-s4-5">@loop("bass", interval=2.0)
-def bass(volume=0.4):
-    for i in range(8):
-        for j in range(4):      # 1 行追加
-            if i % 2 == 0:
-                if j > 2:       # 1 行追加
-                    pass</code></pre>
-
-        <p>ファイルを保存したら、ターミナルで再度評価します。</p>
-
-        <pre data-lang="bash"><code id="code-s4-6">pycodedj eval examples/demo.py::bass</code></pre>
-
-        <pre data-lang="text"><code>[pycodedj] bass  cutoff=1200Hz  lfo=2.16Hz  reverb=0.00  voices=1  amp=0.40</code></pre>
-
-        <p>cutoff が上がって音が明るくなり、lfo も速くなりました。音量を変えたいときは <code>volume=</code> の値を変えます。</p>
-
-        <pre data-lang="python"><code id="code-s4-7">@loop("bass", interval=2.0)
-def bass(volume=0.7):   # ← 大きくする
-    ...</code></pre>
-      </section>
-
-      <hr>
-
-      <!-- Section 5 -->
-      <section id="s5">
-        <h2>5. 保存するだけで音が変わる — watch モード</h2>
-
-        <p>毎回 <code>pycodedj eval</code> を打つのは面倒です。<code>watch</code> コマンドを使うと、起動時に一度すべてのループを評価し、その後は<strong>ファイルを保存するだけで変更されたループだけが再評価されます</strong>。</p>
-
-        <h3>起動方法</h3>
-
-        <pre data-lang="bash"><code id="code-s5-1">pycodedj watch examples/demo.py</code></pre>
-
-        <pre data-lang="text"><code>[pycodedj] watching demo.py — save to reload (Ctrl+C to stop)
-[pycodedj] reloaded demo.py (3 loop(s))</code></pre>
-
-        <p>起動直後に一度音が鳴ります。あとはエディタでコードを書いて保存するだけです。変更していないループは再送信されず、そのまま鳴り続けます。保存のたびに次のように出力されます。</p>
-
-        <pre data-lang="text"><code>[pycodedj] reloaded demo.py (3 loop(s))</code></pre>
-
-        <p>これがライブコーディングの本来のワークフローです。コードを書く → 保存する → 音が変わる、このサイクルを繰り返します。</p>
-
-        <h3>止め方</h3>
-        <p>ターミナルで <strong>Ctrl+C</strong> を押すと監視が止まります。SuperCollider の音はそのまま鳴り続けます。</p>
-
-        <h3>デバウンスについて</h3>
-        <p>連続して保存したとき（vim のような一部のエディタは保存時にテンポラリファイルを経由する）でも、短時間に複数回評価されないよう自動的に間引きます。<code>--debounce</code> オプションでその待機時間を変更できます（デフォルト 0.3 秒）。</p>
-
-        <pre data-lang="bash"><code id="code-s5-2">pycodedj watch demo.py --debounce 0.5</code></pre>
-      </section>
-
-      <hr>
-
-      <!-- Section 6 -->
-      <section id="s6">
-        <h2>6. コードの構造が音を変える</h2>
-
-        <p>PyCodeDJ は Python コードの「構造」を 5 つの音楽パラメーターに変換します。</p>
-
-        <h3>対応表</h3>
-        <table>
-          <thead>
-            <tr>
-              <th>コードのどこを見るか</th>
-              <th>変わる音のパラメーター</th>
-              <th>変化のイメージ</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td>ブロック構造の深さ（<code>if</code> や <code>for</code> のネスト）</td>
-              <td>フィルターの明るさ（Cutoff）</td>
-              <td>深くなるほど音が明るく開く</td>
-            </tr>
-            <tr>
-              <td>制御フローの数（<code>if</code> / <code>for</code> / <code>while</code> の合計）</td>
-              <td>音の揺らぎの速さ（LFO レート）</td>
-              <td>多いほど揺らぎが速くなる</td>
-            </tr>
-            <tr>
-              <td>関数の数（<code>def</code> の数）</td>
-              <td>音の重なり（ポリフォニー声部数）</td>
-              <td>多いほど音が重なる（最大 4）</td>
-            </tr>
-            <tr>
-              <td>コメントの割合（コメント行 ÷ 全行）</td>
-              <td>空間の広さ（リバーブの深さ）</td>
-              <td>多いほど残響が増える</td>
-            </tr>
-            <tr>
-              <td><code>volume=</code> 引数のデフォルト値</td>
-              <td>音量（Amplitude）</td>
-              <td>直接指定。0.0〜1.0</td>
-            </tr>
-            <tr>
-              <td><code>eq=</code> / <code>low=</code> / <code>mid=</code> / <code>high=</code> 引数</td>
-              <td>簡易 3 バンド EQ</td>
-              <td>ループごとの音質補正</td>
-            </tr>
-          </tbody>
-        </table>
-
-        <h3>実例で見る</h3>
-
-        <h4>フィルターの明るさ（ネストの深さ）</h4>
-
-        <pre data-lang="python"><code id="code-s6-1">@loop("test", interval=1.0)
-def f(volume=0.3):
-    # ネスト深さ 1 → フィルター最小（こもった音）
-    pass</code></pre>
-
-        <pre data-lang="python"><code id="code-s6-2">@loop("test", interval=1.0)
-def f(volume=0.3):
-    # ネスト深さ 4 → フィルター最大（明るい音）
-    for i in range(4):
-        for j in range(4):
-            if i == j:
-                pass</code></pre>
-
-        <blockquote>
-          <p><code>x = 1 + 2 * (3 + 4)</code> のような演算式はネストの深さにカウントされません。<code>if</code> や <code>for</code> などのブロック構造だけを数えます。</p>
-        </blockquote>
-
-        <h4>揺らぎの速さ（制御フローの数）</h4>
-
-        <pre data-lang="python"><code id="code-s6-3">@loop("test", interval=1.0)
-def f(volume=0.3):
-    # 制御フロー 0 個 → 揺らぎ最小（ゆったり）
-    pass</code></pre>
-
-        <pre data-lang="python"><code id="code-s6-4">@loop("test", interval=1.0)
-def f(volume=0.3):
-    for i in range(4):   # 1 つ目
-        if i > 2:        # 2 つ目
-            while False: # 3 つ目
-                pass</code></pre>
-
-        <h4>音の重なり（関数の数）</h4>
-
-        <pre data-lang="python"><code id="code-s6-5">@loop("test", interval=1.0)
-def solo(volume=0.3):
-    # 関数 1 個 → 1 声（ソロ）
-    pass</code></pre>
-
-        <pre data-lang="python"><code id="code-s6-6">@loop("test", interval=1.0)
-def f(volume=0.3):
-    # 関数 4 個 → 4 声（最大ポリフォニー）
-    def voice_a(): pass
-    def voice_b(): pass
-    def voice_c(): pass
-    def voice_d(): pass</code></pre>
-
-        <h4>空間の広さ（コメント率）</h4>
-
-        <pre data-lang="python"><code id="code-s6-7">@loop("test", interval=1.0)
-def f(volume=0.3):
-    # コメントなし → ドライな音
-    x = 1
-    return x</code></pre>
-
-        <pre data-lang="python"><code id="code-s6-8">@loop("test", interval=1.0)
-def f(volume=0.3):
-    # コメントが多い → 深い残響
-    # 余白
-    # 余白
-    # 余白
-    pass</code></pre>
-
-        <h4>音量（volume 引数）</h4>
-
-        <pre data-lang="python"><code id="code-s6-9">@loop("kick", interval=1.0)
-def my_kick(volume=0.9):   # 大きい
-    ...
-
-@loop("shimmer", interval=4.0)
-def bg_shimmer(volume=0.05):  # 奥で小さく
-    ...</code></pre>
-
-        <h4>簡易 EQ</h4>
-        <p><code>eq=</code> でジャンル寄りの EQ プリセットを選べます。必要なら <code>low=</code>, <code>mid=</code>, <code>high=</code> で一部だけ上書きできます。</p>
-
-        <pre data-lang="python"><code id="code-s6-10">@loop("bass_reese", interval=0.5)
-def bass(volume=0.45, eq="edm"):
-    ...
-
-@loop("hat_engine", interval=0.25)
-def hats(volume=0.08, eq="edm", low=0.5, high=1.25):
-    ...</code></pre>
-
-        <table>
-          <thead>
-            <tr><th><code>eq</code></th><th>傾向</th></tr>
-          </thead>
-          <tbody>
-            <tr><td><code>"flat"</code></td><td>補正なし</td></tr>
-            <tr><td><code>"rock"</code> / <code>"pop"</code></td><td>低音と高音を少し上げ、中域を少し下げる</td></tr>
-            <tr><td><code>"edm"</code> / <code>"hiphop"</code></td><td>低音を強め、高音も少し上げる</td></tr>
-            <tr><td><code>"classic"</code> / <code>"jazz"</code></td><td>フラット志向</td></tr>
-            <tr><td><code>"acoustic"</code></td><td>低音を控えめにして中高域を少し上げる</td></tr>
-          </tbody>
-        </table>
-      </section>
-
-      <hr>
-
-      <!-- Section 7 -->
-      <section id="s7">
-        <h2>7. pattern() で音程とリズムを指定する</h2>
-
-        <p>前章の「コード構造が音を変える」とは別に、<strong>明示的にリズムと音程を指定する</strong>方法があります。それが <code>pattern()</code> です。</p>
-
-        <h3>基本</h3>
-
-        <pre data-lang="python"><code id="code-s7-1">from pycodedj import loop, pattern
-
-@loop("kick", synth="floor_kick", dur=0.25)
-def kick_drum():
-    pattern("x . x .")</code></pre>
-
-        <p><code>pattern()</code> に渡す文字列に、鳴らすタイミングを書きます。スペースで区切ると 1 ステップです。</p>
-
-        <table>
-          <thead><tr><th>トークン</th><th>意味</th></tr></thead>
-          <tbody>
-            <tr><td><code>x</code></td><td>ここで音を鳴らす（トリガー）</td></tr>
-            <tr><td><code>.</code></td><td>休符（無音）</td></tr>
-            <tr><td><code>0</code>, <code>1</code>, <code>2</code> …</td><td>音を鳴らす + 音程（スケール度数）</td></tr>
-            <tr><td><code>[0 3]</code></td><td>コード（複数の度数を同時発音）</td></tr>
-            <tr><td><code>~</code></td><td>タイ（直前の音を 1 ステップ延長）</td></tr>
-          </tbody>
-        </table>
-
-        <h3>@loop のパラメーター（pattern 用）</h3>
-
-        <p><strong>音色は <code>synth=</code> で指定します。</strong> <code>@loop("bass", synth="floor_kick")</code> と書くと、ループ名は <code>bass</code> のまま、鳴る音色だけが <code>floor_kick</code> になります。</p>
-
-        <table>
-          <thead><tr><th>引数</th><th>説明</th><th>例</th></tr></thead>
-          <tbody>
-            <tr><td><code>synth=</code></td><td>使うシンセ名</td><td><code>synth="floor_kick"</code></td></tr>
-            <tr><td><code>root=</code></td><td>ルートノート</td><td><code>root="A3"</code>, <code>root="C4"</code></td></tr>
-            <tr><td><code>scale=</code></td><td>スケール名</td><td><code>scale="minor"</code>, <code>scale="major"</code></td></tr>
-            <tr><td><code>dur=</code></td><td>1 ステップの長さ（秒）</td><td><code>dur=0.25</code>（16 分音符相当）</td></tr>
-          </tbody>
-        </table>
-
-        <blockquote>
-          <p><code>@loop("kick", synth="floor_kick")</code> の <code>"kick"</code> はループ名、<code>"floor_kick"</code> は音色名です。<code>pycodedj eval demo.py::kick</code> や <code>pycodedj mute kick</code> ではループ名を使います。</p>
-        </blockquote>
-
-        <h3>トリガーパターン — x と . だけで</h3>
-
-        <p>音程なしで「リズムだけ」を指定したいときは <code>x</code> と <code>.</code> だけ使います。</p>
-
-        <pre data-lang="python"><code id="code-s7-2">@loop("kick", synth="floor_kick", dur=0.25)
-def kick():
-    pattern("x . x .")      # 4 ステップ
-
-@loop("hat", synth="hat_engine", dur=0.25)
-def hat():
-    pattern("x x x x x x x x")  # 8 ステップ（16 分グリッド）
-
-@loop("snare", synth="clap_snare", dur=0.25)
-def snare():
-    pattern(". . x . . . x .")   # 2・4 拍に鳴る</code></pre>
-
-        <h3>音程パターン — 度数（整数）で指定する</h3>
-
-        <p>音程を指定したいときは整数（0 以上）を使います。数字はスケールの<strong>度数</strong>（0 から数えるインデックス）です。</p>
-
-        <pre data-lang="python"><code id="code-s7-3">@loop("melody", synth="acid_lead", root="A3", scale="minor", dur=0.25)
-def melody():
-    pattern("0 . 3 . 5 . 7 .")</code></pre>
-
-        <p><code>scale="minor"</code> で <code>root="A3"</code> のとき、度数と音程の対応はこうなります。</p>
-
-        <table>
-          <thead><tr><th>度数</th><th>A ナチュラルマイナー</th></tr></thead>
-          <tbody>
-            <tr><td><code>0</code></td><td>A3</td></tr>
-            <tr><td><code>1</code></td><td>B3</td></tr>
-            <tr><td><code>2</code></td><td>C4</td></tr>
-            <tr><td><code>3</code></td><td>D4</td></tr>
-            <tr><td><code>4</code></td><td>E4</td></tr>
-            <tr><td><code>5</code></td><td>F4</td></tr>
-            <tr><td><code>6</code></td><td>G4</td></tr>
-            <tr><td><code>7</code></td><td>A4（1 オクターブ上）</td></tr>
-          </tbody>
-        </table>
-
-        <blockquote><p>度数が 7 以上になると自動的にオクターブが上がります。<code>7</code> は <code>0</code> の 1 オクターブ上、<code>14</code> は 2 オクターブ上です。</p></blockquote>
-
-        <h3>利用可能なスケール（主なもの）</h3>
-
-        <table>
-          <thead><tr><th><code>scale=</code></th><th>スケール</th></tr></thead>
-          <tbody>
-            <tr><td><code>"major"</code></td><td>メジャー（長調）</td></tr>
-            <tr><td><code>"minor"</code></td><td>ナチュラルマイナー（短調）</td></tr>
-            <tr><td><code>"chromatic"</code></td><td>クロマチック（半音階）</td></tr>
-            <tr><td><code>"dorian"</code></td><td>ドリアン</td></tr>
-            <tr><td><code>"pentatonicMajor"</code></td><td>メジャーペンタトニック</td></tr>
-            <tr><td><code>"pentatonicMinor"</code></td><td>マイナーペンタトニック</td></tr>
-          </tbody>
-        </table>
-
-        <h3>コード — 複数の音を同時に鳴らす</h3>
-
-        <p>角括弧で複数の度数を囲むと、1 ステップで複数の音を同時に鳴らせます。</p>
-
-        <pre data-lang="python"><code id="code-s7-chord">@loop("chord", synth="note", root="C3", scale="minor", dur=0.5)
-def chord():
-    pattern("[0 2 4] . [0 3] .")
-    # [0 2 4]→C3+Eb3+G3（短三和音）, 休, [0 3]→C3+Eb3, 休</code></pre>
-
-        <p>コード内に書けるのは <strong>0 以上の整数のみ</strong>です。<code>.</code>・<code>x</code>・<code>~</code> は書けません。</p>
-
-        <h3>タイ — 音を伸ばす</h3>
-
-        <p><code>~</code> を使うと、直前の音（またはコード）を次のステップまで伸ばせます。</p>
-
-        <pre data-lang="python"><code id="code-s7-tie">@loop("bass", synth="note", root="A1", scale="minor", dur=0.25)
+<main>
+  <h1>PyCodeDJ マニュアル</h1>
+  <blockquote>Python コードを書く。保存する。音が変わる。</blockquote>
+  <nav><a href="index.html">Home</a> · <a href="manual.html">English</a> · <a href="https://github.com/kanekoyuichi/pycodedj">GitHub</a></nav>
+
+  <h2>1. PyCodeDJ とは</h2>
+  <p>PyCodeDJ は Python のソースコードをライブ演奏に変換するツールです。ファイルを AST 解析し、<code>@loop</code> が付いた関数の構造と <code>dj.*</code> のメタ情報を読み取って SuperCollider に OSC を送ります。</p>
+<pre><code>from pycodedj import dj, loop
+
+@loop(interval=2.0)
 def bass():
-    pattern("0 . [0 3] ~ 5 . 3 .")
-    # 0→A1, 休, [0 3]→和音（2ステップ持続）, 5→F2, 休, 3→D2, 休</code></pre>
-
-        <p><code>~</code> は単音・コードの直後にのみ書けます。先頭・<code>.</code> や <code>x</code> の直後は書けません。</p>
-
-        <h3>実例: キック・ベース・メロディー</h3>
-
-        <pre data-lang="python"><code id="code-s7-4">from pycodedj import loop, pattern
-
-@loop("kick", synth="floor_kick", dur=0.25)
-def kick():
-    pattern("x . . . x . . .")
-
-@loop("bass", synth="bass_acid", root="A1", scale="minor", dur=0.25)
-def bass():
-    pattern("0 . [0 3] ~ 5 . 3 .")
-    # 0→A1, 休, [0 3]→和音（2ステップ持続）, 5→F2, 休, 3→D2, 休
-
-@loop("melody", synth="acid_lead", root="A3", scale="minor", dur=0.5)
-def melody():
-    pattern("0 3 5 7")
-
-@loop("pad", interval=4.0)
-def pad(volume=0.06):
-    # 背景の空気感
-    # コード構造で鳴らす
-    pass</code></pre>
-
-        <h3>pattern() と構造マッピングの違い</h3>
-
-        <table>
-          <thead><tr><th></th><th>コード構造マッピング（従来）</th><th>pattern()</th></tr></thead>
-          <tbody>
-            <tr><td>リズム</td><td>コードの構造から自動生成</td><td>自分で指定</td></tr>
-            <tr><td>音程</td><td>コードの構造から自動生成</td><td>自分で指定（または任せる）</td></tr>
-            <tr><td>使いどき</td><td>構造の変化を楽しみたい</td><td>リズム・音程を明示したい</td></tr>
-          </tbody>
-        </table>
-
-        <p>どちらも同じファイルの中で自由に混在させられます。</p>
-      </section>
-
-      <hr>
-
-      <!-- Section 8 -->
-      <section id="s8">
-        <h2>8. 複数のループを同時に動かす</h2>
-
-        <p>PyCodeDJ の最大の特徴は、<strong>複数のループが独立して動き続ける</strong>ことです。1 つのループを変更しても、他のループは止まりません。</p>
-
-        <h3>基本の使い方</h3>
-
-        <pre data-lang="python"><code id="code-s8-1">from pycodedj import loop, pattern
-
-@loop("kick", synth="floor_kick", dur=0.25)
-def kick():
-    pattern("x . x .")
-
-@loop("bass", interval=2.0)
-def bass_line(volume=0.4):
+    dj.volume = 0.4
     for i in range(8):
         if i % 2 == 0:
             pass
 
-@loop("pad", interval=4.0)
-def atmosphere(volume=0.08):
-    # 背景の空気
-    # 余白
+@loop(synth="kick_floor", beat=0.25)
+def kick():
+    dj.volume = 0.8
+    dj.pattern = "x . x ."</code></pre>
+  <p>関数名がループ名になります。<code>pycodedj eval demo.py::bass</code> のように指定します。</p>
+
+  <h2>2. インストールと起動</h2>
+<pre><code>pip install 'pycodedj[watch]'</code></pre>
+  <p>SuperCollider IDE で <code>sc/synths.scd</code> を実行し、次の表示を確認します。</p>
+<pre><code>PyCodeDJ synths loaded. Ready. OSC port: 57120</code></pre>
+<pre><code>pycodedj eval examples/demo.py::bass</code></pre>
+
+  <h2>3. ループの基本構文</h2>
+<pre><code>from pycodedj import dj, loop
+
+@loop(interval=1.0)
+def loop_name():
+    dj.volume = 0.3
+    dj.eq = "flat"
     pass</code></pre>
+  <table>
+    <tr><th>設定</th><th>意味</th><th>デフォルト</th></tr>
+    <tr><td><code>dj.volume</code></td><td>音量。0.0〜1.0</td><td><code>0.3</code></td></tr>
+    <tr><td><code>dj.eq</code></td><td>EQ プリセット</td><td><code>"flat"</code></td></tr>
+    <tr><td><code>dj.low/mid/high</code></td><td>帯域別 EQ 上書き。0.0〜2.0</td><td>プリセット値</td></tr>
+    <tr><td><code>dj.pattern</code></td><td>リズムと音程のパターン</td><td>なし</td></tr>
+  </table>
+<pre><code>@loop(interval=0.25)
+def hats():
+    dj.volume = 0.08
+    dj.eq = "edm"
+    dj.low = 0.5
+    dj.high = 1.25</code></pre>
+  <table>
+    <tr><th>プリセット</th><th>傾向</th></tr>
+    <tr><td><code>"flat"</code></td><td>補正なし</td></tr>
+    <tr><td><code>"classic"</code> / <code>"classical"</code></td><td>低域と高域を控えめにして中域を少し出す</td></tr>
+    <tr><td><code>"jazz"</code></td><td>暖かい低域、中域の存在感、少し柔らかい高域</td></tr>
+    <tr><td><code>"rock"</code> / <code>"pop"</code></td><td>低域と高域を少し上げる</td></tr>
+    <tr><td><code>"edm"</code> / <code>"hiphop"</code></td><td>低域を強める</td></tr>
+    <tr><td><code>"acoustic"</code></td><td>低域を控えめにして中高域を少し上げる</td></tr>
+  </table>
 
-        <p>watch で起動すれば、保存するたびに変更したループだけが更新されます。</p>
+  <h2>4. コード構造マッピング</h2>
+  <p><code>dj.pattern</code> がないループでは、関数本体の形が音になります。</p>
+  <table>
+    <tr><th>読み取るもの</th><th>音楽パラメーター</th><th>効果</th></tr>
+    <tr><td>ブロックの最大ネスト深度</td><td>フィルター cutoff</td><td>深いほど明るい</td></tr>
+    <tr><td><code>if</code> / <code>for</code> / <code>while</code> の数</td><td>LFO レート</td><td>多いほど速い</td></tr>
+    <tr><td>ネストした <code>def</code> の数</td><td>声部数</td><td>多いほど厚い</td></tr>
+    <tr><td>コメント率</td><td>リバーブ</td><td>コメントが多いほど空間が広い</td></tr>
+  </table>
 
-        <pre data-lang="bash"><code id="code-s8-2">pycodedj watch myfile.py</code></pre>
+  <h2>5. dj.pattern でリズムと音程を指定する</h2>
+<pre><code>@loop(synth="bass_acid", root="A1", scale="minor", beat=0.25)
+def bass():
+    dj.volume = 0.35
+    dj.pattern = "0 . [0 3] ~ 5 . 3 ."</code></pre>
+  <table>
+    <tr><th>トークン</th><th>意味</th></tr>
+    <tr><td><code>x</code></td><td>ルート音で鳴らす</td></tr>
+    <tr><td><code>.</code></td><td>休符</td></tr>
+    <tr><td><code>0</code>, <code>1</code>, ...</td><td>スケール度数</td></tr>
+    <tr><td><code>[0 3]</code></td><td>コード</td></tr>
+    <tr><td><code>~</code></td><td>タイ</td></tr>
+  </table>
+  <p><code>dj.pattern = p1</code> のような変数参照は読み取りません。パターン文字列はループ本体に直接書いてください。</p>
 
-        <h3>重低音クラブセットを試す</h3>
+  <h2>6. 複数ループ</h2>
+<pre><code>@loop(synth="kick_floor", beat=0.25)
+def kick():
+    dj.volume = 0.8
+    dj.pattern = "x . x ."
 
-        <p><code>examples/club_set.py</code> は、クラブのフロアで鳴る低域を意識したサンプルです。4つ打ちキック、2・4拍のクラップ、オフビートハット、16分ハット、ランブル、サブベース、アシッドベース、スタブ、フィル、空間ノイズを重ねています。</p>
+@loop(interval=4.0)
+def pad():
+    dj.volume = 0.08
+    # 広い空間
+    pass</code></pre>
+<pre><code>pycodedj watch examples/demo.py</code></pre>
 
-        <pre data-lang="bash"><code id="code-s8-3">pycodedj watch examples/club_set.py</code></pre>
-
-        <p>主なループ名は次の通りです。<code>mute</code> / <code>unmute</code> で足し引きすると、クラブトラックのレイヤー構造がわかりやすくなります。</p>
-
-        <table>
-          <thead><tr><th>ループ名</th><th>役割</th><th>音色名</th></tr></thead>
-          <tbody>
-            <tr><td><code>kick</code></td><td>4つ打ちの土台</td><td><code>floor_kick</code></td></tr>
-            <tr><td><code>rumble</code></td><td>床鳴りする低域</td><td><code>bass_rumble</code></td></tr>
-            <tr><td><code>sub</code> / <code>floor</code></td><td>持続する重低音</td><td><code>sub_bass</code></td></tr>
-            <tr><td><code>acid</code></td><td>動くベースライン</td><td><code>bass_acid</code></td></tr>
-            <tr><td><code>offhat</code> / <code>hats</code></td><td>グルーヴの推進力</td><td><code>hat_ride</code>, <code>hat_engine</code></td></tr>
-            <tr><td><code>room</code></td><td>倉庫のような空間感</td><td><code>warehouse_air</code></td></tr>
-          </tbody>
-        </table>
-
-        <h3>演奏中のコントロール</h3>
-
-        <pre data-lang="bash"><code id="code-s8-4">pycodedj stop bass        # bass を停止する
-pycodedj mute bass        # bass を消音（停止はしない）
-pycodedj unmute bass      # bass の音量を元に戻す
-pycodedj panic            # すべてのループを即時停止
-pycodedj status           # ループの状態を確認</code></pre>
-
-        <h3>ループを削除するには</h3>
-        <p>ファイルからそのブロック（<code>@loop</code> デコレータごと関数）を削除して保存します。watch モードなら保存時に自動的に停止します。</p>
-
-        <h3>サンプルファイル</h3>
-        <table>
-          <thead><tr><th>ファイル</th><th>内容</th></tr></thead>
-          <tbody>
-            <tr><td><code>examples/demo.py</code></td><td>bass / melody / pad の 3 ループ入門デモ</td></tr>
-            <tr><td><code>examples/club_set.py</code></td><td>重低音クラブセット（キック、ランブル、サブ、アシッド、ハット、空間ノイズを含む 11 ループ）</td></tr>
-            <tr><td><code>examples/sound_showcase.py</code></td><td>全 30 音色 — 1 音ずつ eval して確認できる</td></tr>
-          </tbody>
-        </table>
-      </section>
-
-      <hr>
-
-      <!-- Section 9 -->
-      <section id="s9">
-        <h2>9. 音色リファレンス</h2>
-
-        <p>PyCodeDJ では <strong>ループ名</strong> と <strong>音色名</strong> を分けて考えます。</p>
-
-        <ul>
-          <li>ループ名: <code>@loop("kick", ...)</code> の第一引数。<code>pycodedj eval demo.py::kick</code>、<code>mute</code>、<code>solo</code> などで指定する名前</li>
-          <li>音色名: SuperCollider 側のシンセ名。pattern ループでは <code>synth="floor_kick"</code> のように指定する名前</li>
-        </ul>
-
-        <p>音色を選ぶときは、下の表から音色名を選んで <code>synth=</code> に入れます。たとえば <code>@loop("bass", synth="floor_kick")</code> は、<code>bass</code> というループ名で <code>floor_kick</code> の音色を鳴らします。</p>
-
-        <p><code>pattern()</code> を使う場合は、<code>@loop("kick", synth="floor_kick")</code> のように、短いループ名と具体的な音色名を分けて書けます。</p>
-
-        <p><code>pattern()</code> を使わない構造マッピングのループでは、互換性のためにループ名と同じ名前の音色があればそれが使われます。たとえば <code>@loop("bass_acid", interval=0.5)</code> は <code>bass_acid</code> 音色で鳴ります。</p>
-
-        <p>全 30 音色を 1 音ずつ確認したい場合は <code>examples/sound_showcase.py</code> を使います。</p>
-
-        <pre data-lang="bash"><code id="code-s9-1">pycodedj eval examples/sound_showcase.py::floor_kick
+  <h2>7. 音色リファレンス</h2>
+  <p><code>synth=</code> に SuperCollider の音色名を指定します。関数名はループ名のままで、<code>synth=</code> は鳴らす音色だけを選びます。</p>
+<pre><code>@loop(synth="bass_acid", root="A1", scale="minor", beat=0.25)
+def acid():
+    dj.volume = 0.25
+    dj.pattern = "0 . 3 . 5 ."</code></pre>
+  <p>全音色を 1 つずつ試聴:</p>
+<pre><code>pycodedj eval examples/sound_showcase.py::kick_floor
 pycodedj eval examples/sound_showcase.py::bass_acid
-pycodedj eval examples/sound_showcase.py::acid_lead</code></pre>
-
-        <p><code>examples/sound_showcase.py</code> では試聴しやすいように、ループ名を音色名と同じにしています。通常の pattern ループでは、次のように <code>synth=</code> にこの表の音色名を指定します。</p>
-
-        <pre data-lang="python"><code id="code-s9-2">@loop("kick", synth="floor_kick", dur=0.25)
-def kick():
-    pattern("x . x .")</code></pre>
-
-        <h3>キック</h3>
-        <table>
-          <thead>
-            <tr><th>音色名</th><th>音</th></tr>
-          </thead>
-          <tbody>
-            <tr><td><code>kick_hard</code></td><td>硬めでアタックの強いキック</td></tr>
-            <tr><td><code>floor_kick</code></td><td>太い四つ打ちキック</td></tr>
-            <tr><td><code>kick_pulse</code></td><td>軽めのパルスキック</td></tr>
-          </tbody>
-        </table>
-
-        <h3>ベース</h3>
-        <table>
-          <thead>
-            <tr><th>音色名</th><th>音</th></tr>
-          </thead>
-          <tbody>
-            <tr><td><code>bass_rumble</code></td><td>キック由来の低いランブル</td></tr>
-            <tr><td><code>bass_reese</code></td><td>揺れる Reese 系ベース</td></tr>
-            <tr><td><code>sub_bass</code></td><td>サブベース</td></tr>
-            <tr><td><code>bass_acid</code></td><td>303スタイルのアシッドベース（スクウェルチ付き）</td></tr>
-          </tbody>
-        </table>
-
-        <h3>パーカッション</h3>
-        <table>
-          <thead>
-            <tr><th>音色名</th><th>音</th></tr>
-          </thead>
-          <tbody>
-            <tr><td><code>hat_engine</code></td><td>クローズ/オープンのハットグリッド</td></tr>
-            <tr><td><code>hat_ride</code></td><td>長めのライド/オープンハット</td></tr>
-            <tr><td><code>clap_snap</code></td><td>鋭いクラップ</td></tr>
-            <tr><td><code>clap_snare</code></td><td>スネア寄りのクラップ</td></tr>
-            <tr><td><code>tom_drum</code></td><td>フロアタム（ピッチスイープあり）</td></tr>
-            <tr><td><code>snare_roll</code></td><td>スネアロール（lfoRate で速度制御）</td></tr>
-            <tr><td><code>noise_crash</code></td><td>クラッシュシンバル（長いテール）</td></tr>
-          </tbody>
-        </table>
-
-        <h3>コード・スタブ</h3>
-        <table>
-          <thead>
-            <tr><th>音色名</th><th>音</th></tr>
-          </thead>
-          <tbody>
-            <tr><td><code>chord_rave</code></td><td>明るいレイブスタブ</td></tr>
-            <tr><td><code>neon_stab</code></td><td>ネオン系スタブコード</td></tr>
-            <tr><td><code>dub_chord</code></td><td>ダブコード</td></tr>
-            <tr><td><code>stab_saw</code></td><td>デチューンソーコードスタブ</td></tr>
-            <tr><td><code>organ_chord</code></td><td>ハモンドオルガン風コード</td></tr>
-            <tr><td><code>bell_rave</code></td><td>インハーモニクスFMレイブベル</td></tr>
-          </tbody>
-        </table>
-
-        <h3>リード・メロディー</h3>
-        <table>
-          <thead>
-            <tr><th>音色名</th><th>音</th></tr>
-          </thead>
-          <tbody>
-            <tr><td><code>acid_lead</code></td><td>アシッド系リード</td></tr>
-            <tr><td><code>lead_hoover</code></td><td>Hoover 風リード</td></tr>
-            <tr><td><code>soft_pluck</code></td><td>やわらかいプラック</td></tr>
-            <tr><td><code>synth_arp</code></td><td>アルペジオシンセ</td></tr>
-            <tr><td><code>note</code></td><td>汎用ノートシンセ（音程パターン向け）</td></tr>
-          </tbody>
-        </table>
-
-        <h3>アトモスフィア</h3>
-        <table>
-          <thead>
-            <tr><th>音色名</th><th>音</th></tr>
-          </thead>
-          <tbody>
-            <tr><td><code>shimmer_pad</code></td><td>深いシマーパッド</td></tr>
-            <tr><td><code>warehouse_air</code></td><td>倉庫っぽい空気感</td></tr>
-            <tr><td><code>vox_ahh</code></td><td>フォルマントボーカルパッド</td></tr>
-          </tbody>
-        </table>
-
-        <h3>FX</h3>
-        <table>
-          <thead>
-            <tr><th>音色名</th><th>音</th></tr>
-          </thead>
-          <tbody>
-            <tr><td><code>fx_impact</code></td><td>低いインパクト</td></tr>
-            <tr><td><code>riser_noise</code></td><td>ノイズライザー（8秒でスイープ上昇）</td></tr>
-            <tr><td><code>glitch_ticks</code></td><td>細かいグリッチ音</td></tr>
-          </tbody>
-        </table>
-      </section>
-
-      <hr>
-
-      <!-- Section 10 -->
-      <section id="s10">
-        <h2>10. 演奏のアイデア</h2>
-
-        <h3>アイデア A: シンプルから複雑へ育てる</h3>
-        <p>最初は空のコードから始めて、少しずつ要素を加えていきます。watch を起動した状態で保存するたびに音が変わっていく様子を楽しめます。</p>
-
-        <pre data-lang="python"><code id="code-s10-1"># 段階 1: ほぼ無音（フィルター最小、ポリフォニー 1）
-@loop("main", interval=1.0)
-def f(volume=0.3):
-    pass</code></pre>
-
-        <pre data-lang="python"><code id="code-s10-2"># 段階 2: 揺らぎを加える
-@loop("main", interval=1.0)
-def f(volume=0.3):
-    for i in range(4):
-        pass</code></pre>
-
-        <pre data-lang="python"><code id="code-s10-3"># 段階 3: さらに深く
-@loop("main", interval=1.0)
-def f(volume=0.3):
-    for i in range(4):
-        for j in range(2):
-            if i > j:
-                pass</code></pre>
-
-        <pre data-lang="python"><code id="code-s10-4"># 段階 4: 声部を増やしてクライマックス
-@loop("main", interval=1.0)
-def f(volume=0.5):
-    def voice_a():
-        for i in range(4):
-            for j in range(2):
-                if i > j:
-                    pass
-
-    def voice_b():
-        for k in range(8):
-            pass</code></pre>
-
-        <h3>アイデア B: pattern() でライブシーケンス</h3>
-        <p>pattern() を使って、保存するたびにリズムや音程を変えていきます。</p>
-
-        <pre data-lang="python"><code id="code-s10-b1">from pycodedj import loop, pattern
-
-@loop("kick", synth="floor_kick", dur=0.25)
-def kick():
-    pattern("x . x .")     # ← ここを変えて保存するたびにリズムが変わる
-
-@loop("bass", synth="bass_acid", root="A1", scale="minor", dur=0.25)
-def bass():
-    pattern("0 . 0 . 3 .") # ← 度数を変えて和声を変える</code></pre>
-
-        <h3>アイデア C: コントラストをつける</h3>
-        <p>2 つのループを使って、にぎやかなパートと静かなパートを対比させます。</p>
-
-        <pre data-lang="python"><code id="code-s10-5">@loop("bass", interval=2.0)
-def the_bass(volume=0.5):
-    def layer_a():
-        for i in range(8):
-            for j in range(4):
-                if i == j:
-                    pass
-
-    def layer_b():
-        for k in range(8):
-            pass</code></pre>
-
-        <pre data-lang="python"><code id="code-s10-6">@loop("pad", interval=4.0)
-def space(volume=0.08):
-    # 静寂
-    # もっと静寂
-    # ただの余白
-    pass</code></pre>
-
-        <h3>アイデア D: コメントだけで演奏する</h3>
-        <p>関数は 1 つだけ残して、コメントの量だけで演奏します。コメントが増えるほど残響が深くなり、音の空間が変化します。</p>
-
-        <pre data-lang="python"><code id="code-s10-7">@loop("ambient", interval=4.0)
-def f(volume=0.15):
-    # ここからコメントを増やしたり減らしたりするだけ
-    pass</code></pre>
-
-        <h3>アイデア E: 関数名をストーリーとして書く</h3>
-        <p>音は関数の中身の構造で決まります。関数名はどんな名前でも構いません。演奏しながらコードがストーリーになるような書き方もできます。</p>
-
-        <pre data-lang="python"><code id="code-s10-8">@loop("narrative", interval=2.0)
-def the_city_wakes_up(volume=0.3):
-    for hour in range(6):
-        if hour > 4:
-            pass
-
-@loop("texture", interval=1.0)
-def rush_hour(volume=0.2):
-    for commuter in range(8):
-        for train in range(3):
-            if commuter % 2 == 0:
-                pass</code></pre>
-      </section>
-
-      <hr>
-
-      <!-- Section 11 -->
-      <section id="s11">
-        <h2>11. うまくいかないとき</h2>
-
-        <h3>音が鳴らない</h3>
-        <p>まず SuperCollider 単体で音が出るか確認します。SuperCollider IDE で新しい空のドキュメントを開き、次の 1 行を実行します。</p>
-
-        <pre data-lang="supercollider"><code id="code-s11-1">{ SinOsc.ar(440, 0, 0.1) ! 2 }.play;</code></pre>
-
-        <p>実行は <strong>Ctrl+Enter</strong>（Mac は Cmd+Enter）です。音を止めるには <strong>Ctrl+.</strong>（Mac は Cmd+.）を押します。</p>
-        <p>ここで音が出ない場合は、PyCodeDJ ではなく SuperCollider のサーバー、Mac/PC の音量、出力先を確認してください。</p>
-        <p>次に SuperCollider のサーバーが起動しているか確認します。</p>
-
-        <pre data-lang="supercollider"><code id="code-s11-2">s.boot;</code></pre>
-
-        <p>次に <code>sc/synths.scd</code> を再実行します（Ctrl+A → Ctrl+Enter、Mac は Cmd+A → Cmd+Enter）。Post window に次が出るはずです。</p>
-
-        <pre data-lang="text"><code>PyCodeDJ synths loaded. Ready. OSC port: 57120</code></pre>
-
-        <p>OSC port が <code>57120</code> か確認するには、SuperCollider で次を実行します。</p>
-
-        <pre data-lang="supercollider"><code id="code-s11-3">NetAddr.langPort.postln;</code></pre>
-
-        <p><code>57120</code> 以外が表示された場合は、Python 側でその番号を指定します。</p>
-
-        <pre data-lang="bash"><code id="code-s11-4">pycodedj eval examples/demo.py::bass --sc-port 表示された番号</code></pre>
-
-        <p>SuperCollider 側のシンセが読み込まれているか直接確認するには、SuperCollider で次を実行します。</p>
-
-        <pre data-lang="supercollider"><code id="code-s11-5">~startLoop.value("bass", 1);</code></pre>
-
-        <p>これで音が出れば、シンセ定義は読み込まれています。音を止めるには <strong>Ctrl+.</strong>（Mac は Cmd+.）です。</p>
-        <p>さらに OSC 受信を SuperCollider 内だけで確認するには、次を実行します。</p>
-
-        <pre data-lang="supercollider"><code id="code-s11-6">NetAddr("127.0.0.1", NetAddr.langPort).sendMsg("/pycodedj/loop/bass/voice_count", 1);</code></pre>
-
-        <p>これで音が出れば、SuperCollider 側の OSC 受信も動いています。</p>
-        <p>それでも音が鳴らない場合は、接続確認をします。</p>
-
-        <pre data-lang="bash"><code id="code-s11-7">pycodedj eval examples/demo.py::bass</code></pre>
-
-        <p>必要なら SuperCollider 側で OSC の受信ログを出せます。</p>
-
-        <pre data-lang="supercollider"><code id="code-s11-8">OSCFunc.trace(true);</code></pre>
-
-        <p>ログを止めるには次を実行します。</p>
-
-        <pre data-lang="supercollider"><code id="code-s11-9">OSCFunc.trace(false);</code></pre>
-
-        <h3><code>[pycodedj] OSC error</code> というエラーが出る</h3>
-        <p>SuperCollider が起動していないか、ポート番号が違います。</p>
-        <ol>
-          <li>SuperCollider IDE が開いていて、サーバーが起動しているか確認する</li>
-          <li><code>sc/synths.scd</code> を実行して <code>Ready.</code> メッセージを確認する</li>
-          <li>ポート番号がデフォルト（57120）から変わっていれば <code>--sc-port</code> で指定する</li>
-        </ol>
-
-        <pre data-lang="bash"><code id="code-s11-10">pycodedj eval demo.py::bass --sc-port 57200</code></pre>
-
-        <h3>eval を実行したが何も出ない（フィードバックが出ない）</h3>
-        <p>eval に成功すると <code>[pycodedj] ループ名  cutoff=...Hz ...</code> の行が出るはずです。何も出ない場合は stderr を確認してください。構文エラーが出ているかもしれません。</p>
-
-        <h3><code>loop 'xxx' not found</code> というエラーが出る</h3>
-        <p>ループ名の綴りが <code>@loop(...)</code> の第一引数と一致していません。<code>::</code> の後ろの名前を確認してください。</p>
-
-        <pre data-lang="bash"><code id="code-s11-11"># ファイルの中に @loop("bass", ...) と書いてあれば
-pycodedj eval demo.py::bass   # OK
-pycodedj eval demo.py::Bass   # NG（大文字小文字が違う）</code></pre>
-
-        <h3><code>file not found</code> というエラーが出る</h3>
-        <p>ファイルのパスが正しくありません。カレントディレクトリを確認するか、フルパスで指定します。</p>
-
-        <pre data-lang="bash"><code id="code-s11-12">pwd
-ls
-
-pycodedj eval /home/user/projects/myfile.py::bass</code></pre>
-
-        <h3><code>pycodedj watch</code> が watchdog をインストールしろと言う</h3>
-
-        <pre data-lang="bash"><code id="code-s11-13">pip install 'pycodedj[watch]'</code></pre>
-
-        <p>最初のインストールで <code>[watch]</code> を付け忘れた場合はこれで追加できます。</p>
-
-        <h3>構文エラーのあるコードを評価したとき</h3>
-
-        <pre data-lang="text"><code>[pycodedj] syntax error (bass): invalid syntax ...</code></pre>
-
-        <p>構文エラーがあったブロックは変化せず、直前の音を維持します。他のループは止まりません。コードの構文を修正してから再度評価してください。</p>
-      </section>
-
-      <hr>
-
-      <!-- Section 12 -->
-      <section id="s12">
-        <h2>12. コマンドと設定の全リスト</h2>
-
-        <h3><code>pycodedj eval</code></h3>
-        <p>指定したループを一度だけ評価して SuperCollider にパラメーターを送ります。<code>eval</code> は evaluate（評価する）の略で、「このループを今すぐ音に反映する」という意味です。</p>
-
-        <pre data-lang="text"><code>pycodedj eval FILE::LOOP [--sc-host HOST] [--sc-port PORT]</code></pre>
-
-        <table>
-          <thead>
-            <tr>
-              <th>引数・オプション</th>
-              <th>説明</th>
-              <th>デフォルト</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td><code>FILE::LOOP</code></td>
-              <td>ファイルパスとループ名を <code>::</code> で区切る</td>
-              <td>—</td>
-            </tr>
-            <tr>
-              <td><code>--sc-host</code></td>
-              <td>SuperCollider のホスト</td>
-              <td><code>127.0.0.1</code></td>
-            </tr>
-            <tr>
-              <td><code>--sc-port</code></td>
-              <td>SuperCollider の受信ポート番号</td>
-              <td><code>57120</code></td>
-            </tr>
-          </tbody>
-        </table>
-
-        <p><code>FILE::LOOP</code> は、<code>FILE</code> の中にある <code>@loop("LOOP", ...)</code> のブロックを指定します。たとえば <code>examples/demo.py::bass</code> は、<code>@loop("bass", ...)</code> デコレータが付いた関数を評価します。</p>
-        <p>成功すると stdout にフィードバックが出ます。</p>
-
-        <pre data-lang="text"><code>[pycodedj] bass  cutoff=418Hz  lfo=1.08Hz  reverb=0.00  voices=1  amp=0.40</code></pre>
-
-        <p>評価に失敗した場合（構文エラー / OSC 送信失敗）は stderr にエラーが出て終了コード 1 で終了します。</p>
-
-        <p><strong>使用例:</strong></p>
-
-        <pre data-lang="bash"><code id="code-s12-1">pycodedj eval examples/demo.py::bass
-pycodedj eval demo.py::melody --sc-host 192.168.1.10
-pycodedj eval demo.py::pad --sc-port 57200</code></pre>
-
-        <h3><code>pycodedj watch</code></h3>
-        <p>ファイルを監視し、起動時と保存のたびに全ループを自動で再評価します。Ctrl+C で停止します。</p>
-
-        <pre data-lang="text"><code>pycodedj watch FILE [--sc-host HOST] [--sc-port PORT] [--debounce SECS]</code></pre>
-
-        <table>
-          <thead>
-            <tr>
-              <th>引数・オプション</th>
-              <th>説明</th>
-              <th>デフォルト</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td><code>FILE</code></td>
-              <td>監視するファイルのパス</td>
-              <td>—</td>
-            </tr>
-            <tr>
-              <td><code>--sc-host</code></td>
-              <td>SuperCollider のホスト</td>
-              <td><code>127.0.0.1</code></td>
-            </tr>
-            <tr>
-              <td><code>--sc-port</code></td>
-              <td>SuperCollider の受信ポート番号</td>
-              <td><code>57120</code></td>
-            </tr>
-            <tr>
-              <td><code>--debounce</code></td>
-              <td>連続保存をまとめる待機時間（秒）</td>
-              <td><code>0.3</code></td>
-            </tr>
-          </tbody>
-        </table>
-
-        <p><strong>使用例:</strong></p>
-
-        <pre data-lang="bash"><code id="code-s12-2">pycodedj watch examples/demo.py
-pycodedj watch examples/club_set.py --debounce 0.5
-pycodedj watch myfile.py --sc-host 192.168.1.10</code></pre>
-
-        <h3><code>pycodedj panic</code></h3>
-        <p>全アクティブループに即時停止信号を送ります。演奏中に問題が起きたとき、すべての音をすぐ止めたい場合に使います。SuperCollider 側で実行中のシンセをすべて解放し、ループ状態を初期化します。</p>
-
-        <pre data-lang="text"><code>pycodedj panic [--sc-host HOST] [--sc-port PORT]</code></pre>
-
-        <p><strong>使用例:</strong></p>
-        <pre data-lang="bash"><code id="code-s12-3">pycodedj panic</code></pre>
-
-        <h3><code>pycodedj stop</code></h3>
-        <p>指定した 1 つのループを停止します。<code>mute</code> と違い、音量を 0 にするだけではなく、通常ループのシンセと <code>pattern()</code> ループの Pdef の両方を止めます。</p>
-
-        <pre data-lang="text"><code>pycodedj stop NAME [--sc-host HOST] [--sc-port PORT]</code></pre>
-
-        <p><strong>使用例:</strong></p>
-        <pre data-lang="bash"><code id="code-s12-4">pycodedj stop kick_hard</code></pre>
-
-        <h3><code>pycodedj mute</code></h3>
-        <p>ループを消音します（停止はしません）。ループは引き続き管理され、<code>unmute</code> で音量が復元します。</p>
-
-        <pre data-lang="text"><code>pycodedj mute NAME [--sc-host HOST] [--sc-port PORT]</code></pre>
-
-        <table>
-          <thead>
-            <tr><th>引数・オプション</th><th>説明</th><th>デフォルト</th></tr>
-          </thead>
-          <tbody>
-            <tr><td><code>NAME</code></td><td>ループ名</td><td>—</td></tr>
-            <tr><td><code>--sc-host</code></td><td>SuperCollider のホスト</td><td><code>127.0.0.1</code></td></tr>
-            <tr><td><code>--sc-port</code></td><td>SuperCollider の受信ポート番号</td><td><code>57120</code></td></tr>
-          </tbody>
-        </table>
-
-        <p><strong>使用例:</strong></p>
-        <pre data-lang="bash"><code id="code-s12-5">pycodedj mute bass</code></pre>
-
-        <p><strong>注意:</strong> CLI は OSC を直接 SuperCollider に送信します。ループを再評価してもミュート状態を維持したい場合は、watch セッション内で <code>Engine.mute()</code> を呼び出してください。</p>
-
-        <h3><code>pycodedj unmute</code></h3>
-        <p>ミュートしたループの音量を元に戻します。</p>
-
-        <pre data-lang="text"><code>pycodedj unmute NAME [--sc-host HOST] [--sc-port PORT]</code></pre>
-
-        <p><strong>使用例:</strong></p>
-        <pre data-lang="bash"><code id="code-s12-6">pycodedj unmute bass</code></pre>
-
-        <h3><code>pycodedj solo</code></h3>
-        <p><strong>CLI からはサポートされていません。</strong> Solo は watch プロセスの状態へのアクセスが必要です。watch セッション内で <code>Engine.solo()</code> を直接呼び出してください。</p>
-
-        <h3><code>pycodedj unsolo</code></h3>
-        <p><strong>CLI からはサポートされていません。</strong> watch セッション内で <code>Engine.unsolo()</code> を直接呼び出してください。</p>
-
-        <h3><code>pycodedj status</code></h3>
-        <p>アクティブなループの名前・ミュート状態・音量・フィルターカットオフを表示します。</p>
-
-        <pre data-lang="text"><code>pycodedj status [--sc-host HOST] [--sc-port PORT]</code></pre>
-
-        <p>出力形式:</p>
-        <pre data-lang="text"><code>Loop         State    Amp    Cutoff
-bass         playing  0.40   1340Hz
-pad          muted    0.15   200Hz</code></pre>
-
-        <p><strong>注意:</strong> <code>status</code> は <code>pycodedj watch</code> とは別プロセスで動作するため、watch プロセスの状態を読み取れません。CLI から単独で実行すると「no active loops」と表示されます。</p>
-
-        <p><strong>使用例:</strong></p>
-        <pre data-lang="bash"><code id="code-s12-6">pycodedj status</code></pre>
-
-        <h3>ループの書き方</h3>
-
-        <pre data-lang="python"><code id="code-s12-3">from pycodedj import loop
-
-@loop("ループ名", interval=秒)
-def 関数名(volume=音量, eq="プリセット"):
-    # 関数の中身が音楽パラメーターに変換される
-    ...</code></pre>
-
-        <table>
-          <thead>
-            <tr><th>要素</th><th>説明</th></tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td><code>"ループ名"</code></td>
-              <td>SuperCollider に送られる名前。英数字とアンダースコア。例: <code>bass</code>, <code>kick_hard</code></td>
-            </tr>
-            <tr>
-              <td><code>interval=秒</code></td>
-              <td>ループの更新間隔（秒）。省略時は 1.0</td>
-            </tr>
-            <tr>
-              <td><code>volume=音量</code></td>
-              <td>音量。0.0〜1.0 の浮動小数点数。省略時は 0.3</td>
-            </tr>
-            <tr>
-              <td><code>eq="プリセット"</code></td>
-              <td>簡易 EQ。省略時は <code>"flat"</code></td>
-            </tr>
-            <tr>
-              <td><code>low=倍率</code>, <code>mid=倍率</code>, <code>high=倍率</code></td>
-              <td>EQ の手動調整。0.0〜2.0。プリセットの一部だけ上書きできる</td>
-            </tr>
-            <tr>
-              <td>関数名</td>
-              <td>自由につけられる。ループ名とは独立している</td>
-            </tr>
-          </tbody>
-        </table>
-      </section>
-
-      <hr>
-
-      <!-- Section 13 -->
-      <section id="s13">
-        <h2>13. 仕組みをもっと知りたい人へ</h2>
-
-        <h3>マッピングの数値</h3>
-        <table>
-          <thead>
-            <tr>
-              <th>パラメーター</th>
-              <th>入力</th>
-              <th>出力範囲</th>
-              <th>スケール</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td>Cutoff</td>
-              <td>ブロック深さ 0–10</td>
-              <td>200–4000 Hz</td>
-              <td>リニア</td>
-            </tr>
-            <tr>
-              <td>LFO レート</td>
-              <td>制御フロー数 0–10</td>
-              <td>0.1–5.0 Hz</td>
-              <td>リニア</td>
-            </tr>
-            <tr>
-              <td>リバーブ</td>
-              <td>コメント率 0.0–1.0</td>
-              <td>0.0–0.8</td>
-              <td>リニア</td>
-            </tr>
-            <tr>
-              <td>声部数</td>
-              <td>関数数（クランプ）</td>
-              <td>1–4</td>
-              <td>クランプ</td>
-            </tr>
-            <tr>
-              <td>音量</td>
-              <td><code>volume=</code> 引数</td>
-              <td>そのまま</td>
-              <td>パススルー</td>
-            </tr>
-            <tr>
-              <td>EQ</td>
-              <td><code>eq=</code> プリセット + <code>low/mid/high</code></td>
-              <td>0.0–2.0</td>
-              <td>プリセット、手動値はクランプ</td>
-            </tr>
-          </tbody>
-        </table>
-
-        <h3>OSC アドレス</h3>
-        <p>SuperCollider と通信するアドレスの形式です。Hydra などのビジュアルツールを繋ぐときに参照してください。</p>
-        <table>
-          <thead>
-            <tr>
-              <th>アドレス</th>
-              <th>型</th>
-              <th>値</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td><code>/pycodedj/loop/&lt;name&gt;/params</code></td>
-              <td>int, float, float, float, float</td>
-              <td><code>voice_count</code>, <code>cutoff</code>, <code>lfo_rate</code>, <code>reverb</code>, <code>amp</code> の順</td>
-            </tr>
-            <tr>
-              <td><code>/pycodedj/loop/&lt;name&gt;/voice_count</code></td>
-              <td>int</td>
-              <td>1–4（互換用）</td>
-            </tr>
-            <tr>
-              <td><code>/pycodedj/loop/&lt;name&gt;/cutoff</code></td>
-              <td>float</td>
-              <td>200–4000（互換用）</td>
-            </tr>
-            <tr>
-              <td><code>/pycodedj/loop/&lt;name&gt;/lfo_rate</code></td>
-              <td>float</td>
-              <td>0.1–5.0（互換用）</td>
-            </tr>
-            <tr>
-              <td><code>/pycodedj/loop/&lt;name&gt;/reverb</code></td>
-              <td>float</td>
-              <td>0.0–0.8（互換用）</td>
-            </tr>
-            <tr>
-              <td><code>/pycodedj/loop/&lt;name&gt;/amp</code></td>
-              <td>float</td>
-              <td>0.0–1.0（互換用）</td>
-            </tr>
-          </tbody>
-        </table>
-
-        <h3>Python から直接使う</h3>
-        <p>CLI を使わずにプログラムから操作することもできます。</p>
-
-        <pre data-lang="python"><code id="code-s13-1">from pycodedj.block_parser import parse_blocks
-from pycodedj.engine import Engine
-from pycodedj.osc_bridge import OscBridge, OscEndpoint
-
-bridge = OscBridge(audio=OscEndpoint("127.0.0.1", 57120))
-engine = Engine(bridge=bridge)
-
-source = open("demo.py").read()
-blocks = {b.name: b for b in parse_blocks(source).blocks}
-
-params = engine.eval_block(blocks["bass"])
-if params is not None:
-    print(f"cutoff={params.cutoff:.0f}Hz  amp={params.amp:.2f}")</code></pre>
-
-        <p><code>eval_block</code> は成功すると <code>MusicParams</code> を返します。構文エラーや OSC 送信失敗の場合は <code>None</code> を返します。</p>
-
-        <h3>モジュール構成</h3>
-
-        <pre data-lang="text"><code>pycodedj/
-├── _loop.py          # @loop デコレータ（実行時は no-op）
-├── block_parser.py   # @loop デコレータを AST で解析してブロックを分割する
-├── analyzer.py       # コードの特徴量（深さ・数・比率）を抽出する
-├── mapper.py         # 特徴量を音楽パラメーターに変換する
-├── pattern.py        # pattern() 文字列を解析する
-├── engine.py         # ブロック評価のパイプライン全体を管理する
-├── osc_bridge.py     # SuperCollider へ OSC で送信する
-├── watcher.py        # ファイル監視（watchdog ベース）
-└── __main__.py       # CLI コマンドのエントリポイント</code></pre>
-      </section>
-
-    </div>
-  </main>
-</div>
-
-<script>
-  // ── Syntax highlighter (regex-based, no external libs) ──
-
-  const PY_KEYWORDS = /\b(for|if|elif|else|while|def|return|pass|in|range|and|or|not|True|False|None|from|import|class|with|as|try|except|finally|raise|yield|lambda|del|global|nonlocal|assert|break|continue)\b/g;
-  const PY_BUILTIN  = /\b(print|len|range|open|str|int|float|list|dict|set|tuple|type|isinstance|hasattr|getattr|setattr|super|zip|map|filter|enumerate|sorted|reversed|min|max|sum|abs|round)\b/g;
-  const PY_NUMBER   = /\b(\d+(?:\.\d+)?)\b/g;
-  const PY_STRING   = /("""[\s\S]*?"""|'''[\s\S]*?'''|"(?:[^"\\]|\\.)*"|'(?:[^'\\]|\\.)*')/g;
-  const PY_COMMENT  = /(#[^\n]*)/g;
-  const PY_DECO     = /(@\w+)/g;
-
-  const BASH_COMMENT = /(#[^\n]*)/g;
-  const BASH_STRING  = /("(?:[^"\\]|\\.)*"|'(?:[^'\\]|\\.)*')/g;
-
-  const SC_COMMENT   = /(\/\/[^\n]*)/g;
-  const SC_STRING    = /("(?:[^"\\]|\\.)*")/g;
-
-  function escapeHtml(s) {
-    return s
-      .replace(/&/g, '&amp;')
-      .replace(/</g, '&lt;')
-      .replace(/>/g, '&gt;');
-  }
-
-  // Tokenize approach: replace in a specific order, protecting already-replaced spans.
-  // We use a placeholder technique to avoid double-processing.
-
-  function applyHighlight(raw, lang) {
-    // Work on escaped HTML
-    let s = escapeHtml(raw);
-
-    if (lang === 'python') {
-      // We process in stages, using non-overlapping replacements.
-      // Stage 1: extract strings and comments into placeholders
-      const slots = [];
-      function placeholder(match, cls) {
-        const idx = slots.length;
-        slots.push(`<span class="sh-${cls}">${match}</span>`);
-        return `\x00_${idx}\x00`;
-      }
-
-      // comments first (they can contain quote chars)
-      s = s.replace(PY_COMMENT,  (m) => placeholder(m, 'comment'));
-      // strings
-      s = s.replace(PY_STRING,   (m) => placeholder(m, 'string'));
-      // decorators
-      s = s.replace(PY_DECO,     (m) => placeholder(m, 'decorator'));
-      // numbers
-      s = s.replace(PY_NUMBER,   (m) => placeholder(m, 'number'));
-      // builtins before keywords to avoid partial matches
-      s = s.replace(PY_BUILTIN,  (m) => placeholder(m, 'builtin'));
-      // keywords
-      s = s.replace(PY_KEYWORDS, (m) => placeholder(m, 'keyword'));
-
-      // restore placeholders
-      s = s.replace(/\x00_(\d+)\x00/g, (_, i) => slots[parseInt(i)]);
-
-    } else if (lang === 'bash') {
-      const slots = [];
-      function ph(match, cls) {
-        const idx = slots.length;
-        slots.push(`<span class="sh-${cls}">${match}</span>`);
-        return `\x00_${idx}\x00`;
-      }
-      s = s.replace(BASH_COMMENT, (m) => ph(m, 'comment'));
-      s = s.replace(BASH_STRING,  (m) => ph(m, 'string'));
-      s = s.replace(/\x00_(\d+)\x00/g, (_, i) => slots[parseInt(i)]);
-
-    } else if (lang === 'supercollider') {
-      const slots = [];
-      function ph(match, cls) {
-        const idx = slots.length;
-        slots.push(`<span class="sh-${cls}">${match}</span>`);
-        return `\x00_${idx}\x00`;
-      }
-      s = s.replace(SC_COMMENT, (m) => ph(m, 'comment'));
-      s = s.replace(SC_STRING,  (m) => ph(m, 'string'));
-      s = s.replace(/\x00_(\d+)\x00/g, (_, i) => slots[parseInt(i)]);
-    }
-
-    return s;
-  }
-
-  document.querySelectorAll('pre[data-lang]').forEach(pre => {
-    const lang = pre.getAttribute('data-lang');
-    const codeEl = pre.querySelector('code');
-    if (!codeEl) return;
-    const raw = codeEl.textContent;
-    codeEl.innerHTML = applyHighlight(raw, lang);
-  });
-</script>
+pycodedj eval examples/sound_showcase.py::lead_acid</code></pre>
+
+  <h3>Kick</h3>
+  <table><tr><th>音色</th><th>キャラクター</th><th>向いている用途</th></tr>
+    <tr><td><code>kick_hard</code></td><td>タイトでパンチのある短いキック</td><td>強い頭拍、ミニマルなパターン</td></tr>
+    <tr><td><code>kick_floor</code></td><td>太い four-on-the-floor キック</td><td>ダンス/テクノ系の主キック</td></tr>
+    <tr><td><code>kick_pulse</code></td><td>軽めのパルスキック</td><td>補助的な拍、柔らかいリズム支え</td></tr>
+    <tr><td><code>kick_soft</code></td><td>クリックを抑えた丸いキック</td><td>柔らかいグルーヴ、静かな展開</td></tr>
+    <tr><td><code>kick_909</code></td><td>長めの電子的なキックテール</td><td>ハウス/テクノの土台</td></tr>
+    <tr><td><code>kick_click</code></td><td>立ち上がりが明確な短いキック</td><td>速いパターン、輪郭が欲しい場面</td></tr>
+  </table>
+  <h3>Bass</h3>
+  <table><tr><th>音色</th><th>キャラクター</th><th>向いている用途</th></tr>
+    <tr><td><code>bass_rumble</code></td><td>深くゆるい低域の圧力</td><td>キック下のランブル層</td></tr>
+    <tr><td><code>bass_reese</code></td><td>横に広がる Reese 系ベース</td><td>暗いベースライン、持続する動き</td></tr>
+    <tr><td><code>bass_sub</code></td><td>クリーンなサブ低域</td><td>ルート低音、床を支える音</td></tr>
+    <tr><td><code>bass_acid</code></td><td>レゾナンスのある 303 風ベース</td><td>アシッドベースライン、細かいシーケンス</td></tr>
+    <tr><td><code>bass_pluck</code></td><td>短いプラック系ベース</td><td>シンコペーションのある低域フック</td></tr>
+    <tr><td><code>bass_fm</code></td><td>金属感のある FM ベース</td><td>打楽器的なベースライン</td></tr>
+    <tr><td><code>bass_mono</code></td><td>素直なモノシンセベース</td><td>安定したベースフレーズ</td></tr>
+    <tr><td><code>bass_wobble</code></td><td>フィルターが揺れるベース</td><td>ダブステップ風の動き、ブレイク</td></tr>
+  </table>
+  <h3>Percussion</h3>
+  <table><tr><th>音色</th><th>キャラクター</th><th>向いている用途</th></tr>
+    <tr><td><code>hat_engine</code></td><td>短いクローズ/オープンハット感</td><td>16分グリッド、前に進むノリ</td></tr>
+    <tr><td><code>hat_ride</code></td><td>長めのオープンハット/ライド感</td><td>裏拍、持続する高域エネルギー</td></tr>
+    <tr><td><code>clap_snap</code></td><td>鋭く乾いたクラップ</td><td>短いアクセント</td></tr>
+    <tr><td><code>clap_snare</code></td><td>スネア寄りの広いクラップ</td><td>2拍4拍のバックビート</td></tr>
+    <tr><td><code>tom_drum</code></td><td>ピッチが動くタム</td><td>フィル、展開、低めの打楽器</td></tr>
+    <tr><td><code>snare_roll</code></td><td>連打系スネア</td><td>ロール、ビルドアップ</td></tr>
+    <tr><td><code>crash_noise</code></td><td>長いノイズクラッシュ</td><td>セクション切替、インパクト</td></tr>
+    <tr><td><code>rim_shot</code></td><td>乾いたリムのアタック</td><td>隙間のあるシンコペーション</td></tr>
+    <tr><td><code>cowbell</code></td><td>金属的な2音のヒット</td><td>クラシックなマシンパーカッション</td></tr>
+    <tr><td><code>perc_blip</code></td><td>小さな音程付きブリップ</td><td>ミニマルな打楽器、細かい返し</td></tr>
+    <tr><td><code>shaker_loop</code></td><td>連続するシェイカー感</td><td>高域のグルーヴ、前に進む動き</td></tr>
+    <tr><td><code>tick_metal</code></td><td>小さな金属クリック</td><td>グリッチグリッド、高域アクセント</td></tr>
+    <tr><td><code>wood_block</code></td><td>木質のノック音</td><td>乾いたパーカッションパターン</td></tr>
+  </table>
+  <h3>Chords / Stabs</h3>
+  <table><tr><th>音色</th><th>キャラクター</th><th>向いている用途</th></tr>
+    <tr><td><code>chord_rave</code></td><td>明るいレイヴスタブ</td><td>短いコードヒット、フック</td></tr>
+    <tr><td><code>stab_neon</code></td><td>艶のあるシンセスタブ</td><td>メロディックなアクセント</td></tr>
+    <tr><td><code>chord_dub</code></td><td>柔らかい dub techno 風コード</td><td>空間のあるコードパルス</td></tr>
+    <tr><td><code>stab_saw</code></td><td>デチューンした saw スタブ</td><td>強めの和声アクセント</td></tr>
+    <tr><td><code>chord_organ</code></td><td>オルガン風コード</td><td>暖かい和声の土台</td></tr>
+    <tr><td><code>bell_rave</code></td><td>金属的な FM ベル</td><td>明るいメロディックスタブ</td></tr>
+    <tr><td><code>pad_minor</code></td><td>暗いマイナーパッド</td><td>不穏さ、暗めの和声ベッド</td></tr>
+    <tr><td><code>chord_deep</code></td><td>低くフィルターされたコード</td><td>ディープハウス/dub techno のパルス</td></tr>
+    <tr><td><code>chord_glass</code></td><td>透明感のあるコード</td><td>明るくきれいな和声アクセント</td></tr>
+    <tr><td><code>pad_warm</code></td><td>なめらかなアナログ風パッド</td><td>柔らかい背景の和声</td></tr>
+    <tr><td><code>pad_string</code></td><td>ストリングス風シンセパッド</td><td>長く伸びる情緒的なレイヤー</td></tr>
+    <tr><td><code>pad_choir</code></td><td>声のフォルマントを持つパッド</td><td>リードボーカルなしの合唱感</td></tr>
+  </table>
+  <h3>Leads / Notes</h3>
+  <table><tr><th>音色</th><th>キャラクター</th><th>向いている用途</th></tr>
+    <tr><td><code>lead_acid</code></td><td>アシッド風リード</td><td>メロディックなシーケンス</td></tr>
+    <tr><td><code>lead_hoover</code></td><td>Hoover 系リード</td><td>大きく伸びるフレーズ</td></tr>
+    <tr><td><code>pluck_soft</code></td><td>柔らかいプラック</td><td>隙間のあるメロディ</td></tr>
+    <tr><td><code>arp_synth</code></td><td>アルペジオ向きシンセ</td><td>速いメロディの動き</td></tr>
+    <tr><td><code>lead_square</code></td><td>空洞感のある矩形波リード</td><td>レトロなメロディックフック</td></tr>
+    <tr><td><code>lead_fm</code></td><td>ベル寄りの FM リード</td><td>明るいデジタルメロディ</td></tr>
+    <tr><td><code>lead_chip</code></td><td>短いチップチューン風リード</td><td>速いゲーム音楽風フレーズ</td></tr>
+    <tr><td><code>lead_saw</code></td><td>デチューンした saw リード</td><td>大きめのメロディライン</td></tr>
+    <tr><td><code>lead_whistle</code></td><td>細いサイン波風ホイッスル</td><td>高域の対旋律</td></tr>
+    <tr><td><code>note</code></td><td>ニュートラルな音程シンセ</td><td><code>dj.pattern</code> の音程確認、コード確認</td></tr>
+  </table>
+  <h3>Atmosphere / FX</h3>
+  <table><tr><th>音色</th><th>キャラクター</th><th>向いている用途</th></tr>
+    <tr><td><code>pad_shimmer</code></td><td>広くゆっくりしたシマーパッド</td><td>背景のパッド</td></tr>
+    <tr><td><code>air_warehouse</code></td><td>工業的な部屋鳴り</td><td>空気感、ノイズベッド</td></tr>
+    <tr><td><code>vox_ahh</code></td><td>声のフォルマント風パッド</td><td>ブレス、合唱風レイヤー</td></tr>
+    <tr><td><code>fx_drop</code></td><td>低いインパクト音</td><td>ドロップ、展開</td></tr>
+    <tr><td><code>fx_riser</code></td><td>上昇するノイズ</td><td>ビルドアップ</td></tr>
+    <tr><td><code>fx_glitch</code></td><td>小さなグリッチクリック</td><td>細かい打楽器テクスチャ</td></tr>
+    <tr><td><code>drone_space</code></td><td>低く変化するドローン</td><td>長いアンビエントの土台</td></tr>
+    <tr><td><code>fx_down</code></td><td>下降するノイズスイープ</td><td>ドロップ、セクション終わり</td></tr>
+    <tr><td><code>fx_zap</code></td><td>短く落ちるレーザー風ヒット</td><td>小さな FX の句読点</td></tr>
+    <tr><td><code>fx_noise</code></td><td>フィルターされたノイズバースト</td><td>インパクト、展開</td></tr>
+    <tr><td><code>fx_laser</code></td><td>ピッチが曲がるレーザー FX</td><td>SF 風アクセント</td></tr>
+    <tr><td><code>fx_vinyl</code></td><td>クラックルとヒスの背景</td><td>質感、ローファイな背景</td></tr>
+  </table>
+
+  <h2>8. CLI リファレンス</h2>
+<pre><code>pycodedj eval FILE::LOOP
+pycodedj watch examples/demo.py
+pycodedj panic
+pycodedj stop bass
+pycodedj mute bass
+pycodedj unmute bass</code></pre>
+
+  <h2>9. トラブルシューティング</h2>
+  <p>音が出ない場合は SuperCollider を boot し、<code>sc/synths.scd</code> を実行し、OSC port を確認してください。</p>
+  <p>loop not found の場合、<code>::</code> の後ろが Python の関数名と一致しているか確認してください。</p>
+
+  <h2>10. 内部構成</h2>
+  <p>PyCodeDJ は Python ソースを <code>ast</code> で解析します。<code>loop</code>, <code>dj</code>, <code>pattern</code> は通常 import できる実行時ヘルパーです。</p>
+</main>
 </body>
 </html>
