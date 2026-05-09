@@ -5,11 +5,12 @@
 #
 # Club-focused design:
 # - steady four-on-the-floor kick for dancers
+# - click layer for PA translation
 # - clap on 2 and 4
-# - offbeat hats plus 16th-note motion
-# - bass notes locked to the kick with syncopated replies
+# - offbeat hats, shakers, and metallic ticks for top-end motion
+# - bass notes locked to the kick with syncopated and wobble replies
 # - sustained sub and rumble layers for floor pressure
-# - sparse stabs and fills so the bass has room
+# - sparse stabs, risers, and drops so the bass has room
 
 from pycodedj import dj, loop
 
@@ -23,6 +24,19 @@ def kick():
     dj.low = 1.7
     dj.mid = 0.78
     dj.high = 0.82
+    dj.pattern = (
+        "x . . . x . . . x . . . x . . . "
+        "x . . . x . . x x . . . x . . x"
+    )
+
+
+@loop(synth="kick_click", beat=0.117)
+def kick_top():
+    dj.volume = 0.22
+    dj.eq = "edm"
+    dj.low = 0.35
+    dj.mid = 0.82
+    dj.high = 1.08
     dj.pattern = (
         "x . . . x . . . x . . . x . . . "
         "x . . . x . . x x . . . x . . x"
@@ -65,6 +79,32 @@ def hats():
     dj.pattern = (
         "x . x . x x x . x . x . x x x . "
         "x x x . x . x x x . x x x . x ."
+    )
+
+
+@loop(synth="shaker_loop", beat=0.0585)
+def shaker():
+    dj.volume = 0.055
+    dj.eq = "edm"
+    dj.low = 0.22
+    dj.mid = 0.75
+    dj.high = 1.08
+    dj.pattern = (
+        "x . x x x . x . x . x x x . x . "
+        "x x x . x . x x x . x x x . x x"
+    )
+
+
+@loop(synth="tick_metal", beat=0.0585)
+def ticks():
+    dj.volume = 0.045
+    dj.eq = "edm"
+    dj.low = 0.18
+    dj.mid = 0.68
+    dj.high = 1.1
+    dj.pattern = (
+        ". . . x . . x . . x . . . . x . "
+        ". x . . . . x . . . x . . x . ."
     )
 
 
@@ -121,6 +161,19 @@ def acid():
     )
 
 
+@loop(synth="bass_wobble", root="A1", scale="minor", beat=0.117)
+def wobble():
+    dj.volume = 0.16
+    dj.eq = "edm"
+    dj.low = 1.2
+    dj.mid = 0.78
+    dj.high = 0.42
+    dj.pattern = (
+        ". . 0 . . . 3 . . . 0 . 5 . 3 . "
+        ". . 0 . 3 . 0 . . . 5 . 7 . 5 3"
+    )
+
+
 # --- Hooks and fills: sparse enough to leave room for the bass ---
 
 @loop(synth="chord_rave", root="A2", scale="minor", beat=0.117)
@@ -133,6 +186,29 @@ def stabs():
     dj.pattern = (
         ". . . . [0 2 4] . . . . . . . [3 5 7] . . . "
         ". . [5 7 9] . . . . . [0 2 4] . . . [3 5 7] . . ."
+    )
+
+
+@loop(synth="chord_deep", root="A2", scale="minor", beat=0.468)
+def dub():
+    dj.volume = 0.08
+    dj.eq = "edm"
+    dj.low = 0.72
+    dj.mid = 0.7
+    dj.high = 0.62
+    dj.pattern = "[0 2 4] . . . [3 5 7] . . ."
+
+
+@loop(synth="lead_acid", root="A3", scale="minor", beat=0.117)
+def hook():
+    dj.volume = 0.055
+    dj.eq = "edm"
+    dj.low = 0.45
+    dj.mid = 0.78
+    dj.high = 0.82
+    dj.pattern = (
+        ". . . . . . . . 0 . 3 . 5 . 7 . "
+        ". . . . 10 . 7 . 5 . 3 . 0 . . ."
     )
 
 
@@ -149,6 +225,36 @@ def fill():
     )
 
 
+@loop(synth="fx_riser", beat=0.468)
+def riser():
+    dj.volume = 0.07
+    dj.eq = "edm"
+    dj.low = 0.35
+    dj.mid = 0.72
+    dj.high = 0.9
+    dj.pattern = ". . . . . . x ."
+
+
+@loop(synth="fx_down", beat=0.468)
+def down():
+    dj.volume = 0.085
+    dj.eq = "edm"
+    dj.low = 0.7
+    dj.mid = 0.72
+    dj.high = 0.78
+    dj.pattern = "x . . . . . . ."
+
+
+@loop(synth="fx_drop", beat=0.936)
+def impact():
+    dj.volume = 0.12
+    dj.eq = "edm"
+    dj.low = 1.15
+    dj.mid = 0.72
+    dj.high = 0.58
+    dj.pattern = "x . . ."
+
+
 @loop(synth="air_warehouse", root="A1", scale="minor", beat=0.468)
 def room():
     dj.volume = 0.08
@@ -160,3 +266,13 @@ def room():
     # low frequency pressure
     # distant system noise
     dj.pattern = "0 . . . 0 . 3 . 0 . . . 5 . 3 ."
+
+
+@loop(synth="pad_shimmer", root="A2", scale="minor", beat=0.936)
+def haze():
+    dj.volume = 0.045
+    dj.eq = "ambient"
+    dj.low = 0.55
+    dj.mid = 0.72
+    dj.high = 0.62
+    dj.pattern = "[0 2 4] . [5 7 9] ."
