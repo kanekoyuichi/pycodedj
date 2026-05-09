@@ -10,12 +10,12 @@ Python のコードを書くと、リアルタイムに音が変わるライブ�
 
 PyCodeDJ は「コードを書くこと」と「音を鳴らすこと」を直結させます。
 
-`for` ループを増やすと音の揺らぎが速くなり、ネストを深くするとフィルターが開き、コメントを書き込むと空間が広がります。`pattern("x . x .")` と書けばそのリズムで音が鳴り、`pattern("0 . 3 . 5 .")` と書けば指定した音程で演奏されます。
+`for` ループを増やすと音の揺らぎが速くなり、ネストを深くするとフィルターが開き、コメントを書き込むと空間が広がります。`dj.pattern = "x . x ."` と書けばそのリズムで音が鳴り、`dj.pattern = "0 . 3 . 5 ."` と書けば指定した音程で演奏されます。
 
 既存の Python ↔ SuperCollider ブリッジ（sc3nb・supriya）との違いは 2 点です。
 
 - **ホットリロード演奏** — ループを止めずにファイルを差し替える。保存が即座に音の変化になる
-- **2 つの演奏スタイル** — コードの構造から自動生成するモードと、`pattern()` で音程とリズムを明示指定するモードを自由に混在させられる
+- **2 つの演奏スタイル** — コードの構造から自動生成するモードと、`dj.pattern` で音程とリズムを明示指定するモードを自由に混在させられる
 
 ---
 
@@ -45,8 +45,8 @@ BPM クロックは SuperCollider 側の `TempoClock` が保持します。Pytho
 | 制御フロー数（if/for/while） | LFO レート (0.1–5.0 Hz) |
 | 関数定義数 | ポリフォニー声部数 (1–4) |
 | コメント率 | リバーブ Depth (0.0–0.8) |
-| `volume=` 引数 | Amplitude (0.0–1.0) |
-| `eq=` / `low=` / `mid=` / `high=` 引数 | 簡易 3 バンド EQ |
+| `dj.volume` | Amplitude (0.0–1.0) |
+| `dj.eq` / `dj.low` / `dj.mid` / `dj.high` | 簡易 3 バンド EQ |
 
 ---
 
@@ -86,27 +86,31 @@ PyCodeDJ synths loaded. Ready. OSC port: 57120
 **2. ライブコーディングファイルを用意する**
 
 ```python
-from pycodedj import loop, pattern
+from pycodedj import dj, loop
 
 # コードの「構造」が音楽パラメーターになるモード
-@loop("bass", interval=2.0)
-def bass(volume=0.4):
+@loop(interval=2.0)
+def bass():
+    dj.volume = 0.4
     for i in range(8):
         if i % 2 == 0:
             pass
 
-# pattern() でリズムと音程を明示指定するモード
-@loop("kick", synth="floor_kick", dur=0.25)
+# dj.pattern でリズムと音程を明示指定するモード
+@loop(synth="kick_floor", beat=0.25)
 def kick():
-    pattern("x . x .")
+    dj.volume = 0.8
+    dj.pattern = "x . x ."
 
-@loop("melody", synth="acid_lead", root="A3", scale="minor", dur=0.25)
+@loop(synth="lead_acid", root="A3", scale="minor", beat=0.25)
 def melody():
-    pattern("0 . 3 . 5 .")
+    dj.volume = 0.3
+    dj.pattern = "0 . 3 . 5 ."
 
 # コメントで空間を作るモード
-@loop("pad", interval=4.0)
-def pad(volume=0.1):
+@loop(interval=4.0)
+def pad():
+    dj.volume = 0.1
     # 背景の空気
     # 余白
     pass
@@ -141,31 +145,34 @@ pycodedj unmute bass
 
 ---
 
-## pattern() の使い方
+## dj.pattern の使い方
 
-`pattern()` を使うと、リズムと音程を明示的に指定できます。
+`dj.pattern` を使うと、リズムと音程を明示的に指定できます。
 
 ```python
-from pycodedj import loop, pattern
+from pycodedj import dj, loop
 
 # トリガーパターン（x=鳴らす、.=休符）
-@loop("kick", synth="floor_kick", dur=0.25)
+@loop(synth="kick_floor", beat=0.25)
 def kick():
-    pattern("x . x .")
+    dj.volume = 0.8
+    dj.pattern = "x . x ."
 
 # 音程パターン（数字=スケール度数）
-@loop("bass", synth="bass_acid", root="A1", scale="minor", dur=0.25)
+@loop(synth="bass_acid", root="A1", scale="minor", beat=0.25)
 def bass():
-    pattern("0 . 3 . 5 .")
+    dj.volume = 0.35
+    dj.pattern = "0 . 3 . 5 ."
 
 # コードとタイ
-@loop("chord", synth="note", root="A1", scale="minor", dur=0.25)
+@loop(synth="note", root="A1", scale="minor", beat=0.25)
 def chord():
-    pattern("0 . [0 3] ~ 5 . 3 .")
+    dj.volume = 0.25
+    dj.pattern = "0 . [0 3] ~ 5 . 3 ."
     # [0 3] = 2音コード、~ = 直前の音を伸ばす
 ```
 
-`pattern()` のトークン一覧:
+`dj.pattern` のトークン一覧:
 
 | トークン | 意味 |
 | :--- | :--- |
@@ -182,7 +189,7 @@ def chord():
 | `synth=` | 使うシンセ名 |
 | `root=` | ルートノート（例: `"A3"`, `"C4"`） |
 | `scale=` | スケール（例: `"minor"`, `"major"`, `"pentatonicMinor"`） |
-| `dur=` | 1 ステップの長さ（秒）。`0.25` で 16 分音符相当 |
+| `beat=` | 1 ステップの長さ（秒）。`0.25` で 16 分音符相当 |
 
 ---
 
@@ -192,7 +199,7 @@ def chord():
 | :--- | :--- |
 | `examples/demo.py` | bass / melody / pad の 3 ループ入門デモ |
 | `examples/club_set.py` | 重低音クラブセット（キック、ランブル、サブ、アシッド、ハット、空間ノイズを含む 11 ループ） |
-| `examples/sound_showcase.py` | 全 30 音色 — 1 音ずつ eval して確認できる |
+| `examples/sound_showcase.py` | 全 60 音色 — 1 音ずつ eval して確認できる |
 
 ---
 
@@ -220,7 +227,7 @@ def chord():
 - [x] Python → SuperCollider OSC プロトタイプ
 - [x] ホットリロード・ライブループ実装（`pycodedj watch`）
 - [x] Sprint 1: ライブ安定性（`panic`, SyntaxError 維持, `mute`/`solo`, `status`）
-- [x] Sprint 2: 音楽 DSL（`pattern()`, `@loop` パラメータ拡張: `synth`, `root`, `scale`, `dur`）
+- [x] Sprint 2: 音楽 DSL（`dj.pattern`, `@loop` パラメータ拡張: `synth`, `root`, `scale`, `beat`）
 - [ ] Sprint 3: 音色・演奏性（SynthDef 整理, `bpm`, `list-synths`, `sample()`）
 - [ ] Sprint 4: Hydra ビジュアライザー統合
 

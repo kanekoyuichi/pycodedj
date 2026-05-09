@@ -83,6 +83,27 @@ def test_eq_preset() -> None:
     assert p.high == 1.18
 
 
+def test_classic_eq_preset() -> None:
+    p = map_features(_features(), eq="classic")
+    assert p.low == 0.95
+    assert p.mid == 1.08
+    assert p.high == 0.92
+
+
+def test_classical_eq_preset_matches_classic() -> None:
+    p = map_features(_features(), eq="classical")
+    assert p.low == 0.95
+    assert p.mid == 1.08
+    assert p.high == 0.92
+
+
+def test_jazz_eq_preset() -> None:
+    p = map_features(_features(), eq="jazz")
+    assert p.low == 1.05
+    assert p.mid == 1.08
+    assert p.high == 0.95
+
+
 def test_eq_override() -> None:
     p = map_features(_features(), eq="edm", low=1.5)
     assert p.low == 1.5

@@ -1,1678 +1,231 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>PyCodeDJ Manual</title>
   <link rel="icon" href="favicon.svg" type="image/svg+xml">
-  <!-- Google tag (gtag.js) -->
-  <script async src="https://www.googletagmanager.com/gtag/js?id=G-J87606964E"></script>
-  <script>
-    window.dataLayer = window.dataLayer || [];
-    function gtag(){dataLayer.push(arguments);}
-    gtag('js', new Date());
-
-    gtag('config', 'G-J87606964E');
-  </script>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,300;0,400;0,600;1,400&family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
   <style>
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
-    :root {
-      --bg:     #08080e;
-      --bg2:    #0f0f18;
-      --bg3:    #16161f;
-      --border: #1e1e2e;
-      --text:   #cdd6f4;
-      --muted:  #585b70;
-      --green:  #a6e3a1;
-      --pink:   #f38ba8;
-      --blue:   #89b4fa;
-      --cyan:   #89dceb;
-      --yellow: #f9e2af;
-      --mauve:  #cba6f7;
-    }
-
-    html { scroll-behavior: smooth; }
-
-    body {
-      background: var(--bg);
-      color: var(--text);
-      font-family: 'Inter', sans-serif;
-      font-size: 16px;
-      line-height: 1.7;
-      overflow-x: hidden;
-    }
-
-    /* ── Nav ── */
-    nav {
-      position: fixed;
-      top: 0; left: 0; right: 0;
-      z-index: 100;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 0 2rem;
-      height: 56px;
-      background: rgba(8,8,14,0.92);
-      backdrop-filter: blur(12px);
-      border-bottom: 1px solid var(--border);
-    }
-    .nav-logo {
-      font-family: 'JetBrains Mono', monospace;
-      font-weight: 600;
-      font-size: 1rem;
-      color: var(--green);
-      letter-spacing: 0.05em;
-      text-decoration: none;
-    }
-    .nav-back {
-      color: var(--muted);
-      text-decoration: none;
-      font-size: 0.875rem;
-      transition: color 0.2s;
-    }
-    .nav-back:hover { color: var(--text); }
-
-    /* ── Layout ── */
-    .layout {
-      display: flex;
-      padding-top: 56px;
-      min-height: 100vh;
-    }
-
-    /* ── Sidebar ── */
-    .sidebar {
-      position: fixed;
-      top: 56px;
-      left: 0;
-      width: 240px;
-      height: calc(100vh - 56px);
-      overflow-y: auto;
-      background: var(--bg2);
-      border-right: 1px solid var(--border);
-      padding: 2rem 0;
-    }
-    .sidebar-title {
-      font-family: 'JetBrains Mono', monospace;
-      font-size: 0.68rem;
-      letter-spacing: 0.12em;
-      text-transform: uppercase;
-      color: var(--muted);
-      padding: 0 1.5rem;
-      margin-bottom: 1rem;
-    }
-    .sidebar nav {
-      position: static;
-      display: block;
-      background: none;
-      border: none;
-      padding: 0;
-      height: auto;
-      backdrop-filter: none;
-    }
-    .sidebar-toc {
-      list-style: none;
-    }
-    .sidebar-toc li a {
-      display: block;
-      padding: 0.35rem 1.5rem;
-      color: var(--muted);
-      text-decoration: none;
-      font-size: 0.82rem;
-      line-height: 1.4;
-      transition: color 0.15s, background 0.15s;
-      border-left: 2px solid transparent;
-    }
-    .sidebar-toc li a:hover {
-      color: var(--text);
-      background: rgba(255,255,255,0.03);
-      border-left-color: var(--green);
-    }
-
-    /* ── Main content ── */
-    .main {
-      margin-left: 240px;
-      padding: 3rem 2rem 6rem;
-      max-width: calc(240px + 800px + 4rem);
-    }
-    .content {
-      max-width: 800px;
-    }
-
-    @media (max-width: 900px) {
-      .sidebar { display: none; }
-      .main { margin-left: 0; }
-    }
-
-    /* ── Typography ── */
-    h1 {
-      font-size: 2.2rem;
-      font-weight: 700;
-      letter-spacing: -0.02em;
-      color: var(--text);
-      margin-bottom: 0.5rem;
-    }
-    h2 {
-      font-size: 1.5rem;
-      font-weight: 700;
-      letter-spacing: -0.01em;
-      color: var(--text);
-      margin-top: 3rem;
-      margin-bottom: 1rem;
-      padding-bottom: 0.5rem;
-      border-bottom: 1px solid var(--border);
-    }
-    h3 {
-      font-size: 1.1rem;
-      font-weight: 600;
-      color: var(--blue);
-      margin-top: 2rem;
-      margin-bottom: 0.75rem;
-    }
-    h4 {
-      font-size: 0.95rem;
-      font-weight: 600;
-      color: var(--cyan);
-      margin-top: 1.5rem;
-      margin-bottom: 0.5rem;
-    }
-    p {
-      margin-bottom: 1rem;
-    }
-    a {
-      color: var(--blue);
-      text-decoration: none;
-    }
-    a:hover {
-      text-decoration: underline;
-    }
-    strong { color: var(--text); font-weight: 600; }
-    em { font-style: italic; color: var(--cyan); }
-
-    /* ── Inline code ── */
-    code {
-      font-family: 'JetBrains Mono', monospace;
-      font-size: 0.82em;
-      background: var(--bg3);
-      color: var(--green);
-      padding: 0.15em 0.4em;
-      border-radius: 0.25rem;
-      border: 1px solid var(--border);
-    }
-
-    /* ── Code blocks ── */
-    pre {
-      background: var(--bg3);
-      border: 1px solid var(--border);
-      border-left: 3px solid var(--border);
-      border-radius: 0.5rem;
-      padding: 1.25rem 1.5rem;
-      overflow-x: auto;
-      margin: 1rem 0 1.5rem;
-      position: relative;
-    }
-    pre code {
-      font-family: 'JetBrains Mono', monospace;
-      font-size: 0.83rem;
-      background: none;
-      border: none;
-      padding: 0;
-      color: var(--text);
-      border-radius: 0;
-      line-height: 1.7;
-      display: block;
-    }
-    /* language label */
-    pre[data-lang]::before {
-      content: attr(data-lang);
-      position: absolute;
-      top: 0.5rem;
-      right: 0.75rem;
-      font-family: 'JetBrains Mono', monospace;
-      font-size: 0.65rem;
-      color: var(--muted);
-      letter-spacing: 0.08em;
-      text-transform: uppercase;
-    }
-
-    /* ── Syntax highlight classes (JS fills these) ── */
-    .sh-keyword  { color: var(--mauve); }
-    .sh-string   { color: var(--green); }
-    .sh-comment  { color: var(--muted); font-style: italic; }
-    .sh-number   { color: var(--yellow); }
-    .sh-decorator{ color: var(--pink); }
-    .sh-builtin  { color: var(--blue); }
-
-    /* ── Blockquote ── */
-    blockquote {
-      border-left: 3px solid var(--mauve);
-      padding-left: 1rem;
-      margin: 1rem 0 1.5rem;
-      color: var(--muted);
-    }
-    blockquote p {
-      margin: 0;
-    }
-
-    /* ── HR ── */
-    hr {
-      border: none;
-      border-top: 1px solid var(--border);
-      margin: 2.5rem 0;
-    }
-
-    /* ── Tables ── */
-    table {
-      border-collapse: collapse;
-      width: 100%;
-      margin: 1rem 0 1.5rem;
-      font-size: 0.9rem;
-    }
-    th, td {
-      border: 1px solid var(--border);
-      padding: 0.5rem 0.75rem;
-      text-align: left;
-    }
-    th {
-      background: var(--bg3);
-      color: var(--blue);
-      font-weight: 600;
-    }
-    tr:nth-child(even) td {
-      background: var(--bg2);
-    }
-
-    /* ── Lists ── */
-    ul, ol {
-      margin: 0.5rem 0 1rem 1.5rem;
-    }
-    li {
-      margin-bottom: 0.3rem;
-    }
-    li > ul, li > ol {
-      margin-top: 0.3rem;
-    }
-
-    /* ── Sections ── */
-    section {
-      margin-bottom: 1rem;
-    }
-
-    /* ── Leading intro ── */
-    .intro-meta {
-      color: var(--muted);
-      font-size: 0.9rem;
-      margin-bottom: 2rem;
-    }
-    .intro-meta a {
-      color: var(--blue);
-    }
+    :root { color-scheme: dark; --bg:#0b0b10; --panel:#14141d; --text:#e6e6ef; --muted:#9ca3af; --line:#2a2a35; --green:#a6e3a1; --blue:#89b4fa; }
+    body { margin:0; background:var(--bg); color:var(--text); font:16px/1.65 system-ui,-apple-system,Segoe UI,sans-serif; }
+    main { max-width:920px; margin:0 auto; padding:48px 22px 80px; }
+    nav { margin:18px 0 34px; color:var(--muted); }
+    a { color:var(--blue); }
+    h1,h2,h3 { line-height:1.2; }
+    h1 { font-size:42px; margin:0 0 8px; }
+    h2 { margin-top:44px; border-top:1px solid var(--line); padding-top:28px; }
+    code, pre { font-family: ui-monospace,SFMono-Regular,Menlo,Consolas,monospace; }
+    pre { background:var(--panel); border:1px solid var(--line); border-radius:8px; padding:16px; overflow:auto; }
+    code { color:var(--green); }
+    table { width:100%; border-collapse:collapse; margin:18px 0; }
+    th,td { border:1px solid var(--line); padding:9px 10px; vertical-align:top; }
+    th { background:var(--panel); text-align:left; }
+    blockquote { margin:18px 0; padding:10px 16px; border-left:4px solid var(--green); color:var(--muted); background:#101018; }
   </style>
 </head>
 <body>
-<nav>
-  <a href="index.html" class="nav-logo">PyCodeDJ</a>
-  <a href="manual.ja.html" class="nav-back">日本語</a>
-</nav>
+<main>
+  <h1>PyCodeDJ Manual</h1>
+  <blockquote>Write Python code. Hear it change in real time.</blockquote>
+  <nav><a href="index.html">Home</a> · <a href="manual.ja.html">日本語</a> · <a href="https://github.com/kanekoyuichi/pycodedj">GitHub</a></nav>
 
-<div class="layout">
-  <aside class="sidebar">
-    <p class="sidebar-title">Contents</p>
-    <ul class="sidebar-toc">
-<li><a href="#s1">1. What is PyCodeDJ?</a></li>
-<li><a href="#s2">2. Installation</a></li>
-<li><a href="#s3">3. Setting up SuperCollider</a></li>
-<li><a href="#s4">4. Making your first sound</a></li>
-<li><a href="#s5">5. Watch mode &mdash; save to reload</a></li>
-<li><a href="#s6">6. How code structure maps to sound</a></li>
-<li><a href="#s7">7. pattern() &mdash; specify rhythm and pitch</a></li>
-<li><a href="#s8">8. Running multiple loops</a></li>
-<li><a href="#s9">9. Sound Reference</a></li>
-<li><a href="#s10">10. Performance ideas</a></li>
-<li><a href="#s11">11. Troubleshooting</a></li>
-<li><a href="#s12">12. Full command and option reference</a></li>
-<li><a href="#s13">13. Under the hood</a></li>
-    </ul>
-  </aside>
+  <h2>1. What PyCodeDJ Does</h2>
+  <p>PyCodeDJ turns Python source code into live music. It parses files, reads <code>@loop</code> blocks, maps code structure to musical parameters, and sends OSC messages to SuperCollider.</p>
+<pre><code>from pycodedj import dj, loop
 
-  <main class="main">
-<header class="manual-header"><h1>PyCodeDJ Manual</h1></header>
-<p><a href="manual.ja.html">日本語版マニュアルはこちら</a></p>
-<blockquote><p>Write Python code. Hear it change in real time.</p></blockquote>
-<h2>Before you start</h2>
-<p>Anyone who has written a program can try this. No music theory required. It&#x27;s fine if you&#x27;ve never heard of SuperCollider. Follow this manual from the top and you&#x27;ll end up with <strong>sound coming out of Python code you wrote yourself</strong>.</p>
-<p>Estimated time: 20–30 minutes including setup.</p>
-<section id="s1"><h2>1. What is PyCodeDJ?</h2>
-<h3>In one sentence</h3>
-<p><strong>PyCodeDJ is an instrument where writing Python code changes the music in real time.</strong></p>
-<p>Add more <code>for</code> loops and the modulation speeds up. Write three functions and you get three-voice polyphony. Fill the file with comments and the reverb deepens. Write <code>pattern(&quot;x . x .&quot;)</code> and that rhythm plays. Write <code>pattern(&quot;0 . 3 . 5 .&quot;)</code> and those pitches ring out.</p>
-<pre data-lang="python"><code>from pycodedj import loop, pattern
-
-# Code structure controls the sound
-@loop(&quot;bass&quot;, interval=2.0)
-def bass_line(volume=0.4):
+@loop(interval=2.0)
+def bass():
+    dj.volume = 0.4
     for i in range(8):
         if i % 2 == 0:
             pass
 
-# pattern() specifies rhythm and pitch explicitly
-@loop(&quot;kick&quot;, synth=&quot;floor_kick&quot;, dur=0.25)
-def kick_drum():
-    pattern(&quot;x . x .&quot;)
-
-@loop(&quot;melody&quot;, synth=&quot;acid_lead&quot;, root=&quot;A3&quot;, scale=&quot;minor&quot;, dur=0.25)
-def melody_line():
-    pattern(&quot;0 . 3 . 5 . 7 .&quot;)</code></pre>
-<p>Save this file and the sound changes instantly. No extra configuration needed.</p>
-<h3>What can you do with it?</h3>
-<ul>
-<li><strong>Live-coding performance</strong> &mdash; perform music in front of an audience by writing code</li>
-<li><strong>Sonic feedback while coding</strong> &mdash; feel the structure of what you write, in real time</li>
-<li><strong>Programming education</strong> &mdash; immediate auditory feedback for every code change</li>
-</ul>
-<h3>Where does the sound come from?</h3>
-<p>PyCodeDJ itself does not produce sound. <strong>SuperCollider</strong> (a free software audio synthesizer) does. PyCodeDJ is the bridge &mdash; it analyzes your Python code and sends parameters to SuperCollider over OSC.</p>
-<pre data-lang="text"><code>You write Python code and save
-         |
-         v
-   PyCodeDJ analyzes the code
-   (nesting depth, function count,
-     comment ratio, pattern() content…)
-         |
-         | OSC messages
-         v
-   SuperCollider plays the sound
-         |
-         v
-      Speakers</code></pre>
-<p>You only interact with SuperCollider once at the start. After that, it stays in the background.</p>
-<hr>
-</section>
-<section id="s2"><h2>2. Installation</h2>
-<h3>Requirements</h3>
-<ul>
-<li><strong>Python 3.10 or later</strong> &mdash; check with <code>python --version</code> or <code>python3 --version</code></li>
-<li><strong>SuperCollider 3.12 or later</strong> &mdash; instructions in the next section</li>
-</ul>
-<h3>Install PyCodeDJ</h3>
-<pre data-lang="bash"><code>pip install &#x27;pycodedj[watch]&#x27;</code></pre>
-<p>The <code>[watch]</code> extra enables file watching so you can use the <code>watch</code> command. Install it from the start &mdash; it makes live-coding much smoother.</p>
-<p>Verify the installation:</p>
-<pre data-lang="bash"><code>pycodedj --help</code></pre>
-<p>You should see:</p>
-<pre data-lang="text"><code>usage: pycodedj [-h] [--version] {eval,watch,panic,stop,mute,unmute,solo,unsolo,status} ...</code></pre>
-<h3>Development install</h3>
-<pre data-lang="bash"><code>git clone https://github.com/kanekoyuichi/pycodedj
-cd pycodedj
-pip install -e &quot;.[dev]&quot;</code></pre>
-<hr>
-</section>
-<section id="s3"><h2>3. Setting up SuperCollider</h2>
-<p>SuperCollider handles all audio output. You only need to configure it once.</p>
-<h3>Install SuperCollider</h3>
-<p>Download from the official site (<a href="https://supercollider.github.io">supercollider.github.io</a>):</p>
-<ul>
-<li><strong>macOS:</strong> Download the <code>.dmg</code> and install</li>
-<li><strong>Linux:</strong> Use your package manager or the official site (<code>sudo apt install supercollider</code> on Ubuntu)</li>
-<li><strong>Windows:</strong> Download the <code>.exe</code> installer</li>
-</ul>
-<p>After installation, launch <strong>SuperCollider IDE</strong>. If the window opens, you&#x27;re good.</p>
-<h3>The SuperCollider IDE</h3>
-<p>There are two main areas:</p>
-<ul>
-<li><strong>Code area (top):</strong> Where you type and run SuperCollider code like <code>s.boot;</code></li>
-<li><strong>Post window (right or bottom):</strong> Where output, logs, and errors appear</li>
-</ul>
-<p>When this manual says &quot;run in SuperCollider,&quot; it means the code area in SuperCollider IDE &mdash; not your terminal.</p>
-<h3>Step 1: Boot the server</h3>
-<p>In the SuperCollider code area, type this and press <strong>Ctrl+Enter</strong> (Mac: <strong>Cmd+Enter</strong>):</p>
-<pre data-lang="supercollider"><code>s.boot;</code></pre>
-<p>The indicator at the bottom turns green when the server is running.</p>
-<blockquote><p><strong>Tip:</strong> You can also use the menu: <strong>Server &gt; Boot Server</strong>.</p></blockquote>
-<h3>Step 2: Load the synths</h3>
-<p>Open <code>sc/synths.scd</code> from the PyCodeDJ project folder using <strong>File &gt; Open</strong>.</p>
-<p>Press <strong>Ctrl+A</strong> (Mac: <strong>Cmd+A</strong>) to select all, then <strong>Ctrl+Enter</strong> (Mac: <strong>Cmd+Enter</strong>) to run.</p>
-<p>When the Post window shows this, you&#x27;re ready:</p>
-<pre data-lang="text"><code>PyCodeDJ synths loaded. Ready. OSC port: 57120</code></pre>
-<p>If this doesn&#x27;t appear, see <a href="#11-troubleshooting">Troubleshooting</a>.</p>
-<blockquote><p><strong>Note:</strong> After restarting SuperCollider, run <code>sc/synths.scd</code> again.</p></blockquote>
-<h3>Step 3: Verify the connection</h3>
-<p>Back in your terminal, run:</p>
-<pre data-lang="bash"><code>pycodedj eval examples/demo.py::bass</code></pre>
-<p>If the terminal shows <code>[pycodedj] bass ...</code> and SuperCollider plays a sound, the connection works.</p>
-<hr>
-</section>
-<section id="s4"><h2>4. Making your first sound</h2>
-<h3>Loop file basics</h3>
-<p>A PyCodeDJ file looks like this:</p>
-<pre data-lang="python"><code>from pycodedj import loop
-
-@loop(&quot;name&quot;, interval=seconds)
-def function_name(volume=level):
-    # The structure of this code maps to sound
-    ...</code></pre>
-<p>The <code>@loop(&quot;name&quot;, interval=seconds)</code> decorator makes a function a &quot;loop&quot;:</p>
-<ul>
-<li><code>&quot;name&quot;</code> &mdash; the name sent to SuperCollider (letters, numbers, underscores)</li>
-<li><code>interval=seconds</code> &mdash; update interval in seconds (default: 1.0)</li>
-<li><code>volume=level</code> &mdash; volume from 0.0 to 1.0 (default: 0.3)</li>
-</ul>
-<h3>Try the demo file</h3>
-<p>Open <code>examples/demo.py</code>:</p>
-<pre data-lang="python"><code>from pycodedj import loop
-
-@loop(&quot;bass&quot;, interval=2.0)
-def bass(volume=0.4):
-    for i in range(8):
-        if i % 2 == 0:
-            pass
-
-@loop(&quot;melody&quot;, interval=0.5)
-def melody(volume=0.3):
-    x = 1
-    y = 2
-    return x + y
-
-@loop(&quot;pad&quot;, interval=4.0)
-def pad(volume=0.15):
-    # leave space here
-    # a little more
-    # silence is music
-    pass</code></pre>
-<p>Evaluate the <code>bass</code> loop:</p>
-<pre data-lang="bash"><code>pycodedj eval examples/demo.py::bass</code></pre>
-<p>On success:</p>
-<pre data-lang="text"><code>[pycodedj] bass  cutoff=418Hz  lfo=1.08Hz  reverb=0.00  voices=1  amp=0.40</code></pre>
-<p>Now evaluate <code>melody</code> and <code>pad</code>:</p>
-<pre data-lang="bash"><code>pycodedj eval examples/demo.py::melody
-pycodedj eval examples/demo.py::pad</code></pre>
-<p>All three loops are playing simultaneously, independently.</p>
-<h3>Change the code, change the sound</h3>
-<p>Open <code>examples/demo.py</code> in an editor and deepen the nesting in the <code>bass</code> block:</p>
-<p><strong>Before:</strong></p>
-<pre data-lang="python"><code>@loop(&quot;bass&quot;, interval=2.0)
-def bass(volume=0.4):
-    for i in range(8):
-        if i % 2 == 0:
-            pass</code></pre>
-<p><strong>After:</strong></p>
-<pre data-lang="python"><code>@loop(&quot;bass&quot;, interval=2.0)
-def bass(volume=0.4):
-    for i in range(8):
-        for j in range(4):      # added
-            if i % 2 == 0:
-                if j &gt; 2:       # added
-                    pass</code></pre>
-<p>Save, then re-evaluate:</p>
-<pre data-lang="bash"><code>pycodedj eval examples/demo.py::bass</code></pre>
-<pre data-lang="text"><code>[pycodedj] bass  cutoff=1200Hz  lfo=2.16Hz  reverb=0.00  voices=1  amp=0.40</code></pre>
-<p>The filter opened up and the modulation got faster. Deeper nesting = brighter sound.</p>
-<hr>
-</section>
-<section id="s5"><h2>5. Watch mode &mdash; save to reload</h2>
-<p>Running <code>pycodedj eval</code> manually each time gets tedious. The <code>watch</code> command evaluates all loops at startup and then <strong>re-evaluates only changed loops on every save</strong>.</p>
-<h3>Start watching</h3>
-<pre data-lang="bash"><code>pycodedj watch examples/demo.py</code></pre>
-<pre data-lang="text"><code>[pycodedj] watching demo.py — save to reload (Ctrl+C to stop)
-[pycodedj] reloaded demo.py (3 loop(s))</code></pre>
-<p>All loops play immediately. From here, just write code and save. Unchanged loops keep running without being resent. Every save shows:</p>
-<pre data-lang="text"><code>[pycodedj] reloaded demo.py (3 loop(s))</code></pre>
-<p><strong>Write code → Save → Sound changes.</strong> That&#x27;s the live-coding workflow.</p>
-<h3>Stop watching</h3>
-<p>Press <strong>Ctrl+C</strong>. The SuperCollider sound keeps playing. Use <code>pycodedj panic</code> to stop all sound.</p>
-<h3>Syntax errors</h3>
-<p>If you save with a syntax error, <strong>only that loop stays unchanged</strong>. The rest keep playing. The error appears in the terminal:</p>
-<pre data-lang="text"><code>[pycodedj] syntax error (bass): invalid syntax (demo.py, line 7)</code></pre>
-<p>Fix the syntax and save to recover automatically.</p>
-<hr>
-</section>
-<section id="s6"><h2>6. How code structure maps to sound</h2>
-<p>PyCodeDJ reads the <strong>shape</strong> of your code &mdash; not what it computes &mdash; and maps it to five musical parameters.</p>
-<h3>Mapping table</h3>
-<table>
-<thead><tr>
-<th>What PyCodeDJ reads</th>
-<th>Musical parameter</th>
-<th>Effect</th>
-</tr></thead><tbody>
-<tr>
-<td>Block nesting depth (<code>if</code> / <code>for</code> nesting)</td>
-<td>Filter Cutoff (200–4000 Hz)</td>
-<td>Deeper = brighter</td>
-</tr>
-<tr>
-<td>Control-flow count (<code>if</code> / <code>for</code> / <code>while</code>)</td>
-<td>LFO rate (0.1–5.0 Hz)</td>
-<td>More = faster modulation</td>
-</tr>
-<tr>
-<td>Function count (<code>def</code>)</td>
-<td>Polyphony voices (1–4)</td>
-<td>More = richer sound</td>
-</tr>
-<tr>
-<td>Comment ratio (comment lines ÷ total lines)</td>
-<td>Reverb depth (0.0–0.8)</td>
-<td>More = more space</td>
-</tr>
-<tr>
-<td><code>volume=</code> default value</td>
-<td>Amplitude (0.0–1.0)</td>
-<td>Direct control</td>
-</tr>
-<tr>
-<td><code>eq=</code> / <code>low=</code> / <code>mid=</code> / <code>high=</code> arguments</td>
-<td>3-band EQ</td>
-<td>Per-loop tone shaping</td>
-</tr>
-</tbody></table>
-<blockquote><p><strong>Note:</strong> Arithmetic expressions like <code>x = 1 + 2 * (3 + 4)</code> are not counted. Only block-level structure (<code>if</code>, <code>for</code>, <code>while</code>, <code>def</code>) matters.</p></blockquote>
-<h3>Examples</h3>
-<h4>Filter brightness (nesting depth)</h4>
-<pre data-lang="python"><code># Nesting depth 0 → filter minimum (dark, muffled sound)
-@loop(&quot;dark&quot;, interval=1.0)
-def f(volume=0.3):
-    pass</code></pre>
-<pre data-lang="python"><code># Nesting depth 4 → filter maximum (bright, open sound)
-@loop(&quot;bright&quot;, interval=1.0)
-def f(volume=0.3):
-    for i in range(4):
-        for j in range(4):
-            if i == j:
-                pass</code></pre>
-<h4>Modulation speed (control-flow count)</h4>
-<pre data-lang="python"><code># 0 control-flow statements → minimal modulation (steady)
-@loop(&quot;still&quot;, interval=1.0)
-def f(volume=0.3):
-    pass</code></pre>
-<pre data-lang="python"><code># 3 control-flow statements → fast modulation
-@loop(&quot;busy&quot;, interval=1.0)
-def f(volume=0.3):
-    for i in range(4):     # 1
-        if i &gt; 2:          # 2
-            while False:   # 3
-                pass</code></pre>
-<h4>Polyphony (function count)</h4>
-<pre data-lang="python"><code># 1 function → mono (solo)
-@loop(&quot;solo&quot;, interval=1.0)
-def f(volume=0.3):
-    pass</code></pre>
-<pre data-lang="python"><code># 4 functions → 4-voice polyphony (maximum)
-@loop(&quot;choir&quot;, interval=1.0)
-def f(volume=0.3):
-    def voice_a(): pass
-    def voice_b(): pass
-    def voice_c(): pass
-    def voice_d(): pass</code></pre>
-<h4>Space / reverb (comment ratio)</h4>
-<pre data-lang="python"><code># No comments → dry sound
-@loop(&quot;dry&quot;, interval=1.0)
-def f(volume=0.3):
-    x = 1
-    return x</code></pre>
-<pre data-lang="python"><code># Many comments → deep reverb
-@loop(&quot;spacious&quot;, interval=1.0)
-def f(volume=0.3):
-    # space
-    # more space
-    # silence is music
-    pass</code></pre>
-<h4>EQ</h4>
-<pre data-lang="python"><code>@loop(&quot;bass_reese&quot;, interval=0.5)
-def bass(volume=0.45, eq=&quot;edm&quot;):
-    ...
-
-@loop(&quot;hat_engine&quot;, interval=0.25)
-def hats(volume=0.08, eq=&quot;edm&quot;, low=0.5, high=1.25):
-    ...</code></pre>
-<table>
-<thead><tr>
-<th><code>eq=</code> preset</th>
-<th>Character</th>
-</tr></thead><tbody>
-<tr>
-<td><code>&quot;flat&quot;</code></td>
-<td>No adjustment (default)</td>
-</tr>
-<tr>
-<td><code>&quot;rock&quot;</code> / <code>&quot;pop&quot;</code></td>
-<td>Slight boost in lows and highs, slight dip in mids</td>
-</tr>
-<tr>
-<td><code>&quot;edm&quot;</code> / <code>&quot;hiphop&quot;</code></td>
-<td>Strong low boost, slight high boost</td>
-</tr>
-<tr>
-<td><code>&quot;classic&quot;</code> / <code>&quot;jazz&quot;</code></td>
-<td>Flat-leaning</td>
-</tr>
-<tr>
-<td><code>&quot;acoustic&quot;</code></td>
-<td>Restrained lows, slight mid-high lift</td>
-</tr>
-</tbody></table>
-<hr>
-</section>
-<section id="s7"><h2>7. pattern() &mdash; specify rhythm and pitch</h2>
-<p>Beyond code-structure mapping, you can specify rhythm and pitch <strong>explicitly</strong> using <code>pattern()</code>.</p>
-<h3>The basics</h3>
-<pre data-lang="python"><code>from pycodedj import loop, pattern
-
-@loop(&quot;kick&quot;, synth=&quot;floor_kick&quot;, dur=0.25)
-def kick_drum():
-    pattern(&quot;x . x .&quot;)</code></pre>
-<p>The string passed to <code>pattern()</code> describes a sequence of steps:</p>
-<table>
-<thead><tr>
-<th>Token</th>
-<th>Meaning</th>
-</tr></thead><tbody>
-<tr>
-<td><code>x</code></td>
-<td>Trigger: play the sound here</td>
-</tr>
-<tr>
-<td><code>.</code></td>
-<td>Rest: silence</td>
-</tr>
-<tr>
-<td><code>0</code>, <code>1</code>, <code>2</code> …</td>
-<td>Play the sound at this scale degree</td>
-</tr>
-<tr>
-<td><code>[0 3]</code></td>
-<td>Chord: play multiple degrees simultaneously</td>
-</tr>
-<tr>
-<td><code>~</code></td>
-<td>Tie: extend the previous note or chord by one step</td>
-</tr>
-</tbody></table>
-<p>Tokens are separated by spaces. <code>&quot;x . x .&quot;</code> is a 4-step pattern.</p>
-<h3>@loop arguments for pattern mode</h3>
-<p><strong>Choose the sound with <code>synth=</code>.</strong> <code>@loop(&quot;bass&quot;, synth=&quot;floor_kick&quot;)</code> keeps the loop name as <code>bass</code>, but plays the <code>floor_kick</code> synth.</p>
-<table>
-<thead><tr>
-<th>Argument</th>
-<th>Description</th>
-<th>Example</th>
-</tr></thead><tbody>
-<tr>
-<td><code>synth=</code></td>
-<td>Synth name</td>
-<td><code>synth=&quot;floor_kick&quot;</code></td>
-</tr>
-<tr>
-<td><code>root=</code></td>
-<td>Root note</td>
-<td><code>root=&quot;A3&quot;</code>, <code>root=&quot;C4&quot;</code></td>
-</tr>
-<tr>
-<td><code>scale=</code></td>
-<td>Scale name</td>
-<td><code>scale=&quot;minor&quot;</code>, <code>scale=&quot;major&quot;</code></td>
-</tr>
-<tr>
-<td><code>dur=</code></td>
-<td>Step length in seconds</td>
-<td><code>dur=0.25</code> (sixteenth note)</td>
-</tr>
-</tbody></table>
-<blockquote><p><code>volume=</code>, <code>eq=</code>, and <code>interval=</code> still work alongside pattern arguments. In <code>@loop(&quot;kick&quot;, synth=&quot;floor_kick&quot;)</code>, <code>&quot;kick&quot;</code> is the loop name and <code>&quot;floor_kick&quot;</code> is the synth name. Use the loop name for commands such as <code>pycodedj eval demo.py::kick</code> and <code>pycodedj mute kick</code>.</p></blockquote>
-<h3>Trigger patterns &mdash; x and . only</h3>
-<p>When you only want <strong>rhythm</strong> without specific pitches, use <code>x</code> and <code>.</code>:</p>
-<pre data-lang="python"><code>from pycodedj import loop, pattern
-
-@loop(&quot;kick&quot;, synth=&quot;floor_kick&quot;, dur=0.25)
+@loop(synth="kick_floor", beat=0.25)
 def kick():
-    pattern(&quot;x . x .&quot;)           # 4 steps
+    dj.volume = 0.8
+    dj.pattern = "x . x ."</code></pre>
+  <p>The function name is the loop name. Use it with <code>pycodedj eval demo.py::bass</code>, <code>mute</code>, and <code>stop</code>.</p>
 
-@loop(&quot;hat&quot;, synth=&quot;hat_engine&quot;, dur=0.25)
-def hat():
-    pattern(&quot;x x x x x x x x&quot;)  # 8 steps (16th-note grid)
+  <h2>2. Install and Start</h2>
+<pre><code>pip install 'pycodedj[watch]'</code></pre>
+  <p>Open <code>sc/synths.scd</code> in SuperCollider, run it, and confirm:</p>
+<pre><code>PyCodeDJ synths loaded. Ready. OSC port: 57120</code></pre>
+<pre><code>pycodedj eval examples/demo.py::bass</code></pre>
 
-@loop(&quot;snare&quot;, synth=&quot;clap_snare&quot;, dur=0.25)
-def snare():
-    pattern(&quot;. . x . . . x .&quot;)   # backbeat (beats 2 and 4)</code></pre>
-<h3>Pitch patterns &mdash; scale degrees</h3>
-<p>Use non-negative integers to specify <strong>pitch</strong> as a scale degree:</p>
-<pre data-lang="python"><code>@loop(&quot;melody&quot;, synth=&quot;acid_lead&quot;, root=&quot;A3&quot;, scale=&quot;minor&quot;, dur=0.25)
-def melody():
-    pattern(&quot;0 . 3 . 5 . 7 .&quot;)</code></pre>
-<p>With <code>scale=&quot;minor&quot;</code> and <code>root=&quot;A3&quot;</code>, the degrees map like this:</p>
-<table>
-<thead><tr>
-<th>Degree</th>
-<th>A natural minor</th>
-</tr></thead><tbody>
-<tr>
-<td>0</td>
-<td>A3</td>
-</tr>
-<tr>
-<td>1</td>
-<td>B3</td>
-</tr>
-<tr>
-<td>2</td>
-<td>C4</td>
-</tr>
-<tr>
-<td>3</td>
-<td>D4</td>
-</tr>
-<tr>
-<td>4</td>
-<td>E4</td>
-</tr>
-<tr>
-<td>5</td>
-<td>F4</td>
-</tr>
-<tr>
-<td>6</td>
-<td>G4</td>
-</tr>
-<tr>
-<td>7</td>
-<td>A4 (one octave up)</td>
-</tr>
-</tbody></table>
-<blockquote><p>Degrees above 6 automatically wrap up by an octave. <code>7</code> = one octave above <code>0</code>, <code>14</code> = two octaves above <code>0</code>.</p></blockquote>
-<h3>Available scales</h3>
-<p>Any scale from SuperCollider&#x27;s Scale library works. Common ones:</p>
-<table>
-<thead><tr>
-<th><code>scale=</code> value</th>
-<th>Scale</th>
-</tr></thead><tbody>
-<tr>
-<td><code>&quot;major&quot;</code></td>
-<td>Major</td>
-</tr>
-<tr>
-<td><code>&quot;minor&quot;</code></td>
-<td>Natural minor</td>
-</tr>
-<tr>
-<td><code>&quot;chromatic&quot;</code></td>
-<td>Chromatic</td>
-</tr>
-<tr>
-<td><code>&quot;dorian&quot;</code></td>
-<td>Dorian</td>
-</tr>
-<tr>
-<td><code>&quot;phrygian&quot;</code></td>
-<td>Phrygian</td>
-</tr>
-<tr>
-<td><code>&quot;lydian&quot;</code></td>
-<td>Lydian</td>
-</tr>
-<tr>
-<td><code>&quot;mixolydian&quot;</code></td>
-<td>Mixolydian</td>
-</tr>
-<tr>
-<td><code>&quot;pentatonicMajor&quot;</code></td>
-<td>Major pentatonic</td>
-</tr>
-<tr>
-<td><code>&quot;pentatonicMinor&quot;</code></td>
-<td>Minor pentatonic</td>
-</tr>
-</tbody></table>
-<h3>Mixing x and degrees</h3>
-<p>You can mix trigger tokens and degrees in the same pattern. <code>x</code> plays at the root note.</p>
-<pre data-lang="python"><code>@loop(&quot;bass&quot;, synth=&quot;acid_lead&quot;, root=&quot;C3&quot;, scale=&quot;minor&quot;, dur=0.25)
-def bass():
-    pattern(&quot;0 . x . 3 . x .&quot;)
-    # 0→C3, rest, x→C3, rest, 3→Eb3, rest, x→C3, rest</code></pre>
-<h3>Chords &mdash; multiple notes at once</h3>
-<p>Wrap multiple degrees in square brackets to play them simultaneously in one step:</p>
-<pre data-lang="python"><code>@loop(&quot;chord&quot;, synth=&quot;note&quot;, root=&quot;C3&quot;, scale=&quot;minor&quot;, dur=0.5)
-def chord():
-    pattern(&quot;[0 2 4] . [0 3] .&quot;)
-    # [0 2 4]→C3+Eb3+G3 (minor triad), rest, [0 3]→C3+Eb3, rest</code></pre>
-<p>Only non-negative integers are allowed inside brackets. <code>.</code>, <code>x</code>, and <code>~</code> are not valid inside a chord.</p>
-<h3>Ties &mdash; sustaining a note</h3>
-<p>Use <code>~</code> to extend the previous note or chord by one additional step:</p>
-<pre data-lang="python"><code>@loop(&quot;bass&quot;, synth=&quot;note&quot;, root=&quot;A1&quot;, scale=&quot;minor&quot;, dur=0.25)
-def bass():
-    pattern(&quot;0 . [0 3] ~ 5 . 3 .&quot;)
-    # 0→A1, rest, [0 3] chord held for 2 steps, 5→F2, rest, 3→D2, rest</code></pre>
-<p><code>~</code> can only follow a degree or chord. Placing it at the start, or after <code>.</code> or <code>x</code>, raises a <code>ValueError</code>.</p>
-<h3>Root note notation</h3>
-<table>
-<thead><tr>
-<th>Notation</th>
-<th>Note</th>
-</tr></thead><tbody>
-<tr>
-<td><code>&quot;C4&quot;</code></td>
-<td>Middle C</td>
-</tr>
-<tr>
-<td><code>&quot;A3&quot;</code></td>
-<td>A3</td>
-</tr>
-<tr>
-<td><code>&quot;Bb2&quot;</code></td>
-<td>B♭2</td>
-</tr>
-<tr>
-<td><code>&quot;F#3&quot;</code></td>
-<td>F♯3 (also writable as <code>&quot;Fs3&quot;</code>)</td>
-</tr>
-<tr>
-<td><code>&quot;C1&quot;</code></td>
-<td>Low C</td>
-</tr>
-</tbody></table>
-<h3>Full example: kick, bass, and chord</h3>
-<pre data-lang="python"><code>from pycodedj import loop, pattern
+  <h2>3. Basic Loop Syntax</h2>
+<pre><code>from pycodedj import dj, loop
 
-@loop(&quot;kick&quot;, synth=&quot;floor_kick&quot;, dur=0.25)
-def kick():
-    pattern(&quot;x . . . x . . .&quot;)
-
-@loop(&quot;bass&quot;, synth=&quot;bass_acid&quot;, root=&quot;A1&quot;, scale=&quot;minor&quot;, dur=0.25)
-def bass():
-    pattern(&quot;0 . [0 3] ~ 5 . 3 .&quot;)
-    # 0→A1, rest, [0 3] chord held for 2 steps, 5→F2, rest, 3→D2, rest
-
-@loop(&quot;melody&quot;, synth=&quot;acid_lead&quot;, root=&quot;A3&quot;, scale=&quot;minor&quot;, dur=0.5)
-def melody():
-    pattern(&quot;0 3 5 7&quot;)
-
-@loop(&quot;pad&quot;, interval=4.0)
-def pad(volume=0.06):
-    # ambient background
-    # let the code breathe
+@loop(interval=1.0)
+def loop_name():
+    dj.volume = 0.3
+    dj.eq = "flat"
     pass</code></pre>
-<h3>pattern() vs code-structure mapping</h3>
-<table>
-<thead><tr>
-<th></th>
-<th>Code-structure mapping</th>
-<th>pattern()</th>
-</tr></thead><tbody>
-<tr>
-<td>Rhythm</td>
-<td>Generated from code structure</td>
-<td>You specify</td>
-</tr>
-<tr>
-<td>Pitch</td>
-<td>Generated from code structure</td>
-<td>You specify (or omit)</td>
-</tr>
-<tr>
-<td>Use when</td>
-<td>You want the sound to reflect the code&#x27;s shape</td>
-<td>You want precise rhythm and melody</td>
-</tr>
-</tbody></table>
-<p>Both styles can coexist in the same file.</p>
-<hr>
-</section>
-<section id="s8"><h2>8. Running multiple loops</h2>
-<p>The key feature of PyCodeDJ is that <strong>multiple loops run independently</strong>. Updating one loop doesn&#x27;t interrupt the others.</p>
-<h3>Basic setup</h3>
-<pre data-lang="python"><code>from pycodedj import loop, pattern
+  <table>
+    <tr><th>Setting</th><th>Meaning</th><th>Default</th></tr>
+    <tr><td><code>dj.volume</code></td><td>Amplitude, 0.0 to 1.0</td><td><code>0.3</code></td></tr>
+    <tr><td><code>dj.eq</code></td><td>EQ preset</td><td><code>"flat"</code></td></tr>
+    <tr><td><code>dj.low/mid/high</code></td><td>Per-band EQ override, 0.0 to 2.0</td><td>preset value</td></tr>
+    <tr><td><code>dj.pattern</code></td><td>Rhythm and pitch pattern</td><td>none</td></tr>
+  </table>
+<pre><code>@loop(interval=0.25)
+def hats():
+    dj.volume = 0.08
+    dj.eq = "edm"
+    dj.low = 0.5
+    dj.high = 1.25</code></pre>
+  <table>
+    <tr><th>Preset</th><th>Character</th></tr>
+    <tr><td><code>"flat"</code></td><td>No adjustment</td></tr>
+    <tr><td><code>"classic"</code> / <code>"classical"</code></td><td>Restrained lows/highs, forward mids</td></tr>
+    <tr><td><code>"jazz"</code></td><td>Warm lows, forward mids, soft highs</td></tr>
+    <tr><td><code>"rock"</code> / <code>"pop"</code></td><td>Slight low and high boost</td></tr>
+    <tr><td><code>"edm"</code> / <code>"hiphop"</code></td><td>Stronger low end</td></tr>
+    <tr><td><code>"acoustic"</code></td><td>Restrained lows, slight mid-high lift</td></tr>
+  </table>
 
-@loop(&quot;kick&quot;, synth=&quot;floor_kick&quot;, dur=0.25)
+  <h2>4. Code Structure Mapping</h2>
+  <p>When <code>dj.pattern</code> is absent, the shape of the function body controls sound.</p>
+  <table>
+    <tr><th>Code feature</th><th>Music parameter</th><th>Effect</th></tr>
+    <tr><td>Max block depth</td><td>Filter cutoff</td><td>Deeper code sounds brighter</td></tr>
+    <tr><td><code>if</code> / <code>for</code> / <code>while</code> count</td><td>LFO rate</td><td>More control flow moves faster</td></tr>
+    <tr><td>Nested <code>def</code> count</td><td>Voice count</td><td>More functions add voices</td></tr>
+    <tr><td>Comment ratio</td><td>Reverb mix</td><td>More comments add space</td></tr>
+  </table>
+
+  <h2>5. Rhythm and Pitch with dj.pattern</h2>
+<pre><code>@loop(synth="bass_acid", root="A1", scale="minor", beat=0.25)
+def bass():
+    dj.volume = 0.35
+    dj.pattern = "0 . [0 3] ~ 5 . 3 ."</code></pre>
+  <table>
+    <tr><th>Token</th><th>Meaning</th></tr>
+    <tr><td><code>x</code></td><td>Trigger at root note</td></tr>
+    <tr><td><code>.</code></td><td>Rest</td></tr>
+    <tr><td><code>0</code>, <code>1</code>, ...</td><td>Scale degree</td></tr>
+    <tr><td><code>[0 3]</code></td><td>Chord</td></tr>
+    <tr><td><code>~</code></td><td>Tie</td></tr>
+  </table>
+  <p><code>dj.pattern = p1</code> is intentionally not supported. Keep pattern strings visible in the loop body.</p>
+
+  <h2>6. Multiple Loops</h2>
+<pre><code>@loop(synth="kick_floor", beat=0.25)
 def kick():
-    pattern(&quot;x . x .&quot;)
+    dj.volume = 0.8
+    dj.pattern = "x . x ."
 
-@loop(&quot;bass&quot;, interval=2.0)
-def bass_line(volume=0.4):
-    for i in range(8):
-        if i % 2 == 0:
-            pass
-
-@loop(&quot;pad&quot;, interval=4.0)
-def atmosphere(volume=0.08):
-    # ambient space
-    # breathe
+@loop(interval=4.0)
+def pad():
+    dj.volume = 0.08
+    # wide space
     pass</code></pre>
-<p>Start watching and each save updates only the changed loops:</p>
-<pre data-lang="bash"><code>pycodedj watch myfile.py</code></pre>
-<h3>Try the sub-heavy club set</h3>
-<p><code>examples/club_set.py</code> is a low-end club-floor example. It layers a four-on-the-floor kick, clap on beats 2 and 4, offbeat hats, 16th-note hats, rumble, sub bass, acid bass, sparse stabs, fills, and room noise.</p>
-<pre data-lang="bash"><code>pycodedj watch examples/club_set.py</code></pre>
-<p>These are the main loop names. Use <code>mute</code> / <code>unmute</code> to bring layers in and out and hear how the groove is built.</p>
-<table>
-<thead><tr>
-<th>Loop name</th>
-<th>Role</th>
-<th>Synth name</th>
-</tr></thead><tbody>
-<tr>
-<td><code>kick</code></td>
-<td>Four-on-the-floor foundation</td>
-<td><code>floor_kick</code></td>
-</tr>
-<tr>
-<td><code>rumble</code></td>
-<td>Floor-shaking low end</td>
-<td><code>bass_rumble</code></td>
-</tr>
-<tr>
-<td><code>sub</code> / <code>floor</code></td>
-<td>Sustained sub pressure</td>
-<td><code>sub_bass</code></td>
-</tr>
-<tr>
-<td><code>acid</code></td>
-<td>Moving bassline</td>
-<td><code>bass_acid</code></td>
-</tr>
-<tr>
-<td><code>offhat</code> / <code>hats</code></td>
-<td>Groove and forward motion</td>
-<td><code>hat_ride</code>, <code>hat_engine</code></td>
-</tr>
-<tr>
-<td><code>room</code></td>
-<td>Warehouse-like space</td>
-<td><code>warehouse_air</code></td>
-</tr>
-</tbody></table>
-<h3>Live controls</h3>
-<p><strong>Stop, mute, and unmute</strong></p>
-<pre data-lang="bash"><code>pycodedj stop bass        # stop bass
-pycodedj mute bass        # silence without stopping
-pycodedj unmute bass      # restore volume</code></pre>
-<p><strong>Emergency stop</strong></p>
-<pre data-lang="bash"><code>pycodedj panic            # stop everything immediately</code></pre>
-<p><strong>Check loop status</strong></p>
-<pre data-lang="bash"><code>pycodedj status</code></pre>
-<pre data-lang="text"><code>Loop         State    Amp    Cutoff
-kick         playing  0.30   —
-bass         playing  0.40   1340Hz
-pad          muted    0.08   200Hz</code></pre>
-<h3>Removing a loop</h3>
-<p>Delete the <code>@loop</code> block (decorator + function) and save. In watch mode, the loop stops automatically.</p>
-<hr>
-</section>
-<section id="s9"><h2>9. Sound Reference</h2>
-<p>PyCodeDJ has two related names:</p>
-<ul>
-<li>Loop name: the first argument to <code>@loop(&quot;kick&quot;, ...)</code>. Use it with <code>pycodedj eval demo.py::kick</code>, <code>mute</code>, <code>solo</code>, and status commands.</li>
-<li>Synth name: the SuperCollider synth name. Pattern loops set it with <code>synth=&quot;floor_kick&quot;</code>.</li>
-</ul>
-<p>To choose a sound, pick a synth name from the tables below and put it in <code>synth=</code>. For example, <code>@loop(&quot;bass&quot;, synth=&quot;floor_kick&quot;)</code> creates a loop called <code>bass</code> that plays the <code>floor_kick</code> synth.</p>
-<p>With <code>pattern()</code>, you can keep these names separate: <code>@loop(&quot;kick&quot;, synth=&quot;floor_kick&quot;)</code> means the loop is called <code>kick</code>, and it plays the <code>floor_kick</code> synth.</p>
-<p>For non-pattern structure-mapping loops, PyCodeDJ keeps the older shorthand: if the loop name matches a synth name, that synth is used. For example, <code>@loop(&quot;bass_acid&quot;, interval=0.5)</code> plays the <code>bass_acid</code> synth.</p>
-<p>To audition all 30 synths one at a time, use <code>examples/sound_showcase.py</code>:</p>
-<pre data-lang="bash"><code>pycodedj eval examples/sound_showcase.py::floor_kick
+<pre><code>pycodedj watch examples/demo.py</code></pre>
+
+  <h2>7. Sound Reference</h2>
+  <p>Use <code>synth=</code> to choose a SuperCollider synth. The function name remains the loop name; <code>synth=</code> only chooses the sound.</p>
+<pre><code>@loop(synth="bass_acid", root="A1", scale="minor", beat=0.25)
+def acid():
+    dj.volume = 0.25
+    dj.pattern = "0 . 3 . 5 ."</code></pre>
+  <p>Audition all sounds one at a time:</p>
+<pre><code>pycodedj eval examples/sound_showcase.py::kick_floor
 pycodedj eval examples/sound_showcase.py::bass_acid
-pycodedj eval examples/sound_showcase.py::acid_lead</code></pre>
-<p>In <code>examples/sound_showcase.py</code>, loop names intentionally match synth names so each sound is easy to audition. In normal pattern loops, put one of the synth names below in <code>synth=</code>:</p>
-<pre data-lang="python"><code>@loop(&quot;kick&quot;, synth=&quot;floor_kick&quot;, dur=0.25)
-def kick():
-    pattern(&quot;x . x .&quot;)</code></pre>
-<h3>Kick</h3>
-<table>
-<thead><tr>
-<th>Synth name</th>
-<th>Sound</th>
-</tr></thead><tbody>
-<tr>
-<td><code>kick_hard</code></td>
-<td>Hard, punchy kick</td>
-</tr>
-<tr>
-<td><code>floor_kick</code></td>
-<td>Full four-on-the-floor kick</td>
-</tr>
-<tr>
-<td><code>kick_pulse</code></td>
-<td>Light pulse kick</td>
-</tr>
-</tbody></table>
-<h3>Bass</h3>
-<table>
-<thead><tr>
-<th>Synth name</th>
-<th>Sound</th>
-</tr></thead><tbody>
-<tr>
-<td><code>bass_rumble</code></td>
-<td>Deep low rumble</td>
-</tr>
-<tr>
-<td><code>bass_reese</code></td>
-<td>Reese-style wobble bass</td>
-</tr>
-<tr>
-<td><code>sub_bass</code></td>
-<td>Sub bass</td>
-</tr>
-<tr>
-<td><code>bass_acid</code></td>
-<td>303-style acid bass</td>
-</tr>
-</tbody></table>
-<h3>Percussion</h3>
-<table>
-<thead><tr>
-<th>Synth name</th>
-<th>Sound</th>
-</tr></thead><tbody>
-<tr>
-<td><code>hat_engine</code></td>
-<td>Closed/open hi-hat grid</td>
-</tr>
-<tr>
-<td><code>hat_ride</code></td>
-<td>Long ride/open hat</td>
-</tr>
-<tr>
-<td><code>clap_snap</code></td>
-<td>Sharp clap</td>
-</tr>
-<tr>
-<td><code>clap_snare</code></td>
-<td>Snare-like clap</td>
-</tr>
-<tr>
-<td><code>tom_drum</code></td>
-<td>Floor tom (pitch sweep)</td>
-</tr>
-<tr>
-<td><code>snare_roll</code></td>
-<td>Snare roll</td>
-</tr>
-<tr>
-<td><code>noise_crash</code></td>
-<td>Crash cymbal (long tail)</td>
-</tr>
-</tbody></table>
-<h3>Chords / Stabs</h3>
-<table>
-<thead><tr>
-<th>Synth name</th>
-<th>Sound</th>
-</tr></thead><tbody>
-<tr>
-<td><code>chord_rave</code></td>
-<td>Bright rave stab</td>
-</tr>
-<tr>
-<td><code>neon_stab</code></td>
-<td>Neon-style stab chord</td>
-</tr>
-<tr>
-<td><code>dub_chord</code></td>
-<td>Dub chord</td>
-</tr>
-<tr>
-<td><code>stab_saw</code></td>
-<td>Detuned saw chord stab</td>
-</tr>
-<tr>
-<td><code>organ_chord</code></td>
-<td>Hammond-style organ chord</td>
-</tr>
-<tr>
-<td><code>bell_rave</code></td>
-<td>FM rave bell</td>
-</tr>
-</tbody></table>
-<h3>Lead / Melody</h3>
-<table>
-<thead><tr>
-<th>Synth name</th>
-<th>Sound</th>
-</tr></thead><tbody>
-<tr>
-<td><code>acid_lead</code></td>
-<td>Acid-style lead</td>
-</tr>
-<tr>
-<td><code>lead_hoover</code></td>
-<td>Hoover-style lead</td>
-</tr>
-<tr>
-<td><code>soft_pluck</code></td>
-<td>Soft pluck</td>
-</tr>
-<tr>
-<td><code>synth_arp</code></td>
-<td>Arpeggio synth</td>
-</tr>
-<tr>
-<td><code>note</code></td>
-<td>General-purpose note synth (for pitch patterns)</td>
-</tr>
-</tbody></table>
-<h3>Atmosphere</h3>
-<table>
-<thead><tr>
-<th>Synth name</th>
-<th>Sound</th>
-</tr></thead><tbody>
-<tr>
-<td><code>shimmer_pad</code></td>
-<td>Deep shimmer pad</td>
-</tr>
-<tr>
-<td><code>warehouse_air</code></td>
-<td>Industrial air texture</td>
-</tr>
-<tr>
-<td><code>vox_ahh</code></td>
-<td>Formant vocal pad</td>
-</tr>
-</tbody></table>
-<h3>FX</h3>
-<table>
-<thead><tr>
-<th>Synth name</th>
-<th>Sound</th>
-</tr></thead><tbody>
-<tr>
-<td><code>fx_impact</code></td>
-<td>Low impact hit</td>
-</tr>
-<tr>
-<td><code>riser_noise</code></td>
-<td>Noise riser (8-second upward sweep)</td>
-</tr>
-<tr>
-<td><code>glitch_ticks</code></td>
-<td>Fine glitch ticks</td>
-</tr>
-</tbody></table>
-<hr>
-</section>
-<section id="s10"><h2>10. Performance ideas</h2>
-<h3>Idea A: Grow from silence</h3>
-<p>Start with empty code and add elements one save at a time. Each save is an audible step.</p>
-<pre data-lang="python"><code># Stage 1: minimum (dark filter, mono)
-@loop(&quot;main&quot;, interval=1.0)
-def f(volume=0.3):
-    pass</code></pre>
-<pre data-lang="python"><code># Stage 2: add movement
-@loop(&quot;main&quot;, interval=1.0)
-def f(volume=0.3):
-    for i in range(4):
-        pass</code></pre>
-<pre data-lang="python"><code># Stage 3: open the filter with deeper nesting
-@loop(&quot;main&quot;, interval=1.0)
-def f(volume=0.3):
-    for i in range(4):
-        for j in range(2):
-            if i &gt; j:
-                pass</code></pre>
-<pre data-lang="python"><code># Stage 4: climax — maximum polyphony
-@loop(&quot;main&quot;, interval=1.0)
-def f(volume=0.5):
-    def voice_a():
-        for i in range(4):
-            for j in range(2):
-                if i &gt; j:
-                    pass
-    def voice_b():
-        for k in range(8):
-            pass</code></pre>
-<h3>Idea B: Live sequence with pattern()</h3>
-<p>Change the pattern string on each save.</p>
-<pre data-lang="python"><code>from pycodedj import loop, pattern
+pycodedj eval examples/sound_showcase.py::lead_acid</code></pre>
 
-@loop(&quot;kick&quot;, synth=&quot;floor_kick&quot;, dur=0.25)
-def kick():
-    pattern(&quot;x . x .&quot;)     # ← change this and save to change the rhythm
+  <h3>Kicks</h3>
+  <table><tr><th>Synth</th><th>Character</th><th>Good for</th></tr>
+    <tr><td><code>kick_hard</code></td><td>Tight, punchy, short attack</td><td>Strong downbeats and minimal patterns</td></tr>
+    <tr><td><code>kick_floor</code></td><td>Full four-on-the-floor club kick</td><td>Main kick in dance/techno loops</td></tr>
+    <tr><td><code>kick_pulse</code></td><td>Lighter pulse kick</td><td>Secondary pulse, softer rhythmic support</td></tr>
+    <tr><td><code>kick_soft</code></td><td>Rounder kick with less click</td><td>Warm grooves and quieter sections</td></tr>
+    <tr><td><code>kick_909</code></td><td>Long electronic kick tail</td><td>House and techno foundations</td></tr>
+    <tr><td><code>kick_click</code></td><td>Short kick with a clear transient</td><td>Fast patterns that need definition</td></tr>
+  </table>
+  <h3>Bass</h3>
+  <table><tr><th>Synth</th><th>Character</th><th>Good for</th></tr>
+    <tr><td><code>bass_rumble</code></td><td>Deep, loose low-end pressure</td><td>Rumble layers under a kick</td></tr>
+    <tr><td><code>bass_reese</code></td><td>Wide, moving Reese-style bass</td><td>Dark basslines and sustained movement</td></tr>
+    <tr><td><code>bass_sub</code></td><td>Clean sine-like sub weight</td><td>Fundamental low notes and floor pressure</td></tr>
+    <tr><td><code>bass_acid</code></td><td>Resonant 303-like acid tone</td><td>Patterned basslines and squelchy sequences</td></tr>
+    <tr><td><code>bass_pluck</code></td><td>Short plucked bass</td><td>Syncopated low-end hooks</td></tr>
+    <tr><td><code>bass_fm</code></td><td>Metallic FM low tone</td><td>Percussive basslines</td></tr>
+    <tr><td><code>bass_mono</code></td><td>Simple mono synth bass</td><td>Stable bass phrases</td></tr>
+    <tr><td><code>bass_wobble</code></td><td>Filter-modulated bass</td><td>Dubstep-style movement and breakdowns</td></tr>
+  </table>
+  <h3>Percussion</h3>
+  <table><tr><th>Synth</th><th>Character</th><th>Good for</th></tr>
+    <tr><td><code>hat_engine</code></td><td>Short closed/open hat texture</td><td>16th-note grids and forward motion</td></tr>
+    <tr><td><code>hat_ride</code></td><td>Longer open hat / ride color</td><td>Offbeats and sustained top-end energy</td></tr>
+    <tr><td><code>clap_snap</code></td><td>Sharp, dry clap</td><td>Snappy accents</td></tr>
+    <tr><td><code>clap_snare</code></td><td>Broader snare-like clap</td><td>Backbeats on beats 2 and 4</td></tr>
+    <tr><td><code>tom_drum</code></td><td>Pitch-swept tom</td><td>Fills, transitions, low percussion</td></tr>
+    <tr><td><code>snare_roll</code></td><td>Repeated snare texture</td><td>Rolls and build-ups</td></tr>
+    <tr><td><code>crash_noise</code></td><td>Long noisy crash</td><td>Section changes and impacts</td></tr>
+    <tr><td><code>rim_shot</code></td><td>Dry rim transient</td><td>Sparse syncopation</td></tr>
+    <tr><td><code>cowbell</code></td><td>Metallic two-tone hit</td><td>Classic machine percussion</td></tr>
+    <tr><td><code>perc_blip</code></td><td>Small pitched blip</td><td>Minimal percussion and call-response details</td></tr>
+    <tr><td><code>shaker_loop</code></td><td>Continuous shaker texture</td><td>Top-end groove and motion</td></tr>
+    <tr><td><code>tick_metal</code></td><td>Tiny metallic tick</td><td>Glitch grids and high-frequency accents</td></tr>
+    <tr><td><code>wood_block</code></td><td>Woody resonant knock</td><td>Dry percussion patterns</td></tr>
+  </table>
+  <h3>Chords and Stabs</h3>
+  <table><tr><th>Synth</th><th>Character</th><th>Good for</th></tr>
+    <tr><td><code>chord_rave</code></td><td>Bright rave stab</td><td>Short chord hits and hooks</td></tr>
+    <tr><td><code>stab_neon</code></td><td>Glossy synthetic stab</td><td>Melodic accents</td></tr>
+    <tr><td><code>chord_dub</code></td><td>Soft dub-techno chord</td><td>Spacious chord pulses</td></tr>
+    <tr><td><code>stab_saw</code></td><td>Detuned saw stab</td><td>Aggressive harmonic accents</td></tr>
+    <tr><td><code>chord_organ</code></td><td>Organ-like sustained chord</td><td>Warm harmonic beds</td></tr>
+    <tr><td><code>bell_rave</code></td><td>Metallic FM bell</td><td>Bright melodic stabs</td></tr>
+    <tr><td><code>pad_minor</code></td><td>Dark minor pad</td><td>Suspense and darker harmonic beds</td></tr>
+    <tr><td><code>chord_deep</code></td><td>Low filtered chord</td><td>Deep house / dub-techno pulses</td></tr>
+    <tr><td><code>chord_glass</code></td><td>Clear glassy chord</td><td>Clean bright harmonic accents</td></tr>
+    <tr><td><code>pad_warm</code></td><td>Smooth analog-style pad</td><td>Soft background harmony</td></tr>
+    <tr><td><code>pad_string</code></td><td>Bowed string-like synth pad</td><td>Long sustained emotional layers</td></tr>
+    <tr><td><code>pad_choir</code></td><td>Vocal-formant pad</td><td>Choral beds without a lead vocal</td></tr>
+  </table>
+  <h3>Leads and Notes</h3>
+  <table><tr><th>Synth</th><th>Character</th><th>Good for</th></tr>
+    <tr><td><code>lead_acid</code></td><td>Acid-style lead</td><td>Melodic sequences</td></tr>
+    <tr><td><code>lead_hoover</code></td><td>Hoover-like lead</td><td>Big sustained gestures</td></tr>
+    <tr><td><code>pluck_soft</code></td><td>Gentle plucked tone</td><td>Sparse melodies</td></tr>
+    <tr><td><code>arp_synth</code></td><td>Arpeggiated synth tone</td><td>Fast melodic motion</td></tr>
+    <tr><td><code>lead_square</code></td><td>Hollow square-wave lead</td><td>Retro melodic hooks</td></tr>
+    <tr><td><code>lead_fm</code></td><td>Bell-like FM lead</td><td>Bright digital melodies</td></tr>
+    <tr><td><code>lead_chip</code></td><td>Short chiptune lead</td><td>Fast arcade-like phrases</td></tr>
+    <tr><td><code>lead_saw</code></td><td>Detuned saw lead</td><td>Larger melodic lines</td></tr>
+    <tr><td><code>lead_whistle</code></td><td>Thin sine-like whistle</td><td>High counter-melodies</td></tr>
+    <tr><td><code>note</code></td><td>Neutral note synth</td><td>General <code>dj.pattern</code> pitch tests and chords</td></tr>
+  </table>
+  <h3>Atmosphere and FX</h3>
+  <table><tr><th>Synth</th><th>Character</th><th>Good for</th></tr>
+    <tr><td><code>pad_shimmer</code></td><td>Wide, slow shimmer</td><td>Background pads</td></tr>
+    <tr><td><code>air_warehouse</code></td><td>Industrial room tone</td><td>Space, air, and noise bed</td></tr>
+    <tr><td><code>vox_ahh</code></td><td>Vocal-like formant pad</td><td>Breath and choir-like layers</td></tr>
+    <tr><td><code>fx_drop</code></td><td>Low impact hit</td><td>Drops and transitions</td></tr>
+    <tr><td><code>fx_riser</code></td><td>Rising noise sweep</td><td>Build-ups</td></tr>
+    <tr><td><code>fx_glitch</code></td><td>Small glitch clicks</td><td>Detailed percussive texture</td></tr>
+    <tr><td><code>drone_space</code></td><td>Low evolving drone</td><td>Long ambient beds</td></tr>
+    <tr><td><code>fx_down</code></td><td>Descending noise sweep</td><td>Drops and section endings</td></tr>
+    <tr><td><code>fx_zap</code></td><td>Short falling laser-like hit</td><td>Small FX punctuation</td></tr>
+    <tr><td><code>fx_noise</code></td><td>Filtered noise burst</td><td>Impacts and transitions</td></tr>
+    <tr><td><code>fx_laser</code></td><td>Pitch-bending laser FX</td><td>Sci-fi accents</td></tr>
+    <tr><td><code>fx_vinyl</code></td><td>Crackle and hiss bed</td><td>Texture and lo-fi background</td></tr>
+  </table>
 
-@loop(&quot;bass&quot;, synth=&quot;bass_acid&quot;, root=&quot;A1&quot;, scale=&quot;minor&quot;, dur=0.25)
-def bass():
-    pattern(&quot;0 . 0 . 3 .&quot;) # ← change degrees to change the harmony</code></pre>
-<h3>Idea C: Contrast quiet and loud</h3>
-<p>Pair a busy loop with a spacious one.</p>
-<pre data-lang="python"><code>@loop(&quot;bass&quot;, interval=2.0)
-def the_bass(volume=0.5):
-    def layer_a():
-        for i in range(8):
-            for j in range(4):
-                if i == j:
-                    pass
-    def layer_b():
-        for k in range(8):
-            pass
+  <h2>8. CLI Reference</h2>
+<pre><code>pycodedj eval FILE::LOOP
+pycodedj watch examples/demo.py
+pycodedj panic
+pycodedj stop bass
+pycodedj mute bass
+pycodedj unmute bass</code></pre>
 
-@loop(&quot;pad&quot;, interval=4.0)
-def space(volume=0.08):
-    # silence
-    # more silence
-    # just space
-    pass</code></pre>
-<h3>Idea D: Perform with comments only</h3>
-<p>Leave one function and change only the comment count. More comments = more reverb.</p>
-<pre data-lang="python"><code>@loop(&quot;ambient&quot;, interval=4.0)
-def f(volume=0.15):
-    # add or remove lines here to change the space
-    pass</code></pre>
-<h3>Idea E: Write a story with function names</h3>
-<p>Sound comes from code structure, not function names. Name things whatever you like.</p>
-<pre data-lang="python"><code>@loop(&quot;scene&quot;, interval=2.0)
-def the_city_wakes_up(volume=0.3):
-    for hour in range(6):
-        if hour &gt; 4:
-            pass
+  <h2>9. Troubleshooting</h2>
+  <p>No sound: boot SuperCollider, run <code>sc/synths.scd</code>, confirm the OSC port, then run <code>pycodedj eval examples/demo.py::bass</code>.</p>
+  <p>Loop not found: the name after <code>::</code> must match the Python function name.</p>
 
-@loop(&quot;rush&quot;, interval=1.0)
-def rush_hour(volume=0.2):
-    for commuter in range(8):
-        for train in range(3):
-            if commuter % 2 == 0:
-                pass</code></pre>
-<hr>
-</section>
-<section id="s11"><h2>11. Troubleshooting</h2>
-<h3>No sound</h3>
-<p>First, check that SuperCollider works on its own. In the SuperCollider code area:</p>
-<pre data-lang="supercollider"><code>{ SinOsc.ar(440, 0, 0.1) ! 2 }.play;</code></pre>
-<p><strong>Ctrl+Enter</strong> to run, <strong>Ctrl+.</strong> (Mac: <strong>Cmd+.</strong>) to stop.</p>
-<p>If this produces no sound, the issue is with SuperCollider, not PyCodeDJ. Check your system volume, output device, and audio server.</p>
-<p>If it does produce sound, work through these checks:</p>
-<p><strong>1. Is the server booted?</strong></p>
-<pre data-lang="supercollider"><code>s.boot;</code></pre>
-<p><strong>2. Is <code>sc/synths.scd</code> loaded?</strong></p>
-<p>Select all (Ctrl+A) and run (Ctrl+Enter). The Post window should show:</p>
-<pre data-lang="text"><code>PyCodeDJ synths loaded. Ready. OSC port: 57120</code></pre>
-<p><strong>3. Is the port number correct?</strong></p>
-<p>Run this in SuperCollider:</p>
-<pre data-lang="supercollider"><code>NetAddr.langPort.postln;</code></pre>
-<p>If it shows something other than <code>57120</code>, specify it:</p>
-<pre data-lang="bash"><code>pycodedj eval examples/demo.py::bass --sc-port PORT_NUMBER</code></pre>
-<p><strong>4. Trace OSC messages</strong></p>
-<pre data-lang="supercollider"><code>OSCFunc.trace(true);</code></pre>
-<p>Run <code>pycodedj eval</code> and check whether messages appear in the Post window. Disable tracing when done:</p>
-<pre data-lang="supercollider"><code>OSCFunc.trace(false);</code></pre>
-<h3><code>[pycodedj] OSC error</code></h3>
-<p>SuperCollider isn&#x27;t running or the port number is wrong.</p>
-<ol>
-<li>1. Check that SuperCollider IDE is open and the server is booted</li>
-<li>2. Run <code>sc/synths.scd</code> and confirm <code>Ready.</code> in the Post window</li>
-<li>3. If the port differs from 57120, use <code>--sc-port</code></li>
-</ol>
-<h3><code>loop &#x27;xxx&#x27; not found</code></h3>
-<p>The loop name after <code>::</code> doesn&#x27;t match the first argument of <code>@loop(...)</code>.</p>
-<pre data-lang="bash"><code># If the file contains @loop(&quot;bass&quot;, ...)
-pycodedj eval demo.py::bass   # correct
-pycodedj eval demo.py::Bass   # wrong (case sensitive)</code></pre>
-<h3><code>file not found</code></h3>
-<p>Check your current directory and use an absolute path if needed.</p>
-<pre data-lang="bash"><code>pwd    # show current directory
-ls     # list files
-
-pycodedj eval /home/user/projects/myfile.py::bass</code></pre>
-<h3><code>pycodedj watch</code> asks you to install watchdog</h3>
-<pre data-lang="bash"><code>pip install &#x27;pycodedj[watch]&#x27;</code></pre>
-<h3>Output device changed and now there&#x27;s no sound</h3>
-<p>SuperCollider uses the output device that was active when the server booted. After changing the device:</p>
-<pre data-lang="supercollider"><code>ServerOptions.devices;  // list available devices
-
-s.quit;
-s.options.outDevice = &quot;Your Device Name&quot;;
-s.options.numInputBusChannels = 0;
-s.boot;</code></pre>
-<p>Then run <code>sc/synths.scd</code> again.</p>
-<hr>
-</section>
-<section id="s12"><h2>12. Full command and option reference</h2>
-<h3><code>pycodedj eval</code></h3>
-<p>Evaluate one loop and send parameters to SuperCollider.</p>
-<pre data-lang="text"><code>pycodedj eval FILE::LOOP [--sc-host HOST] [--sc-port PORT]</code></pre>
-<table>
-<thead><tr>
-<th>Argument / option</th>
-<th>Description</th>
-<th>Default</th>
-</tr></thead><tbody>
-<tr>
-<td><code>FILE::LOOP</code></td>
-<td>File path and loop name separated by <code>::</code></td>
-<td>&mdash;</td>
-</tr>
-<tr>
-<td><code>--sc-host</code></td>
-<td>SuperCollider host</td>
-<td><code>127.0.0.1</code></td>
-</tr>
-<tr>
-<td><code>--sc-port</code></td>
-<td>SuperCollider receive port</td>
-<td><code>57120</code></td>
-</tr>
-</tbody></table>
-<p>On success, stdout shows:</p>
-<pre data-lang="text"><code>[pycodedj] bass  cutoff=418Hz  lfo=1.08Hz  reverb=0.00  voices=1  amp=0.40</code></pre>
-<p>On failure, stderr shows an error and exit code is 1.</p>
-<pre data-lang="bash"><code>pycodedj eval examples/demo.py::bass
-pycodedj eval demo.py::melody --sc-host 192.168.1.10
-pycodedj eval demo.py::pad --sc-port 57200</code></pre>
-<h3><code>pycodedj watch</code></h3>
-<p>Watch a file, evaluate all loops at startup, and re-evaluate changed loops on every save. Stop with Ctrl+C.</p>
-<pre data-lang="text"><code>pycodedj watch FILE [--sc-host HOST] [--sc-port PORT] [--debounce SECS]</code></pre>
-<table>
-<thead><tr>
-<th>Argument / option</th>
-<th>Description</th>
-<th>Default</th>
-</tr></thead><tbody>
-<tr>
-<td><code>FILE</code></td>
-<td>File to watch</td>
-<td>&mdash;</td>
-</tr>
-<tr>
-<td><code>--sc-host</code></td>
-<td>SuperCollider host</td>
-<td><code>127.0.0.1</code></td>
-</tr>
-<tr>
-<td><code>--sc-port</code></td>
-<td>SuperCollider receive port</td>
-<td><code>57120</code></td>
-</tr>
-<tr>
-<td><code>--debounce</code></td>
-<td>Seconds to wait before re-evaluating on rapid saves</td>
-<td><code>0.3</code></td>
-</tr>
-</tbody></table>
-<pre data-lang="bash"><code>pycodedj watch examples/demo.py
-pycodedj watch examples/club_set.py --debounce 0.5</code></pre>
-<h3><code>pycodedj panic</code></h3>
-<p>Send an immediate stop signal to all active loops.</p>
-<pre data-lang="text"><code>pycodedj panic [--sc-host HOST] [--sc-port PORT]</code></pre>
-<pre data-lang="bash"><code>pycodedj panic</code></pre>
-<h3><code>pycodedj stop</code></h3>
-<p>Stop one loop by name. Unlike <code>mute</code>, this stops both the legacy synth loop and the <code>pattern()</code> Pdef for that loop.</p>
-<pre data-lang="text"><code>pycodedj stop NAME [--sc-host HOST] [--sc-port PORT]</code></pre>
-<pre data-lang="bash"><code>pycodedj stop kick_hard</code></pre>
-<h3><code>pycodedj mute</code></h3>
-<p>Silence a loop without stopping it.</p>
-<pre data-lang="text"><code>pycodedj mute NAME [--sc-host HOST] [--sc-port PORT]</code></pre>
-<pre data-lang="bash"><code>pycodedj mute bass</code></pre>
-<h3><code>pycodedj unmute</code></h3>
-<p>Restore a muted loop&#x27;s volume.</p>
-<pre data-lang="text"><code>pycodedj unmute NAME [--sc-host HOST] [--sc-port PORT]</code></pre>
-<pre data-lang="bash"><code>pycodedj unmute bass</code></pre>
-<h3><code>pycodedj status</code></h3>
-<p>Show the state of all active loops.</p>
-<pre data-lang="text"><code>pycodedj status [--sc-host HOST] [--sc-port PORT]</code></pre>
-<pre data-lang="text"><code>Loop         State    Amp    Cutoff
-bass         playing  0.40   1340Hz
-pad          muted    0.15   200Hz</code></pre>
-<blockquote><p><strong>Note:</strong> <code>status</code> runs in a separate process from <code>watch</code> and can only see loops that watch is currently managing.</p></blockquote>
-<h3>Loop syntax summary</h3>
-<pre data-lang="python"><code>from pycodedj import loop, pattern
-
-# Code-structure mode
-@loop(&quot;name&quot;, interval=seconds)
-def function_name(volume=level, eq=&quot;preset&quot;):
-    # code structure maps to sound
-    ...
-
-# pattern() mode
-@loop(&quot;name&quot;, synth=&quot;synth_name&quot;, root=&quot;note&quot;, scale=&quot;scale_name&quot;, dur=seconds)
-def function_name(volume=level):
-    pattern(&quot;x . x . 0 . 3 .&quot;)</code></pre>
-<table>
-<thead><tr>
-<th>Argument</th>
-<th>Description</th>
-<th>Default</th>
-</tr></thead><tbody>
-<tr>
-<td><code>&quot;name&quot;</code></td>
-<td>Loop name (letters, numbers, underscores)</td>
-<td>&mdash;</td>
-</tr>
-<tr>
-<td><code>interval=</code></td>
-<td>Update interval in seconds</td>
-<td><code>1.0</code></td>
-</tr>
-<tr>
-<td><code>volume=</code></td>
-<td>Volume (0.0–1.0)</td>
-<td><code>0.3</code></td>
-</tr>
-<tr>
-<td><code>eq=</code></td>
-<td>EQ preset</td>
-<td><code>&quot;flat&quot;</code></td>
-</tr>
-<tr>
-<td><code>low=</code>, <code>mid=</code>, <code>high=</code></td>
-<td>Per-band EQ multiplier (0.0–2.0)</td>
-<td>preset values</td>
-</tr>
-<tr>
-<td><code>synth=</code></td>
-<td>Synth name for pattern mode</td>
-<td>&mdash;</td>
-</tr>
-<tr>
-<td><code>root=</code></td>
-<td>Root note for pattern mode</td>
-<td><code>&quot;C4&quot;</code></td>
-</tr>
-<tr>
-<td><code>scale=</code></td>
-<td>Scale name for pattern mode</td>
-<td><code>&quot;chromatic&quot;</code></td>
-</tr>
-<tr>
-<td><code>dur=</code></td>
-<td>Step length in seconds for pattern mode</td>
-<td><code>0.25</code></td>
-</tr>
-</tbody></table>
-<hr>
-</section>
-<section id="s13"><h2>13. Under the hood</h2>
-<h3>Mapping numbers</h3>
-<table>
-<thead><tr>
-<th>Parameter</th>
-<th>Input</th>
-<th>Output range</th>
-<th>Scale</th>
-</tr></thead><tbody>
-<tr>
-<td>Cutoff</td>
-<td>Block depth 0–10</td>
-<td>200–4000 Hz</td>
-<td>Linear</td>
-</tr>
-<tr>
-<td>LFO rate</td>
-<td>Control-flow count 0–10</td>
-<td>0.1–5.0 Hz</td>
-<td>Linear</td>
-</tr>
-<tr>
-<td>Reverb</td>
-<td>Comment ratio 0.0–1.0</td>
-<td>0.0–0.8</td>
-<td>Linear</td>
-</tr>
-<tr>
-<td>Voice count</td>
-<td>Function count (clamped)</td>
-<td>1–4</td>
-<td>Clamp</td>
-</tr>
-<tr>
-<td>Amplitude</td>
-<td><code>volume=</code> argument</td>
-<td>pass-through</td>
-<td>Pass-through</td>
-</tr>
-</tbody></table>
-<h3>OSC address reference</h3>
-<p>Use these addresses to connect external tools like Hydra.</p>
-<table>
-<thead><tr>
-<th>Address</th>
-<th>Type</th>
-<th>Value</th>
-</tr></thead><tbody>
-<tr>
-<td><code>/pycodedj/loop/&lt;name&gt;/params</code></td>
-<td>int, float, float, float, float</td>
-<td><code>voice_count</code>, <code>cutoff</code>, <code>lfo_rate</code>, <code>reverb</code>, <code>amp</code> (in order)</td>
-</tr>
-<tr>
-<td><code>/pycodedj/loop/&lt;name&gt;/pattern</code></td>
-<td>int, str, float, str, int…</td>
-<td><code>root_midi</code>, <code>scale</code>, <code>dur</code>, <code>synth</code>, <code>step…</code></td>
-</tr>
-<tr>
-<td><code>/pycodedj/loop/&lt;name&gt;/pattern_stop</code></td>
-<td>&mdash;</td>
-<td>Stop pattern</td>
-</tr>
-<tr>
-<td><code>/pycodedj/loop/&lt;name&gt;/synth</code></td>
-<td>str</td>
-<td>Synth name (empty string to clear)</td>
-</tr>
-<tr>
-<td><code>/pycodedj/loop/&lt;name&gt;/amp</code></td>
-<td>float</td>
-<td>Amplitude (compatibility)</td>
-</tr>
-</tbody></table>
-<h3>Using the Python API directly</h3>
-<pre data-lang="python"><code>from pycodedj.block_parser import parse_blocks
-from pycodedj.engine import Engine
-from pycodedj.osc_bridge import OscBridge, OscEndpoint
-
-bridge = OscBridge(audio=OscEndpoint(&quot;127.0.0.1&quot;, 57120))
-engine = Engine(bridge=bridge)
-
-source = open(&quot;demo.py&quot;).read()
-blocks = {b.name: b for b in parse_blocks(source).blocks}
-
-params = engine.eval_block(blocks[&quot;bass&quot;])
-if params is not None:
-    print(f&quot;cutoff={params.cutoff:.0f}Hz  amp={params.amp:.2f}&quot;)</code></pre>
-<p><code>eval_block</code> returns <code>MusicParams</code> on success, or <code>None</code> on syntax error or OSC failure.</p>
-<h3>Module overview</h3>
-<pre data-lang="text"><code>pycodedj/
-├── _loop.py          # @loop decorator (no-op at runtime)
-├── block_parser.py   # AST parser: extracts @loop blocks from source
-├── analyzer.py       # Feature extraction: depth, counts, ratios
-├── mapper.py         # Maps features to MusicParams
-├── pattern.py        # Parses pattern() strings to step lists
-├── engine.py         # Evaluation pipeline
-├── osc_bridge.py     # OSC communication with SuperCollider
-├── watcher.py        # File watcher (watchdog-based)
-└── __main__.py       # CLI entry point</code></pre>
-</section>
-  </main>
-</div>
-
-<script>
-  // ── Syntax highlighter (regex-based, no external libs) ──
-
-  const PY_KEYWORDS = /\b(for|if|elif|else|while|def|return|pass|in|range|and|or|not|True|False|None|from|import|class|with|as|try|except|finally|raise|yield|lambda|del|global|nonlocal|assert|break|continue)\b/g;
-  const PY_BUILTIN  = /\b(print|len|range|open|str|int|float|list|dict|set|tuple|type|isinstance|hasattr|getattr|setattr|super|zip|map|filter|enumerate|sorted|reversed|min|max|sum|abs|round)\b/g;
-  const PY_NUMBER   = /\b(\d+(?:\.\d+)?)\b/g;
-  const PY_STRING   = /("""[\s\S]*?"""|'''[\s\S]*?'''|"(?:[^"\\]|\\.)*"|'(?:[^'\\]|\\.)*')/g;
-  const PY_COMMENT  = /(#[^\n]*)/g;
-  const PY_DECO     = /(@\w+)/g;
-
-  const BASH_COMMENT = /(#[^\n]*)/g;
-  const BASH_STRING  = /("(?:[^"\\]|\\.)*"|'(?:[^'\\]|\\.)*')/g;
-
-  const SC_COMMENT   = /(\/\/[^\n]*)/g;
-  const SC_STRING    = /("(?:[^"\\]|\\.)*")/g;
-
-  function escapeHtml(s) {
-    return s
-      .replace(/&/g, '&amp;')
-      .replace(/</g, '&lt;')
-      .replace(/>/g, '&gt;');
-  }
-
-  // Tokenize approach: replace in a specific order, protecting already-replaced spans.
-  // We use a placeholder technique to avoid double-processing.
-
-  function applyHighlight(raw, lang) {
-    // Work on escaped HTML
-    let s = escapeHtml(raw);
-
-    if (lang === 'python') {
-      // We process in stages, using non-overlapping replacements.
-      // Stage 1: extract strings and comments into placeholders
-      const slots = [];
-      function placeholder(match, cls) {
-        const idx = slots.length;
-        slots.push(`<span class="sh-${cls}">${match}</span>`);
-        return `\x00_${idx}\x00`;
-      }
-
-      // comments first (they can contain quote chars)
-      s = s.replace(PY_COMMENT,  (m) => placeholder(m, 'comment'));
-      // strings
-      s = s.replace(PY_STRING,   (m) => placeholder(m, 'string'));
-      // decorators
-      s = s.replace(PY_DECO,     (m) => placeholder(m, 'decorator'));
-      // numbers
-      s = s.replace(PY_NUMBER,   (m) => placeholder(m, 'number'));
-      // builtins before keywords to avoid partial matches
-      s = s.replace(PY_BUILTIN,  (m) => placeholder(m, 'builtin'));
-      // keywords
-      s = s.replace(PY_KEYWORDS, (m) => placeholder(m, 'keyword'));
-
-      // restore placeholders
-      s = s.replace(/\x00_(\d+)\x00/g, (_, i) => slots[parseInt(i)]);
-
-    } else if (lang === 'bash') {
-      const slots = [];
-      function ph(match, cls) {
-        const idx = slots.length;
-        slots.push(`<span class="sh-${cls}">${match}</span>`);
-        return `\x00_${idx}\x00`;
-      }
-      s = s.replace(BASH_COMMENT, (m) => ph(m, 'comment'));
-      s = s.replace(BASH_STRING,  (m) => ph(m, 'string'));
-      s = s.replace(/\x00_(\d+)\x00/g, (_, i) => slots[parseInt(i)]);
-
-    } else if (lang === 'supercollider') {
-      const slots = [];
-      function ph(match, cls) {
-        const idx = slots.length;
-        slots.push(`<span class="sh-${cls}">${match}</span>`);
-        return `\x00_${idx}\x00`;
-      }
-      s = s.replace(SC_COMMENT, (m) => ph(m, 'comment'));
-      s = s.replace(SC_STRING,  (m) => ph(m, 'string'));
-      s = s.replace(/\x00_(\d+)\x00/g, (_, i) => slots[parseInt(i)]);
-    }
-
-    return s;
-  }
-
-  document.querySelectorAll('pre[data-lang]').forEach(pre => {
-    const lang = pre.getAttribute('data-lang');
-    const codeEl = pre.querySelector('code');
-    if (!codeEl) return;
-    const raw = codeEl.textContent;
-    codeEl.innerHTML = applyHighlight(raw, lang);
-  });
-</script>
+  <h2>10. Under the Hood</h2>
+  <p>PyCodeDJ parses Python with <code>ast</code>. <code>loop</code>, <code>dj</code>, and <code>pattern</code> are runtime helpers so files can still be imported normally.</p>
+</main>
 </body>
 </html>

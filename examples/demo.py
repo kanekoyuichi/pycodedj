@@ -1,28 +1,36 @@
-# PyCodeDJ demo — run each block independently:
+# PyCodeDJ demo — run each loop independently:
+#   pycodedj eval examples/demo.py::kick
 #   pycodedj eval examples/demo.py::bass
 #   pycodedj eval examples/demo.py::melody
 #   pycodedj eval examples/demo.py::pad
 
-from pycodedj import loop
+from pycodedj import dj, loop
 
 
-@loop("bass", interval=2.0)
-def bass(volume=0.4):
-    for i in range(8):
-        if i % 2 == 0:
-            pass
+@loop(synth="kick_floor", beat=0.25)
+def kick():
+    dj.volume = 0.8
+    dj.eq = "edm"
+    dj.low = 1.5
+    dj.pattern = "x . . . x . . ."
 
 
-@loop("melody", interval=0.5)
-def melody(volume=0.3):
-    x = 1
-    y = 2
-    return x + y
+@loop(synth="bass_acid", root="A1", scale="minor", beat=0.25)
+def bass():
+    dj.volume = 0.35
+    dj.eq = "edm"
+    dj.low = 1.3
+    dj.pattern = "0 . 3 . 5 . 3 ."
 
 
-@loop("pad", interval=4.0)
-def pad(volume=0.15):
-    # ここに余白を置く
-    # もう少し置く
-    # 静寂も音楽
-    pass
+@loop(synth="lead_acid", root="A3", scale="minor", beat=0.25)
+def melody():
+    dj.volume = 0.18
+    dj.pattern = ". 0 . 3 . 5 7 ."
+
+
+@loop(synth="pad_shimmer", root="A2", scale="minor", beat=0.5)
+def pad():
+    dj.volume = 0.15
+    dj.eq = "ambient"
+    dj.pattern = "[0 2 4] . . . [5 7 9] . . ."
