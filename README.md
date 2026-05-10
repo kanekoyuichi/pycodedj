@@ -144,6 +144,13 @@ pycodedj mute bass
 pycodedj unmute bass
 ```
 
+**7. Set BPM and list synths**
+
+```bash
+pycodedj bpm 128
+pycodedj list-synths
+```
+
 ---
 
 ## Using dj.pattern
@@ -212,6 +219,7 @@ Token reference:
 | `/pycodedj/loop/<name>/pattern` | int, str, float, str, int… | Pattern data |
 | `/pycodedj/loop/<name>/pattern_stop` | — | Stop pattern |
 | `/pycodedj/loop/<name>/amp` | float | Amplitude (compatibility) |
+| `/pycodedj/bpm` | float | SuperCollider TempoClock BPM |
 
 ---
 
@@ -229,7 +237,7 @@ Token reference:
 - [x] Hot-reload live loop implementation (`pycodedj watch`)
 - [x] Sprint 1: Live stability (`panic`, SyntaxError recovery, `mute`/`solo`, `status`)
 - [x] Sprint 2: Music DSL (`dj.pattern`, `@loop` parameter expansion: `synth`, `root`, `scale`, `beat`)
-- [ ] Sprint 3: Sound design and playability (SynthDef cleanup, `bpm`, `list-synths`, `sample()`)
+- [x] Sprint 3: Sound design and playability (SynthDef cleanup, `bpm`, `list-synths`)
 - [ ] Sprint 4: Hydra visualiser integration
 
 ---

@@ -1,0 +1,83 @@
+from __future__ import annotations
+
+SYNTH_CATEGORIES: dict[str, tuple[str, ...]] = {
+    "Kicks": (
+        "kick_hard",
+        "kick_floor",
+        "kick_pulse",
+        "kick_soft",
+        "kick_909",
+        "kick_click",
+    ),
+    "Basses": (
+        "bass_rumble",
+        "bass_reese",
+        "bass_sub",
+        "bass_acid",
+        "bass_pluck",
+        "bass_fm",
+        "bass_mono",
+        "bass_wobble",
+    ),
+    "Percussion": (
+        "hat_engine",
+        "hat_ride",
+        "clap_snap",
+        "clap_snare",
+        "tom_drum",
+        "snare_roll",
+        "crash_noise",
+        "rim_shot",
+        "cowbell",
+        "perc_blip",
+        "shaker_loop",
+        "tick_metal",
+        "wood_block",
+    ),
+    "Chords": (
+        "chord_rave",
+        "stab_neon",
+        "chord_dub",
+        "stab_saw",
+        "chord_organ",
+        "bell_rave",
+        "pad_minor",
+        "chord_deep",
+        "chord_glass",
+        "pad_warm",
+        "pad_string",
+        "pad_choir",
+    ),
+    "Leads": (
+        "lead_acid",
+        "lead_hoover",
+        "pluck_soft",
+        "arp_synth",
+        "lead_square",
+        "lead_fm",
+        "lead_chip",
+        "lead_saw",
+        "lead_whistle",
+    ),
+    "Atmospheric": (
+        "pad_shimmer",
+        "air_warehouse",
+        "vox_ahh",
+        "drone_space",
+        "note",
+    ),
+    "FX": (
+        "fx_drop",
+        "fx_riser",
+        "fx_glitch",
+        "fx_down",
+        "fx_zap",
+        "fx_noise",
+        "fx_laser",
+        "fx_vinyl",
+    ),
+}
+
+SYNTH_NAMES: tuple[str, ...] = tuple(
+    name for names in SYNTH_CATEGORIES.values() for name in names
+)

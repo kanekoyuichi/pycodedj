@@ -122,6 +122,26 @@ def test_send_panic_skips_visual_when_none(mock_endpoint: OscEndpoint) -> None:
     assert _send_mock(mock_endpoint).call_count == 1
 
 
+# --- send_bpm ---
+
+def test_send_bpm_sends_to_audio(mock_endpoint: OscEndpoint) -> None:
+    bridge = OscBridge(audio=mock_endpoint)
+    bridge.send_bpm(128.0)
+
+    call_map = {c.args[0]: c.args[1] for c in _send_mock(mock_endpoint).call_args_list}
+    assert call_map["/pycodedj/bpm"] == [128.0]
+
+
+def test_send_bpm_sends_to_visual_when_set(
+    mock_endpoint: OscEndpoint, mock_visual: OscEndpoint
+) -> None:
+    bridge = OscBridge(audio=mock_endpoint, visual=mock_visual)
+    bridge.send_bpm(130.0)
+
+    visual_call_map = {c.args[0]: c.args[1] for c in _send_mock(mock_visual).call_args_list}
+    assert visual_call_map["/pycodedj/bpm"] == [130.0]
+
+
 # --- send_pattern ---
 
 def test_send_pattern_address(mock_endpoint: OscEndpoint) -> None:

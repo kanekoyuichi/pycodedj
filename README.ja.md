@@ -144,6 +144,13 @@ pycodedj mute bass
 pycodedj unmute bass
 ```
 
+**7. BPM 変更とシンセ一覧**
+
+```bash
+pycodedj bpm 128
+pycodedj list-synths
+```
+
 ---
 
 ## dj.pattern の使い方
@@ -212,6 +219,7 @@ def chord():
 | `/pycodedj/loop/<name>/pattern` | int, str, float, str, int… | パターンデータ |
 | `/pycodedj/loop/<name>/pattern_stop` | — | パターン停止 |
 | `/pycodedj/loop/<name>/amp` | float | 音量（互換用） |
+| `/pycodedj/bpm` | float | SuperCollider TempoClock BPM |
 
 ---
 
@@ -229,7 +237,7 @@ def chord():
 - [x] ホットリロード・ライブループ実装（`pycodedj watch`）
 - [x] Sprint 1: ライブ安定性（`panic`, SyntaxError 維持, `mute`/`solo`, `status`）
 - [x] Sprint 2: 音楽 DSL（`dj.pattern`, `@loop` パラメータ拡張: `synth`, `root`, `scale`, `beat`）
-- [ ] Sprint 3: 音色・演奏性（SynthDef 整理, `bpm`, `list-synths`, `sample()`）
+- [x] Sprint 3: 音色・演奏性（SynthDef 整理, `bpm`, `list-synths`）
 - [ ] Sprint 4: Hydra ビジュアライザー統合
 
 ---

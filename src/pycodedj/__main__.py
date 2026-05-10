@@ -67,6 +67,13 @@ def _build_parser() -> argparse.ArgumentParser:
     status_p.add_argument("--sc-host", default="127.0.0.1", help="SuperCollider host")
     status_p.add_argument("--sc-port", default=57120, type=int, help="SuperCollider port")
 
+    bpm_p = sub.add_parser("bpm", help="Set SuperCollider TempoClock BPM")
+    bpm_p.add_argument("value", type=float, help="BPM value, greater than 0")
+    bpm_p.add_argument("--sc-host", default="127.0.0.1", help="SuperCollider host")
+    bpm_p.add_argument("--sc-port", default=57120, type=int, help="SuperCollider port")
+
+    sub.add_parser("list-synths", help="List available synth names")
+
     return parser
 
 
@@ -247,6 +254,32 @@ def _cmd_status(args: argparse.Namespace) -> int:
     return 0
 
 
+def _cmd_bpm(args: argparse.Namespace) -> int:
+    if args.value <= 0:
+        sys.stderr.write("[pycodedj] bpm must be greater than 0\n")
+        return 1
+    bridge = _make_bridge(args)
+    if bridge is None:
+        return 1
+    try:
+        Engine(bridge=bridge).set_bpm(args.value)
+    except (OscError, ValueError) as e:
+        sys.stderr.write(f"[pycodedj] bpm error: {e}\n")
+        return 1
+    print(f"[pycodedj] bpm set to {args.value:g}")
+    return 0
+
+
+def _cmd_list_synths(args: argparse.Namespace) -> int:
+    from .synths import SYNTH_CATEGORIES
+
+    for category, names in SYNTH_CATEGORIES.items():
+        print(f"{category}:")
+        for name in names:
+            print(f"  {name}")
+    return 0
+
+
 def main() -> None:
     parser = _build_parser()
     args = parser.parse_args()
@@ -269,6 +302,10 @@ def main() -> None:
         sys.exit(_cmd_unsolo(args))
     elif args.command == "status":
         sys.exit(_cmd_status(args))
+    elif args.command == "bpm":
+        sys.exit(_cmd_bpm(args))
+    elif args.command == "list-synths":
+        sys.exit(_cmd_list_synths(args))
     else:
         parser.print_help()
         sys.exit(1)

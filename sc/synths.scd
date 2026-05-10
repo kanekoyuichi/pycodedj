@@ -1276,6 +1276,16 @@ s.waitForBoot({
         "PyCodeDJ panic: all loops stopped.".postln;
     }, '/pycodedj/panic');
 
+    if (~pycodedjBpm.notNil) { ~pycodedjBpm.free };
+    ~pycodedjBpm = OSCFunc({ |msg, time, addr|
+        var bpm;
+        bpm = msg[1].asFloat;
+        if (bpm > 0) {
+            TempoClock.default.tempo = bpm / 60;
+            ("PyCodeDJ BPM set: " ++ bpm.asString).postln;
+        };
+    }, '/pycodedj/bpm');
+
     if (~pycodedjOSC.notNil) {
         thisProcess.removeOSCRecvFunc(~pycodedjOSC);
     };

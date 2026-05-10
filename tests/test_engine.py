@@ -227,6 +227,36 @@ def test_panic_on_empty_engine_is_noop() -> None:
     assert engine.list_loops() == []
 
 
+# --- bpm ---
+
+def test_set_bpm_sends_osc_and_stores_value() -> None:
+    engine = _make_engine()
+
+    from typing import cast
+    mock_send = cast(MagicMock, engine.bridge.audio._client).send_message
+    mock_send.reset_mock()
+
+    engine.set_bpm(128.0)
+
+    assert engine.bpm == 128.0
+    assert mock_send.call_args.args[0] == "/pycodedj/bpm"
+    assert mock_send.call_args.args[1] == [128.0]
+
+
+def test_set_bpm_rejects_non_positive_value() -> None:
+    import pytest
+
+    engine = _make_engine()
+
+    from typing import cast
+    mock_send = cast(MagicMock, engine.bridge.audio._client).send_message
+    mock_send.reset_mock()
+
+    with pytest.raises(ValueError, match="bpm must be greater than 0"):
+        engine.set_bpm(0)
+    mock_send.assert_not_called()
+
+
 # --- status ---
 
 def test_status_returns_loop_info() -> None:

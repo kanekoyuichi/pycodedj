@@ -2,5 +2,5 @@
 
 from ._loop import dj, loop, pattern
 
-__version__ = "0.7.0"
+__version__ = "0.8.0"
 __all__ = ["dj", "loop", "pattern"]

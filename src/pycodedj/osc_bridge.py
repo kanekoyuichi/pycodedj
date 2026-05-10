@@ -44,6 +44,11 @@ class OscBridge:
         if self.visual is not None:
             self.visual.send("/pycodedj/panic")
 
+    def send_bpm(self, bpm: float) -> None:
+        self.audio.send("/pycodedj/bpm", bpm)
+        if self.visual is not None:
+            self.visual.send("/pycodedj/bpm", bpm)
+
     def send_pattern(
         self,
         name: str,

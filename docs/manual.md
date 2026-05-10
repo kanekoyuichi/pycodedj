@@ -395,6 +395,18 @@ pycodedj mute bass
 pycodedj unmute bass
 ```
 
+Set TempoClock BPM:
+
+```bash
+pycodedj bpm 128
+```
+
+List synth names:
+
+```bash
+pycodedj list-synths
+```
+
 Common options:
 
 | Option | Meaning | Default |

@@ -1,5 +1,18 @@
 # Changelog
 
+## [0.8.0] - 2026-05-10
+
+### Features
+
+- `pycodedj bpm <value>` を追加。OSC 経由で SuperCollider の `TempoClock.default` BPM を変更できる
+- `pycodedj list-synths` を追加。利用可能なシンセ名をカテゴリ別に一覧表示できる
+- シンセ名一覧を `src/pycodedj/synths.py` に集約
+
+### Docs
+
+- README とマニュアルに `bpm` / `list-synths` の使い方を追加
+- OSC アドレス仕様に `/pycodedj/bpm` を追加
+
 ## [0.6.1] - 2026-05-09
 
 ### Improvements

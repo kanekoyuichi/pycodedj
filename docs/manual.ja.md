@@ -395,6 +395,18 @@ pycodedj mute bass
 pycodedj unmute bass
 ```
 
+TempoClock の BPM を変更:
+
+```bash
+pycodedj bpm 128
+```
+
+シンセ名の一覧:
+
+```bash
+pycodedj list-synths
+```
+
 主なオプション:
 
 | オプション | 意味 | デフォルト |

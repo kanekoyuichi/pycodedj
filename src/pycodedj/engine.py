@@ -30,6 +30,7 @@ class LoopStatus:
 @dataclass
 class Engine:
     bridge: OscBridge
+    bpm: float = 120.0
     _states: dict[str, LoopState] = field(default_factory=dict, init=False, repr=False)
 
     def eval_block(self, block: LoopBlock) -> MusicParams | None:
@@ -132,6 +133,12 @@ class Engine:
         for name in list(self._states):
             self.stop_loop(name)
         self.bridge.send_panic()
+
+    def set_bpm(self, bpm: float) -> None:
+        if bpm <= 0:
+            raise ValueError("bpm must be greater than 0")
+        self.bridge.send_bpm(bpm)
+        self.bpm = bpm
 
     def status(self) -> list[LoopStatus]:
         return [
