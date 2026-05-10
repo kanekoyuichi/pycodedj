@@ -19,6 +19,8 @@ class LoopBlock:
     low: float | None = None
     mid: float | None = None
     high: float | None = None
+    cutoff: float | None = None
+    reverb: float | None = None
     # S2-1: @loop デコレータ拡張
     synth: str | None = None
     root: str | None = None
@@ -105,7 +107,7 @@ def _extract_pattern_call(node: ast.FunctionDef) -> str | None:
 
 
 def _extract_dj_assignments(node: ast.FunctionDef) -> dict[str, object]:
-    dj_attrs = {"volume", "eq", "low", "mid", "high", "pattern"}
+    dj_attrs = {"volume", "eq", "low", "mid", "high", "pattern", "cutoff", "reverb"}
     values: dict[str, object] = {}
     for child in _walk_body(node):
         if not isinstance(child, ast.Assign):
@@ -159,6 +161,8 @@ def parse_blocks(source: str) -> ParseResult:
             low=_optional_float(dj_values.get("low")),
             mid=_optional_float(dj_values.get("mid")),
             high=_optional_float(dj_values.get("high")),
+            cutoff=_optional_float(dj_values.get("cutoff")),
+            reverb=_optional_float(dj_values.get("reverb")),
             synth=_optional_str(loop_kwargs.get("synth")),
             root=_optional_str(loop_kwargs.get("root")),
             scale=_optional_str(loop_kwargs.get("scale")),

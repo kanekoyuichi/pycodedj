@@ -48,9 +48,11 @@ def kick():
 
   <h2>2. Install and Start</h2>
 <pre><code>pip install 'pycodedj[watch]'</code></pre>
+  <p>The <code>[watch]</code> extra installs the file watcher used by <code>pycodedj watch</code>.</p>
   <p>Open <code>sc/synths.scd</code> in SuperCollider, run it, and confirm:</p>
 <pre><code>PyCodeDJ synths loaded. Ready. OSC port: 57120</code></pre>
 <pre><code>pycodedj eval examples/demo.py::bass</code></pre>
+  <p>If you hear a low bass sound, Python is successfully sending messages to SuperCollider. Use <code>pycodedj panic</code> to stop everything.</p>
 
   <h2>3. Basic Loop Syntax</h2>
 <pre><code>from pycodedj import dj, loop
@@ -63,6 +65,8 @@ def loop_name():
   <table>
     <tr><th>Setting</th><th>Meaning</th><th>Default</th></tr>
     <tr><td><code>dj.volume</code></td><td>Amplitude, 0.0 to 1.0</td><td><code>0.3</code></td></tr>
+    <tr><td><code>dj.cutoff</code></td><td>Filter cutoff override, 200 to 4000 Hz</td><td>AST mapping</td></tr>
+    <tr><td><code>dj.reverb</code></td><td>Reverb mix override, 0.0 to 0.8</td><td>AST mapping</td></tr>
     <tr><td><code>dj.eq</code></td><td>EQ preset</td><td><code>"flat"</code></td></tr>
     <tr><td><code>dj.low/mid/high</code></td><td>Per-band EQ override, 0.0 to 2.0</td><td>preset value</td></tr>
     <tr><td><code>dj.pattern</code></td><td>Rhythm and pitch pattern</td><td>none</td></tr>
@@ -91,6 +95,7 @@ def hats():
     <tr><td><code>if</code> / <code>for</code> / <code>while</code> count</td><td>LFO rate</td><td>More control flow moves faster</td></tr>
     <tr><td>Nested <code>def</code> count</td><td>Voice count</td><td>More functions add voices</td></tr>
     <tr><td>Comment ratio</td><td>Reverb mix</td><td>More comments add space</td></tr>
+    <tr><td><code>dj.cutoff</code> / <code>dj.reverb</code></td><td>Filter/reverb</td><td>Direct override when specified</td></tr>
   </table>
 
   <h2>5. Rhythm and Pitch with dj.pattern</h2>
@@ -221,11 +226,49 @@ pycodedj mute bass
 pycodedj unmute bass</code></pre>
 
   <h2>9. Troubleshooting</h2>
-  <p>No sound: boot SuperCollider, run <code>sc/synths.scd</code>, confirm the OSC port, then run <code>pycodedj eval examples/demo.py::bass</code>.</p>
-  <p>Loop not found: the name after <code>::</code> must match the Python function name.</p>
+  <p>When something does not work, first check that the SuperCollider server is booted, <code>sc/synths.scd</code> has been run, and the Post window says <code>Ready. OSC port: 57120</code>.</p>
+  <h3>No Sound</h3>
+  <ol>
+    <li>Open SuperCollider IDE and boot the server.</li>
+    <li>Select all of <code>sc/synths.scd</code> and run it.</li>
+    <li>Confirm <code>PyCodeDJ synths loaded. Ready. OSC port: 57120</code> in the Post window.</li>
+    <li>Run <code>pycodedj eval examples/demo.py::bass</code>.</li>
+  </ol>
+  <p>If it still does not play, check mute settings, red errors in the Post window, and try one showcase sound.</p>
+<pre><code>pycodedj eval examples/sound_showcase.py::kick_floor</code></pre>
+  <h3><code>OSC error</code></h3>
+  <p>Python cannot send a message to SuperCollider. Check that SuperCollider is open, the server is booted, and the OSC port matches.</p>
+<pre><code>pycodedj eval examples/demo.py::bass --sc-port 57120
+pycodedj watch examples/demo.py --sc-port 57120</code></pre>
+  <h3><code>loop not found</code></h3>
+  <p>The name after <code>::</code> must match the Python <code>def</code> function name. <code>synth="kick_floor"</code> is a sound name, not the loop name.</p>
+<pre><code>@loop(interval=2.0)
+def bass():
+    pass
+
+pycodedj eval demo.py::bass</code></pre>
+  <h3><code>SyntaxError</code></h3>
+  <p>Check for a missing <code>:</code>, incorrect indentation, or a missing closing quote. In <code>watch</code> mode, fix the file and save again; the previous valid loop keeps playing.</p>
+  <h3><code>pycodedj: command not found</code></h3>
+  <p><code>pycodedj</code> is not installed, or it was installed into another Python environment. Install again or try running through Python.</p>
+<pre><code>pip install 'pycodedj[watch]'
+python -m pycodedj eval examples/demo.py::bass</code></pre>
+  <h3>The Sound Is Too Loud or Too Quiet</h3>
+  <p>Adjust <code>dj.volume</code> in each loop. For a first test, <code>0.1</code> to <code>0.4</code> is usually manageable.</p>
 
   <h2>10. Under the Hood</h2>
-  <p>PyCodeDJ parses Python with <code>ast</code>. <code>loop</code>, <code>dj</code>, and <code>pattern</code> are runtime helpers so files can still be imported normally.</p>
+  <p>PyCodeDJ parses Python source with <code>ast</code>. The runtime functions <code>loop</code>, <code>dj</code>, and <code>pattern</code> are intentionally close to no-op helpers so files can still be imported as Python.</p>
+  <p>Main modules:</p>
+<pre><code>pycodedj/
+├── _loop.py          # loop decorator and dj namespace
+├── block_parser.py   # extracts @loop blocks and dj metadata
+├── analyzer.py       # code feature extraction
+├── mapper.py         # feature-to-music mapping
+├── pattern.py        # pattern string parser
+├── engine.py         # evaluation pipeline
+├── osc_bridge.py     # OSC communication
+├── watcher.py        # file watching
+└── __main__.py       # CLI</code></pre>
 </main>
 </body>
 </html>

@@ -48,9 +48,11 @@ def kick():
 
   <h2>2. インストールと起動</h2>
 <pre><code>pip install 'pycodedj[watch]'</code></pre>
+  <p><code>[watch]</code> を付けると、保存時に自動更新する <code>pycodedj watch</code> が使えます。</p>
   <p>SuperCollider IDE で <code>sc/synths.scd</code> を実行し、次の表示を確認します。</p>
 <pre><code>PyCodeDJ synths loaded. Ready. OSC port: 57120</code></pre>
 <pre><code>pycodedj eval examples/demo.py::bass</code></pre>
+  <p>低いベース音が鳴れば、Python から SuperCollider へメッセージが届いています。止めるときは <code>pycodedj panic</code> を使います。</p>
 
   <h2>3. ループの基本構文</h2>
 <pre><code>from pycodedj import dj, loop
@@ -63,6 +65,8 @@ def loop_name():
   <table>
     <tr><th>設定</th><th>意味</th><th>デフォルト</th></tr>
     <tr><td><code>dj.volume</code></td><td>音量。0.0〜1.0</td><td><code>0.3</code></td></tr>
+    <tr><td><code>dj.cutoff</code></td><td>フィルター cutoff の直接指定。200〜4000 Hz</td><td>AST マッピング</td></tr>
+    <tr><td><code>dj.reverb</code></td><td>リバーブ量の直接指定。0.0〜0.8</td><td>AST マッピング</td></tr>
     <tr><td><code>dj.eq</code></td><td>EQ プリセット</td><td><code>"flat"</code></td></tr>
     <tr><td><code>dj.low/mid/high</code></td><td>帯域別 EQ 上書き。0.0〜2.0</td><td>プリセット値</td></tr>
     <tr><td><code>dj.pattern</code></td><td>リズムと音程のパターン</td><td>なし</td></tr>
@@ -91,6 +95,7 @@ def hats():
     <tr><td><code>if</code> / <code>for</code> / <code>while</code> の数</td><td>LFO レート</td><td>多いほど速い</td></tr>
     <tr><td>ネストした <code>def</code> の数</td><td>声部数</td><td>多いほど厚い</td></tr>
     <tr><td>コメント率</td><td>リバーブ</td><td>コメントが多いほど空間が広い</td></tr>
+    <tr><td><code>dj.cutoff</code> / <code>dj.reverb</code></td><td>フィルター/リバーブ</td><td>書いた場合だけ直接上書き</td></tr>
   </table>
 
   <h2>5. dj.pattern でリズムと音程を指定する</h2>
@@ -221,11 +226,49 @@ pycodedj mute bass
 pycodedj unmute bass</code></pre>
 
   <h2>9. トラブルシューティング</h2>
-  <p>音が出ない場合は SuperCollider を boot し、<code>sc/synths.scd</code> を実行し、OSC port を確認してください。</p>
-  <p>loop not found の場合、<code>::</code> の後ろが Python の関数名と一致しているか確認してください。</p>
+  <p>困ったときは、SuperCollider のサーバーが boot 済みか、<code>sc/synths.scd</code> を実行済みか、Post window に <code>Ready. OSC port: 57120</code> が出ているかを最初に確認します。</p>
+  <h3>音が出ない</h3>
+  <ol>
+    <li>SuperCollider IDE を開き、サーバーを boot します。</li>
+    <li><code>sc/synths.scd</code> を全選択して実行します。</li>
+    <li>Post window に <code>PyCodeDJ synths loaded. Ready. OSC port: 57120</code> が出ているか確認します。</li>
+    <li><code>pycodedj eval examples/demo.py::bass</code> を実行します。</li>
+  </ol>
+  <p>それでも鳴らない場合は、本体やオーディオインターフェイスのミュート、Post window の赤いエラー、別音色の確認を順番に見ます。</p>
+<pre><code>pycodedj eval examples/sound_showcase.py::kick_floor</code></pre>
+  <h3><code>OSC error</code></h3>
+  <p>Python から SuperCollider にメッセージを送れない状態です。SuperCollider が起動しているか、サーバーが boot 済みか、OSC ポート番号が合っているかを確認します。</p>
+<pre><code>pycodedj eval examples/demo.py::bass --sc-port 57120
+pycodedj watch examples/demo.py --sc-port 57120</code></pre>
+  <h3><code>loop not found</code></h3>
+  <p><code>::</code> の後ろに書いた名前が、Python ファイル内の <code>def</code> の関数名と一致していません。<code>synth="kick_floor"</code> は音色名で、ループ名ではありません。</p>
+<pre><code>@loop(interval=2.0)
+def bass():
+    pass
+
+pycodedj eval demo.py::bass</code></pre>
+  <h3><code>SyntaxError</code></h3>
+  <p><code>:</code> の付け忘れ、インデントのずれ、文字列の閉じ忘れを確認してください。<code>watch</code> モードでは、修正して保存すると再読み込みされ、直前に正常だったループは鳴り続けます。</p>
+  <h3><code>pycodedj: command not found</code></h3>
+  <p><code>pycodedj</code> が未インストールか、別の Python 環境に入っています。再インストールし、必要なら Python 経由で実行します。</p>
+<pre><code>pip install 'pycodedj[watch]'
+python -m pycodedj eval examples/demo.py::bass</code></pre>
+  <h3>音が大きすぎる、または小さすぎる</h3>
+  <p>各ループの <code>dj.volume</code> を調整します。最初は <code>0.1</code> から <code>0.4</code> くらいが扱いやすいです。</p>
 
   <h2>10. 内部構成</h2>
-  <p>PyCodeDJ は Python ソースを <code>ast</code> で解析します。<code>loop</code>, <code>dj</code>, <code>pattern</code> は通常 import できる実行時ヘルパーです。</p>
+  <p>PyCodeDJ は Python ソースを <code>ast</code> で解析します。<code>loop</code>, <code>dj</code>, <code>pattern</code> は実行時には no-op に近いヘルパーで、通常の Python ファイルとして import できます。</p>
+  <p>主なモジュール:</p>
+<pre><code>pycodedj/
+├── _loop.py          # loop デコレータと dj 名前空間
+├── block_parser.py   # @loop ブロックと dj メタ情報の抽出
+├── analyzer.py       # コード特徴量抽出
+├── mapper.py         # 特徴量から音楽パラメーターへの変換
+├── pattern.py        # pattern 文字列パーサー
+├── engine.py         # 評価パイプライン
+├── osc_bridge.py     # OSC 通信
+├── watcher.py        # ファイル監視
+└── __main__.py       # CLI</code></pre>
 </main>
 </body>
 </html>

@@ -46,13 +46,15 @@ The function name is the loop name. Use it with commands such as `pycodedj eval 
 Requirements:
 
 - Python 3.10 or later
-- SuperCollider 3.12 or later
+- SuperCollider 3.12 or later. This is the app that actually makes the sound.
 
 Install:
 
 ```bash
 pip install 'pycodedj[watch]'
 ```
+
+The `[watch]` extra installs the file watcher used by `pycodedj watch`.
 
 Load the SuperCollider synths:
 
@@ -65,11 +67,19 @@ Load the SuperCollider synths:
 PyCodeDJ synths loaded. Ready. OSC port: 57120
 ```
 
-Verify:
+First check:
 
 ```bash
 pycodedj eval examples/demo.py::bass
 ```
+
+If you hear a low bass sound, Python is successfully sending messages to SuperCollider. To stop everything:
+
+```bash
+pycodedj panic
+```
+
+SuperCollider is the sound engine. `pycodedj` sends instructions to it. If there is no sound, first check that SuperCollider is running and that `sc/synths.scd` has been loaded.
 
 ## 3. Basic Loop Syntax
 
@@ -91,6 +101,8 @@ Loop metadata lives in the `dj` namespace:
 | Setting | Meaning | Default |
 | :--- | :--- | :--- |
 | `dj.volume` | Amplitude, 0.0 to 1.0 | `0.3` |
+| `dj.cutoff` | Filter cutoff override, 200 to 4000 Hz | AST mapping |
+| `dj.reverb` | Reverb mix override, 0.0 to 0.8 | AST mapping |
 | `dj.eq` | EQ preset | `"flat"` |
 | `dj.low` | Low-band multiplier, 0.0 to 2.0 | preset value |
 | `dj.mid` | Mid-band multiplier, 0.0 to 2.0 | preset value |
@@ -135,6 +147,7 @@ When `dj.pattern` is absent, PyCodeDJ maps the shape of the function body to sou
 | Nested `def` count | Voice count | More functions add voices, up to 4 |
 | Comment ratio | Reverb mix | More comments add space |
 | `dj.volume` | Amplitude | Direct level control |
+| `dj.cutoff` / `dj.reverb` | Filter/reverb | Direct override when specified |
 | `dj.eq` + `dj.low/mid/high` | EQ | Per-loop tone shaping |
 
 Example:
@@ -392,26 +405,141 @@ Common options:
 
 ## 9. Troubleshooting
 
-No sound:
+When something does not work, start with these three checks:
 
-1. Boot the SuperCollider server.
-2. Run `sc/synths.scd`.
-3. Confirm the Post window says `Ready. OSC port: 57120`.
-4. Run `pycodedj eval examples/demo.py::bass`.
+1. The SuperCollider server is booted.
+2. `sc/synths.scd` has been run, and the Post window says `Ready. OSC port: 57120`.
+3. You have tried `pycodedj eval examples/demo.py::bass` in a terminal.
 
-OSC error:
+### No Sound
 
-- SuperCollider is not running, or the port is wrong.
-- If SuperCollider uses a different port, pass `--sc-port`.
+First check that SuperCollider can make sound.
 
-Loop not found:
+1. Open SuperCollider IDE.
+2. Boot the server.
+3. Open `sc/synths.scd`, select all, and run it.
+4. Check that the Post window prints:
 
-- The name after `::` must match the Python function name.
-- `def bass():` is addressed as `demo.py::bass`.
+```text
+PyCodeDJ synths loaded. Ready. OSC port: 57120
+```
 
-Syntax error:
+Then run the smallest PyCodeDJ check:
 
-- Fix the file and save again. In watch mode, the previous good version keeps playing.
+```bash
+pycodedj eval examples/demo.py::bass
+```
+
+If it still does not play, check these in order:
+
+- Your computer or audio interface is not muted.
+- The SuperCollider server is booted. Opening the IDE is not enough.
+- `sc/synths.scd` did not print an error in the Post window.
+- Try one sound from `examples/sound_showcase.py`.
+
+```bash
+pycodedj eval examples/sound_showcase.py::kick_floor
+```
+
+### `OSC error`
+
+Python cannot send a message to SuperCollider. Usually SuperCollider is not running, the server is not booted, or the OSC port is different.
+
+Check:
+
+- SuperCollider is open.
+- The SuperCollider server is booted.
+- `sc/synths.scd` has been run and the Post window shows `OSC port: 57120`.
+
+If the Post window shows a different port, pass the same port to `pycodedj`.
+
+```bash
+pycodedj eval examples/demo.py::bass --sc-port 57120
+pycodedj watch examples/demo.py --sc-port 57120
+```
+
+### `loop not found`
+
+The name after `::` does not match a Python function name in the file.
+
+For this loop:
+
+```python
+@loop(interval=2.0)
+def bass():
+    pass
+```
+
+Use:
+
+```bash
+pycodedj eval demo.py::bass
+```
+
+Common mistakes:
+
+- `demo.py::Bass` uses different capitalization.
+- You run `demo.py::kick`, but the file says `def kick_loop():`.
+- You treat `synth="kick_floor"` as the loop name. The loop name is the `def` function name.
+
+### `SyntaxError`
+
+The Python file is temporarily invalid. In `watch` mode, fix the file and save it again. If a loop was already playing, the previous valid version keeps playing.
+
+Common causes:
+
+- Missing `:`.
+- Incorrect indentation.
+- Missing closing `"`.
+
+Example:
+
+```python
+@loop(synth="kick_floor", beat=0.25)
+def kick():
+    dj.pattern = "x . x ."
+```
+
+### `pycodedj: command not found`
+
+`pycodedj` is not installed, or it was installed into a different Python environment.
+
+Install again:
+
+```bash
+pip install 'pycodedj[watch]'
+```
+
+If the command still is not found, try running it through Python:
+
+```bash
+python -m pycodedj eval examples/demo.py::bass
+```
+
+### `pycodedj watch` Does Not Work
+
+The watcher dependency may be missing. Install with the `[watch]` extra:
+
+```bash
+pip install 'pycodedj[watch]'
+```
+
+### The Sound Is Too Loud or Too Quiet
+
+Adjust `dj.volume` in each loop. For a first test, `0.1` to `0.4` is usually manageable.
+
+```python
+@loop(synth="kick_floor", beat=0.25)
+def kick():
+    dj.volume = 0.2
+    dj.pattern = "x . x ."
+```
+
+To stop everything:
+
+```bash
+pycodedj panic
+```
 
 ## 10. Under the Hood
 

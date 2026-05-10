@@ -12,6 +12,8 @@ class _Dj:
     mid: float | None = None
     high: float | None = None
     pattern: str | None = None
+    cutoff: float | None = None
+    reverb: float | None = None
 
 
 dj = _Dj()

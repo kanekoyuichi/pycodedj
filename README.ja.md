@@ -46,6 +46,7 @@ BPM クロックは SuperCollider 側の `TempoClock` が保持します。Pytho
 | 関数定義数 | ポリフォニー声部数 (1–4) |
 | コメント率 | リバーブ Depth (0.0–0.8) |
 | `dj.volume` | Amplitude (0.0–1.0) |
+| `dj.cutoff` / `dj.reverb` | フィルター/リバーブの直接指定 |
 | `dj.eq` / `dj.low` / `dj.mid` / `dj.high` | 簡易 3 バンド EQ |
 
 ---

@@ -55,6 +55,10 @@ def _clamp_eq(value: float) -> float:
     return min(max(value, 0.0), 2.0)
 
 
+def _clamp(value: float, minimum: float, maximum: float) -> float:
+    return min(max(value, minimum), maximum)
+
+
 def _resolve_eq(
     eq: str = "flat",
     low: float | None = None,
@@ -76,17 +80,19 @@ def map_features(
     low: float | None = None,
     mid: float | None = None,
     high: float | None = None,
+    cutoff: float | None = None,
+    reverb: float | None = None,
 ) -> MusicParams:
-    cutoff = _lerp(features.max_depth, _CUTOFF_DEPTH_MAX, _CUTOFF_MIN, _CUTOFF_MAX)
+    mapped_cutoff = _lerp(features.max_depth, _CUTOFF_DEPTH_MAX, _CUTOFF_MIN, _CUTOFF_MAX)
     lfo_rate = _lerp(features.control_flow_count, _LFO_COUNT_MAX, _LFO_MIN, _LFO_MAX)
-    reverb_mix = _lerp(features.comment_ratio, 1.0, _REVERB_MIN, _REVERB_MAX)
+    mapped_reverb = _lerp(features.comment_ratio, 1.0, _REVERB_MIN, _REVERB_MAX)
     voice_count = min(max(features.function_count, _VOICE_MIN), _VOICE_MAX)
     eq_low, eq_mid, eq_high = _resolve_eq(eq, low, mid, high)
 
     return MusicParams(
-        cutoff=cutoff,
+        cutoff=mapped_cutoff if cutoff is None else _clamp(cutoff, _CUTOFF_MIN, _CUTOFF_MAX),
         lfo_rate=lfo_rate,
-        reverb_mix=reverb_mix,
+        reverb_mix=mapped_reverb if reverb is None else _clamp(reverb, _REVERB_MIN, _REVERB_MAX),
         voice_count=voice_count,
         amp=volume,
         low=eq_low,

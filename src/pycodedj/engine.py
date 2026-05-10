@@ -42,6 +42,8 @@ class Engine:
                 low=block.low,
                 mid=block.mid,
                 high=block.high,
+                cutoff=block.cutoff,
+                reverb=block.reverb,
             )
             existing = self._states.get(block.name)
             muted = existing.muted if existing is not None else False

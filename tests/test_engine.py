@@ -44,6 +44,23 @@ def test_eval_block_stores_params_on_success() -> None:
     assert "bass" in engine.list_loops()
 
 
+def test_eval_block_applies_cutoff_reverb_overrides() -> None:
+    engine = _make_engine()
+    block = LoopBlock(
+        name="bass",
+        interval=1.0,
+        source="def f():\n    pass",
+        cutoff=1234.0,
+        reverb=0.42,
+    )
+
+    result = engine.eval_block(block)
+
+    assert result is not None
+    assert result.cutoff == 1234.0
+    assert result.reverb_mix == 0.42
+
+
 def test_eval_block_does_not_store_on_error() -> None:
     engine = _make_engine()
     engine.eval_block(_block("def f(:", name="bass"))

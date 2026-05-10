@@ -46,6 +46,7 @@ BPM clock is held by SuperCollider's `TempoClock`. Python only sends parameter u
 | Function definition count | Polyphony voice count (1–4) |
 | Comment ratio | Reverb depth (0.0–0.8) |
 | `dj.volume` | Amplitude (0.0–1.0) |
+| `dj.cutoff` / `dj.reverb` | Direct filter/reverb override |
 | `dj.eq` / `dj.low` / `dj.mid` / `dj.high` | Simple 3-band EQ |
 
 ---

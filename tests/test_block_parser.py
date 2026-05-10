@@ -229,6 +229,8 @@ def test_new_fields_default_to_none() -> None:
     assert blocks[0].scale is None
     assert blocks[0].dur is None
     assert blocks[0].pattern_str is None
+    assert blocks[0].cutoff is None
+    assert blocks[0].reverb is None
 
 
 # --- Sprint 2: pattern() extraction ---
@@ -309,6 +311,8 @@ def bass(volume=0.9):
     dj.low = 1.7
     dj.mid = 0.78
     dj.high = 0.82
+    dj.cutoff = 1800
+    dj.reverb = 0.35
     dj.pattern = "0 . [0 3] ~ 5 . 3 ."
 """
 
@@ -347,6 +351,12 @@ def test_dj_eq_extracted() -> None:
     assert blocks[0].high == 0.82
 
 
+def test_dj_cutoff_reverb_extracted() -> None:
+    blocks = parse_blocks(_WITH_DJ_METADATA).blocks
+    assert blocks[0].cutoff == 1800.0
+    assert blocks[0].reverb == 0.35
+
+
 def test_dj_pattern_extracted() -> None:
     blocks = parse_blocks(_WITH_DJ_METADATA).blocks
     assert blocks[0].pattern_str == "0 . [0 3] ~ 5 . 3 ."
@@ -361,6 +371,8 @@ def test_dj_metadata_ignores_nested_scope() -> None:
     blocks = parse_blocks(_WITH_NESTED_DJ_METADATA).blocks
     assert blocks[0].volume == 0.3
     assert blocks[0].pattern_str is None
+    assert blocks[0].cutoff is None
+    assert blocks[0].reverb is None
 
 
 def test_dj_pattern_preferred_over_pattern_call() -> None:

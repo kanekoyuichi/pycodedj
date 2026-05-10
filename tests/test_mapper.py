@@ -56,6 +56,26 @@ def test_reverb_full_comments() -> None:
     assert p.reverb_mix == 0.8
 
 
+def test_cutoff_override() -> None:
+    p = map_features(_features(max_depth=0), cutoff=1200.0)
+    assert p.cutoff == 1200.0
+
+
+def test_cutoff_override_clamped() -> None:
+    assert map_features(_features(), cutoff=100.0).cutoff == 200.0
+    assert map_features(_features(), cutoff=9999.0).cutoff == 4000.0
+
+
+def test_reverb_override() -> None:
+    p = map_features(_features(comment_ratio=0.0), reverb=0.45)
+    assert p.reverb_mix == 0.45
+
+
+def test_reverb_override_clamped() -> None:
+    assert map_features(_features(), reverb=-1.0).reverb_mix == 0.0
+    assert map_features(_features(), reverb=2.0).reverb_mix == 0.8
+
+
 def test_voice_count_clamp_min() -> None:
     p = map_features(_features(function_count=0))
     assert p.voice_count == 1

@@ -46,13 +46,15 @@ def kick():
 必要なもの:
 
 - Python 3.10 以上
-- SuperCollider 3.12 以上
+- SuperCollider 3.12 以上。音を実際に作るアプリです
 
 インストール:
 
 ```bash
 pip install 'pycodedj[watch]'
 ```
+
+`[watch]` を付けると、ファイルを保存したときに自動で演奏を更新する `pycodedj watch` が使えます。
 
 SuperCollider 側の準備:
 
@@ -65,11 +67,19 @@ SuperCollider 側の準備:
 PyCodeDJ synths loaded. Ready. OSC port: 57120
 ```
 
-確認:
+最初の確認:
 
 ```bash
 pycodedj eval examples/demo.py::bass
 ```
+
+この時点で低いベース音が鳴れば、Python から SuperCollider へメッセージが届いています。止めるときは次を実行します。
+
+```bash
+pycodedj panic
+```
+
+SuperCollider は音を出す側、`pycodedj` は「どの音をどう鳴らすか」を送る側です。音が出ないときは、まず SuperCollider が起動していて、`sc/synths.scd` の読み込みが終わっているかを確認してください。
 
 ## 3. ループの基本構文
 
@@ -91,6 +101,8 @@ def loop_name():
 | 設定 | 意味 | デフォルト |
 | :--- | :--- | :--- |
 | `dj.volume` | 音量。0.0〜1.0 | `0.3` |
+| `dj.cutoff` | フィルター cutoff の直接指定。200〜4000 Hz | AST マッピング |
+| `dj.reverb` | リバーブ量の直接指定。0.0〜0.8 | AST マッピング |
 | `dj.eq` | EQ プリセット | `"flat"` |
 | `dj.low` | 低域倍率。0.0〜2.0 | プリセット値 |
 | `dj.mid` | 中域倍率。0.0〜2.0 | プリセット値 |
@@ -135,6 +147,7 @@ EQ プリセット:
 | ネストした `def` の数 | 声部数 | 多いほど厚い。最大 4 |
 | コメント率 | リバーブ | コメントが多いほど空間が広い |
 | `dj.volume` | 音量 | 直接指定 |
+| `dj.cutoff` / `dj.reverb` | フィルター/リバーブ | 書いた場合だけ直接上書き |
 | `dj.eq` + `dj.low/mid/high` | EQ | ループごとの音質補正 |
 
 例:
@@ -392,26 +405,141 @@ pycodedj unmute bass
 
 ## 9. トラブルシューティング
 
-音が出ない:
+困ったときは、最初に次の 3 点だけ確認してください。
 
-1. SuperCollider のサーバーを boot する。
-2. `sc/synths.scd` を実行する。
-3. Post window に `Ready. OSC port: 57120` が出ているか確認する。
-4. `pycodedj eval examples/demo.py::bass` を実行する。
+1. SuperCollider のサーバーが boot されている。
+2. `sc/synths.scd` を実行済みで、Post window に `Ready. OSC port: 57120` が出ている。
+3. ターミナルで `pycodedj eval examples/demo.py::bass` を実行している。
 
-OSC error:
+### 音が出ない
 
-- SuperCollider が起動していないか、ポートが違います。
-- ポートが違う場合は `--sc-port` を指定してください。
+まず、SuperCollider 側が音を出せる状態か確認します。
 
-loop not found:
+1. SuperCollider IDE を開く。
+2. メニューまたはショートカットでサーバーを boot する。
+3. `sc/synths.scd` を開き、全選択して実行する。
+4. Post window に次の行が出るか見る。
 
-- `::` の後ろは Python の関数名と一致させます。
-- `def bass():` は `demo.py::bass` で指定します。
+```text
+PyCodeDJ synths loaded. Ready. OSC port: 57120
+```
 
-SyntaxError:
+次に、ターミナルで最小の確認コマンドを実行します。
 
-- ファイルを修正して保存してください。watch モードでは直前の正常なループが鳴り続けます。
+```bash
+pycodedj eval examples/demo.py::bass
+```
+
+それでも鳴らない場合は、次を順番に確認してください。
+
+- パソコン本体やオーディオインターフェイスの音量がミュートになっていないか。
+- SuperCollider のサーバーが boot 済みか。IDE の表示だけ開いていても、サーバーが boot されていないと音は出ません。
+- `sc/synths.scd` を実行したあとにエラーが出ていないか。Post window の赤いエラーを確認してください。
+- 別の音色を試す場合は `examples/sound_showcase.py` を 1 つずつ eval してください。
+
+```bash
+pycodedj eval examples/sound_showcase.py::kick_floor
+```
+
+### `OSC error` と表示される
+
+これは Python から SuperCollider にメッセージを送れない状態です。多くの場合、SuperCollider が起動していないか、OSC ポート番号が合っていません。
+
+確認すること:
+
+- SuperCollider を起動しているか。
+- SuperCollider のサーバーを boot しているか。
+- `sc/synths.scd` を実行し、Post window に `OSC port: 57120` が出ているか。
+
+もし Post window に別のポート番号が出ている場合は、`pycodedj` 側にも同じ番号を指定します。
+
+```bash
+pycodedj eval examples/demo.py::bass --sc-port 57120
+pycodedj watch examples/demo.py --sc-port 57120
+```
+
+### `loop not found` と表示される
+
+`::` の後ろに書いた名前が、Python ファイル内の関数名と一致していません。
+
+たとえばファイルに次の関数がある場合:
+
+```python
+@loop(interval=2.0)
+def bass():
+    pass
+```
+
+指定するコマンドは次です。
+
+```bash
+pycodedj eval demo.py::bass
+```
+
+よくある間違い:
+
+- `demo.py::Bass` のように大文字小文字が違う。
+- `demo.py::kick` を指定しているが、ファイルには `def kick_loop():` と書いてある。
+- `synth="kick_floor"` をループ名だと思っている。ループ名は `def` の関数名です。
+
+### `SyntaxError` と表示される
+
+Python ファイルの書き方が途中で壊れています。`watch` モードでは、修正して保存すれば再読み込みされます。演奏中の場合、直前に正常だったループは鳴り続けます。
+
+よくある原因:
+
+- `:` を忘れている。
+- インデントがずれている。
+- 文字列の `"` を閉じ忘れている。
+
+例:
+
+```python
+@loop(synth="kick_floor", beat=0.25)
+def kick():
+    dj.pattern = "x . x ."
+```
+
+### `pycodedj: command not found` と表示される
+
+`pycodedj` がインストールされていないか、別の Python 環境に入っています。
+
+まずインストールし直します。
+
+```bash
+pip install 'pycodedj[watch]'
+```
+
+それでも同じ場合は、Python 経由で実行できるか確認します。
+
+```bash
+python -m pycodedj eval examples/demo.py::bass
+```
+
+### `pycodedj watch` が動かない
+
+`watch` 機能に必要な依存パッケージが入っていない可能性があります。`[watch]` 付きでインストールしてください。
+
+```bash
+pip install 'pycodedj[watch]'
+```
+
+### 音が大きすぎる、または小さすぎる
+
+各ループの `dj.volume` を調整します。最初は `0.1` から `0.4` くらいが扱いやすいです。
+
+```python
+@loop(synth="kick_floor", beat=0.25)
+def kick():
+    dj.volume = 0.2
+    dj.pattern = "x . x ."
+```
+
+全体を止めたいときは次を使います。
+
+```bash
+pycodedj panic
+```
 
 ## 10. 内部構成
 
