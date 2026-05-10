@@ -364,11 +364,6 @@
       border: 1px solid var(--border);
       border-radius: 0.75rem;
     }
-    .flow-icon {
-      font-size: 2rem;
-      margin-bottom: 0.75rem;
-      line-height: 1;
-    }
     .flow-title {
       font-size: 0.8rem;
       font-weight: 600;
@@ -385,7 +380,20 @@
       padding: 0 0.5rem;
       opacity: 0.6;
     }
-    @media (max-width: 680px) { .flow-arrow { transform: rotate(90deg); } }
+    @media (max-width: 680px) {
+      .flow {
+        flex-direction: column;
+        flex-wrap: nowrap;
+        gap: 0.5rem;
+      }
+      .flow-step {
+        width: min(100%, 280px);
+      }
+      .flow-arrow {
+        padding: 0;
+        transform: rotate(90deg);
+      }
+    }
 
     /* ── Mappings ── */
     .mappings {
@@ -401,10 +409,6 @@
       transition: border-color 0.2s, transform 0.2s;
     }
     .mapping-card:hover { border-color: var(--muted); transform: translateY(-2px); }
-    .mapping-icon {
-      font-size: 1.5rem;
-      margin-bottom: 1rem;
-    }
     .mapping-code {
       font-family: 'JetBrains Mono', monospace;
       font-size: 0.75rem;
@@ -700,25 +704,21 @@
 
     <div class="flow">
       <div class="flow-step">
-        <div class="flow-icon">✍️</div>
         <div class="flow-title">Write Python</div>
         <div class="flow-desc">Any valid Python — functions, loops, comments</div>
       </div>
       <div class="flow-arrow">→</div>
       <div class="flow-step">
-        <div class="flow-icon">🔬</div>
         <div class="flow-title">AST Analysis</div>
         <div class="flow-desc">Depth, control-flow count, function count, comment ratio</div>
       </div>
       <div class="flow-arrow">→</div>
       <div class="flow-step">
-        <div class="flow-icon">📡</div>
         <div class="flow-title">OSC Bridge</div>
         <div class="flow-desc">Parameters sent over UDP to SuperCollider</div>
       </div>
       <div class="flow-arrow">→</div>
       <div class="flow-step">
-        <div class="flow-icon">🔊</div>
         <div class="flow-title">Sound</div>
         <div class="flow-desc">Real-time synthesis via scsynth</div>
       </div>
@@ -726,30 +726,26 @@
 
     <div class="mappings">
       <div class="mapping-card">
-        <div class="mapping-icon">🌊</div>
         <div class="mapping-code">nesting depth</div>
-        <div class="mapping-arrow">──▶</div>
+        <div class="mapping-arrow">controls</div>
         <div class="mapping-param">Filter Cutoff</div>
         <div class="mapping-desc">Deeper if/for nesting opens the filter. More structure = brighter sound.</div>
       </div>
       <div class="mapping-card">
-        <div class="mapping-icon">〰️</div>
         <div class="mapping-code">if / for / while count</div>
-        <div class="mapping-arrow">──▶</div>
+        <div class="mapping-arrow">controls</div>
         <div class="mapping-param">LFO Rate</div>
         <div class="mapping-desc">More control flow = faster modulation. Complexity becomes movement.</div>
       </div>
       <div class="mapping-card">
-        <div class="mapping-icon">🎹</div>
         <div class="mapping-code">def count</div>
-        <div class="mapping-arrow">──▶</div>
+        <div class="mapping-arrow">controls</div>
         <div class="mapping-param">Voice Count</div>
         <div class="mapping-desc">Each function is a voice. Four functions fill a chord.</div>
       </div>
       <div class="mapping-card">
-        <div class="mapping-icon">🌫️</div>
         <div class="mapping-code">comment ratio</div>
-        <div class="mapping-arrow">──▶</div>
+        <div class="mapping-arrow">controls</div>
         <div class="mapping-param">Reverb Depth</div>
         <div class="mapping-desc">Whitespace becomes space. More comments = deeper reverb.</div>
       </div>
