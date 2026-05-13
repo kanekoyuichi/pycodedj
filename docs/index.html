@@ -984,10 +984,21 @@
     sampleTime.textContent = `${formatTime(sampleAudio.currentTime)} / ${formatTime(duration)}`;
   }
 
+  function trackSamplePlay() {
+    if (typeof gtag !== 'function') return;
+    gtag('event', 'sample_play', {
+      content_type: 'audio',
+      item_id: 'pycodedj-sample',
+      item_name: 'sample music',
+      audio_src: sampleAudio.currentSrc || sampleAudio.src,
+    });
+  }
+
   sampleBtn.addEventListener('click', async () => {
     try {
       if (sampleAudio.paused) {
         await sampleAudio.play();
+        trackSamplePlay();
       } else {
         sampleAudio.pause();
       }
